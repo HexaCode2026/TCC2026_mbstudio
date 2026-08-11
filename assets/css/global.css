@@ -1,0 +1,35 @@
+body {
+
+    background: white;
+
+}
+
+.links {
+
+    position: relative;
+    display: flex;
+    gap: 140px;
+    color: black;
+    font-size: 22px;
+    margin-top: 110px;
+    margin-left: 210px;
+
+}
+
+.links a {
+
+    text-decoration: none;
+    color: black;
+   
+
+}
+
+#fundolinks {
+
+    background-color: white;
+    border: 2px solid #C5A95F;
+    width: 1490px;
+    height: 70px;
+    margin-top: -50px;
+    margin-left: -10px;
+}

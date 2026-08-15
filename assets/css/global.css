@@ -4,6 +4,16 @@ body {
 
 }
 
+#logo {
+
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    margin-left: 45%;
+    margin-top: -145px;
+
+}
+
 .links {
 
     position: relative;
@@ -11,7 +21,7 @@ body {
     gap: 140px;
     color: black;
     font-size: 22px;
-    margin-top: 110px;
+    margin-top: 140px;
     margin-left: 210px;
 
 }
@@ -20,16 +30,207 @@ body {
 
     text-decoration: none;
     color: black;
-   
+    transition: color 0.3s ease;
+  
+}
+
+.links a.ativo{ /* marca a pagina atual com a cor amarela nos links */
+    
+    color: #d6a110;
+
+}
+
+.links a:hover { /* muda a cor dos outros links quando mouse passa encima */
+
+    color: #d6a110;
 
 }
 
 #fundolinks {
 
     background-color: white;
-    border: 2px solid #C5A95F;
-    width: 1490px;
+    border: 2px solid #cec7b3;
+    width: 100.9%;
     height: 70px;
     margin-top: -50px;
     margin-left: -10px;
+
+}
+
+#TxtMenor {
+
+    position: absolute;
+    margin-top: 70px;
+    margin-left: 13%;
+    color: #d6a110;
+    font-size: 19px;
+    font-family: georgia, serif;
+
+}
+
+#TxtMaior {
+
+    position: absolute;
+    margin-top: 100px;
+    margin-left: 13%;
+    color: #000000;
+    font-size: 45px;
+    font-family: Didot, serif;
+
+}
+
+.Beleza {
+
+    color: #d6a110;
+
+}
+
+#linha {
+
+    position: absolute;
+    width: 19%;
+    height: 2px;
+    background-color: #C5A95F;
+    margin-top: 230px;
+    margin-left: 13%;
+
+}
+
+#descricao {
+
+    position: absolute;
+    margin-top: 260px;
+    margin-left: 14%;
+    color: #2f2d2d;
+    font-size: 15px;
+    font-family: "Candara", sans-serif;
+
+}
+
+#btn-servicos {
+
+    position: absolute;
+    margin-top: 340px;
+    margin-left: 17%;
+    background-color: #C5A95F;
+    color: white;
+    font-size: 15px;
+    font-family: "Candara", sans-serif;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+}
+
+#btn-servicos:hover {
+
+    background-color: #000000;
+    color: rgb(231, 215, 1);
+
+}
+
+#btn-servicos:active {
+
+   transform: scale(0.92);
+
+}
+
+/* inicio do rodapé */
+
+#separadorRodape {
+
+    position: fixed;
+    width: 99.4%;
+    height: 2px;
+    background-color: #cec7b3;
+    margin-top: 455px;
+
+}
+
+#fundoRodape { 
+
+    position: fixed;
+    width: 1200px;
+    height: 60px;
+    background-color: #C5A95F;
+    margin-top: 470px;
+    margin-left: 130px;
+    border-radius: 5px;
+
+}
+
+#textoRodape {
+
+    position: fixed;
+    margin-top: 490px;
+    margin-left: 290px;
+    color: White;
+    font-size: 20px;
+    font-family: "Candara", sans-serif;
+
+}
+
+#linhaRodape {
+
+    position: fixed;
+    width: 400px;
+    height: 2px;
+    background-color: rgb(243, 230, 230);
+    margin-top: 501px;
+    margin-left: 530px;
+
+}
+
+#btn-agendar {
+
+    position: fixed;
+    margin-top: 480px;
+    margin-left: 1000px;
+    background-color: #ffffffd0;
+    color: rgb(0, 0, 0);
+    font-size: 15px;
+    font-family: "Candara", sans-serif;
+    text-decoration: none;
+    padding: 10px 60px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.01s ease;
+
+}
+
+#btn-agendar:hover {
+
+    background-color: #000000;
+    color: rgb(231, 215, 1);
+
+}
+
+#btn-agendar:active {
+
+   transform: scale(0.92);
+
+}
+
+/* fim do rodapé */
+
+#marcadorImagem { /* apagar esta parte dps, somente marcador de espaço reservado pra imagem*/
+
+    position: absolute;
+    width: 450px;
+    height: 400px;
+    margin-top: 30px;
+    margin-left: 800px;
+    background-color: #C5A95F;
+
+}
+
+#texto { /* apagar esta parte dps, somente marcador de espaço reservado pra imagem*/
+
+    position: absolute;
+    margin-top: 200px;
+    margin-left: 850px;
+    color: #000000;
+    font-size: 20px;
+    font-family: "Candara", sans-serif;
+
 }

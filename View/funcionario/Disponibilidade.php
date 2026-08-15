@@ -213,7 +213,42 @@ $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
             return `${h}:${m}`;
         }
 
-        function validarFormulario() {
+        let feriadosCache = {};
+
+        async function getFeriados(ano) {
+            if (feriadosCache[ano]) return feriadosCache[ano];
+            try {
+                const response = await fetch(`https://brasilapi.com.br/api/feriados/v1/${ano}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    feriadosCache[ano] = data.map(f => f.date);
+                    return feriadosCache[ano];
+                }
+            } catch (e) {
+                console.error('Erro ao buscar feriados', e);
+            }
+            return [];
+        }
+
+        async function validarDiaBloqueado(dateString) {
+            if (!dateString) return false;
+            const dataObj = new Date(dateString + 'T12:00:00'); 
+            
+            if (dataObj.getDay() === 1) {
+                return "Segundas-feiras o estabelecimento está fechado.";
+            }
+
+            const ano = dateString.substring(0, 4);
+            const feriados = await getFeriados(ano);
+            
+            if (feriados.includes(dateString)) {
+                return "Este dia é feriado e o estabelecimento está fechado.";
+            }
+
+            return false;
+        }
+
+        async function validarFormulario() {
             atualizarDataMinima();
             const inputDate = document.getElementById('Dis_date');
             const selectSer = document.getElementById('Dis_ser');
@@ -223,8 +258,28 @@ $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
             const btnEditar = document.getElementById('btnEditar');
             const btnExcluir = document.getElementById('btnExcluir');
 
+            let msgErroData = document.getElementById('msg-erro-data');
+            if (!msgErroData) {
+                msgErroData = document.createElement('div');
+                msgErroData.id = 'msg-erro-data';
+                msgErroData.style.color = 'red';
+                msgErroData.style.fontSize = '14px';
+                msgErroData.style.marginTop = '5px';
+                inputDate.parentNode.appendChild(msgErroData);
+            }
+            msgErroData.innerText = '';
+
             const hoje = getHojeFormatado();
-            const hasDate = inputDate.value.trim() !== '' && inputDate.value >= hoje;
+            let hasDate = inputDate.value.trim() !== '' && inputDate.value >= hoje;
+
+            if (hasDate) {
+                const motivoBloqueio = await validarDiaBloqueado(inputDate.value);
+                if (motivoBloqueio) {
+                    msgErroData.innerText = motivoBloqueio;
+                    hasDate = false;
+                }
+            }
+
             const selectedOption = selectSer.options[selectSer.selectedIndex];
             const duration = selectedOption ? parseInt(selectedOption.getAttribute('data-duration')) : 0;
             const hasSer = selectSer.value.trim() !== '' && duration > 0;

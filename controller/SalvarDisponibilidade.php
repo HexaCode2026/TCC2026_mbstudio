@@ -24,6 +24,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
+    // Validar se é segunda-feira
+    $diaDaSemana = date('w', strtotime($date));
+    if ($diaDaSemana == 1) { // 1 = Segunda-feira
+        echo "<script>
+            alert('Segundas-feiras o estabelecimento está fechado. Selecione outra data.');
+            window.location='../View/funcionario/Disponibilidade.php';
+        </script>";
+        exit;
+    }
+
+    // Validar se é feriado consultando a BrasilAPI
+    $ano = date('Y', strtotime($date));
+    $urlFeriados = "https://brasilapi.com.br/api/feriados/v1/" . $ano;
+    $context = stream_context_create(['http' => ['ignore_errors' => true, 'timeout' => 5]]);
+    $feriadosJson = @file_get_contents($urlFeriados, false, $context);
+    
+    if ($feriadosJson !== false) {
+        $feriados = json_decode($feriadosJson, true);
+        if (is_array($feriados)) {
+            foreach ($feriados as $feriado) {
+                if (isset($feriado['date']) && $feriado['date'] === $date) {
+                    echo "<script>
+                        alert('Este dia é feriado e o estabelecimento está fechado. Selecione outra data.');
+                        window.location='../View/funcionario/Disponibilidade.php';
+                    </script>";
+                    exit;
+                }
+            }
+        }
+    }
+
     // Validar se todos os horários estão entre 08:00 e 19:00 e início menor que o fim
     foreach ($horarios as $h) {
         $start = $h['start'] ?? '';

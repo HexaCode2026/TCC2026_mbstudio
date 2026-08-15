@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('America/Sao_Paulo');
 session_start();
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/Availability.php";
@@ -14,12 +15,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $date = $_POST['Dis_date'] ?? null;
     $horarios = $_POST['horarios'] ?? [];
 
-    if (!$date || empty($horarios)) {
+    $hoje = date('Y-m-d');
+    if (!$date || $date < $hoje || empty($horarios)) {
         echo "<script>
-            alert('Por favor, preencha a data e defina os horários com status.');
+            alert('Por favor, preencha uma data válida (a partir de hoje) e defina os horários com status.');
             window.location='../View/funcionario/Disponibilidade.php';
         </script>";
         exit;
+    }
+
+    // Validar se todos os horários estão entre 08:00 e 19:00 e início < fim
+    foreach ($horarios as $h) {
+        $start = $h['start'] ?? '';
+        $end = $h['end'] ?? '';
+        if ($start < '08:00' || $end > '19:00' || $start >= $end) {
+            echo "<script>
+                alert('Os horários devem estar entre 08:00 e 19:00 e o horário de início deve ser menor que o de término.');
+                window.location='../View/funcionario/Disponibilidade.php';
+            </script>";
+            exit;
+        }
     }
 
     // Buscar ou garantir o Emp_id do funcionário logado

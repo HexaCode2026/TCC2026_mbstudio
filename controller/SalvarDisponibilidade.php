@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    // Validar se todos os horários estão entre 08:00 e 19:00 e início < fim
+    // Validar se todos os horários estão entre 08:00 e 19:00 e início menor que o fim
     foreach ($horarios as $h) {
         $start = $h['start'] ?? '';
         $end = $h['end'] ?? '';

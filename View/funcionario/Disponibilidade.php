@@ -38,6 +38,20 @@ $servicos = $stmtServicos->fetchAll(PDO::FETCH_ASSOC);
 require_once "../../model/Availability.php";
 $availabilityModel = new Availability($pdo);
 $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
+
+// Obter datas únicas das disponibilidades para o filtro
+$datasCadastradas = [];
+if (!empty($minhasDisponibilidades)) {
+    foreach ($minhasDisponibilidades as $disp) {
+        $data = $disp['Ava_date'];
+        if (!in_array($data, $datasCadastradas)) {
+            $datasCadastradas[] = $data;
+        }
+    }
+    usort($datasCadastradas, function($a, $b) {
+        return strtotime($a) - strtotime($b);
+    });
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -100,17 +114,6 @@ $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
 
         <!-- CONTAINER DINÂMICO DOS HORÁRIOS DE ATENDIMENTO -->
         <div id="Dis_scheduled-times">
-            <!-- Controle de definição para todos os horários -->
-            <div id="horarios-actions">
-                <label><strong>Definir todos como:</strong></label>
-                <div>
-                    <button type="button" onclick="definirTodosStatus('Disponivel')">Disponível</button>
-                    <button type="button" onclick="definirTodosStatus('Folga')">Folga</button>
-                    <button type="button" onclick="definirTodosStatus('Ferias')">Férias</button>
-                    <button type="button" onclick="definirTodosStatus('Bloqueado')">Bloqueado</button>
-                </div>
-            </div>
-
             <div id="lista-horarios-vazia">
                 Selecione um serviço, horário de início e término para gerar os horários de atendimento (entre 08:00 e 19:00).
             </div>
@@ -132,7 +135,30 @@ $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
     <h2>Disponibilidades Cadastradas</h2>
 
     <?php if (!empty($minhasDisponibilidades)): ?>
-        <table>
+        <label for="filtroData"><strong>Selecionar Data:</strong></label>
+        <select id="filtroData" onchange="filtrarTabelaPorData()">
+            <option value="nenhuma"> </option>
+            <option value="todas">Todas as datas</option>
+            <?php foreach ($datasCadastradas as $data): ?>
+                <option value="<?= htmlspecialchars($data) ?>"><?= date('d/m/Y', strtotime($data)) ?></option>
+            <?php endforeach; ?>
+        </select>
+        <br><br>
+
+        <div id="acoes-lote-data" style="display: none; margin-bottom: 20px;">
+            <label><strong>Definir todos os horários desta data como:</strong></label>
+            <div style="margin-top: 5px;">
+                <button type="button" onclick="salvarLote('Disponivel')">Disponível</button>
+                <button type="button" onclick="salvarLote('Folga')">Folga</button>
+                <button type="button" onclick="salvarLote('Ferias')">Férias</button>
+                <button type="button" onclick="salvarLote('Bloqueado')">Bloqueado</button>
+            </div>
+            <!-- Formulário oculto preenchido pelo JS -->
+            <form action="../../controller/EditarDisponibilidade.php" method="POST" id="formLoteData" style="display: none;">
+            </form>
+        </div>
+
+        <table id="tabelaDisponibilidades">
             <thead>
                 <tr>
                     <th>Data</th>
@@ -145,7 +171,7 @@ $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
             </thead>
             <tbody>
                 <?php foreach ($minhasDisponibilidades as $disp): ?>
-                    <tr>
+                    <tr data-data="<?= htmlspecialchars($disp['Ava_date']) ?>">
                         <td><?= date('d/m/Y', strtotime($disp['Ava_date'])) ?></td>
                         <td><?= htmlspecialchars(substr($disp['Ava_start'], 0, 5)) ?></td>
                         <td><?= htmlspecialchars(substr($disp['Ava_end'], 0, 5)) ?></td>
@@ -179,6 +205,68 @@ $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
     <?php endif; ?>
 
     <script>
+        function filtrarTabelaPorData() {
+            const filtro = document.getElementById('filtroData').value;
+            const tabela = document.getElementById('tabelaDisponibilidades');
+            const linhas = document.querySelectorAll('#tabelaDisponibilidades tbody tr');
+            const divLote = document.getElementById('acoes-lote-data');
+            const inputLote = document.getElementById('inputLoteData');
+            
+            if (filtro === 'nenhuma') {
+                tabela.style.display = 'none';
+                if (divLote) divLote.style.display = 'none';
+            } else {
+                tabela.style.display = '';
+                linhas.forEach(linha => {
+                    if (filtro === 'todas' || linha.getAttribute('data-data') === filtro) {
+                        linha.style.display = '';
+                    } else {
+                        linha.style.display = 'none';
+                    }
+                });
+
+                // Mostrar os botões de ação em lote apenas se uma data específica estiver selecionada
+                if (filtro === 'todas' || filtro === 'nenhuma') {
+                    if (divLote) divLote.style.display = 'none';
+                } else {
+                    if (divLote) divLote.style.display = 'block';
+                }
+            }
+        }
+
+        function salvarLote(status) {
+            const formLote = document.getElementById('formLoteData');
+            formLote.innerHTML = '';
+            
+            const inputStatus = document.createElement('input');
+            inputStatus.type = 'hidden';
+            inputStatus.name = 'Ava_status';
+            inputStatus.value = status;
+            formLote.appendChild(inputStatus);
+
+            const linhas = document.querySelectorAll('#tabelaDisponibilidades tbody tr');
+            let adicionou = false;
+            linhas.forEach(linha => {
+                if (linha.style.display !== 'none') {
+                    const idInput = linha.querySelector('input[name="Ava_id"]');
+                    if (idInput) {
+                        const inputId = document.createElement('input');
+                        inputId.type = 'hidden';
+                        inputId.name = 'Ava_id[]';
+                        inputId.value = idInput.value;
+                        formLote.appendChild(inputId);
+                        adicionou = true;
+                    }
+                }
+            });
+
+            if (adicionou) {
+                formLote.submit();
+            } else {
+                alert('Nenhum horário disponível para edição nesta data.');
+            }
+        }
+
         const MIN_TIME = 8 * 60;   // 08:00 (480 minutos)
         const MAX_TIME = 19 * 60;  // 19:00 (1140 minutos)
 
@@ -307,7 +395,6 @@ $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
             const inputEnd = document.getElementById('Dis_end');
             const containerLista = document.getElementById('lista-horarios');
             const msgVazia = document.getElementById('lista-horarios-vazia');
-            const acoesRapidas = document.getElementById('horarios-actions');
 
             const selectedOption = selectSer.options[selectSer.selectedIndex];
             const duration = selectedOption ? parseInt(selectedOption.getAttribute('data-duration')) : 0;
@@ -320,7 +407,6 @@ $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
                 msgVazia.style.display = 'block';
                 msgVazia.innerText = 'Selecione um serviço, horário de início e término para gerar os horários de atendimento (entre 08:00 e 19:00).';
                 containerLista.style.display = 'none';
-                acoesRapidas.style.display = 'none';
                 validarFormulario();
                 return;
             }
@@ -329,7 +415,6 @@ $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
                 msgVazia.style.display = 'block';
                 msgVazia.innerText = 'Os horários de início e término devem estar entre 08:00 (8h) e 19:00 (19h).';
                 containerLista.style.display = 'none';
-                acoesRapidas.style.display = 'none';
                 validarFormulario();
                 return;
             }
@@ -338,7 +423,6 @@ $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
                 msgVazia.style.display = 'block';
                 msgVazia.innerText = 'O horário de início não pode ser maior ou igual ao horário de término.';
                 containerLista.style.display = 'none';
-                acoesRapidas.style.display = 'none';
                 validarFormulario();
                 return;
             }
@@ -347,7 +431,6 @@ $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
                 msgVazia.style.display = 'block';
                 msgVazia.innerText = `O intervalo selecionado (${endMin - startMin} min) é menor que a duração do serviço (${duration} min).`;
                 containerLista.style.display = 'none';
-                acoesRapidas.style.display = 'none';
                 validarFormulario();
                 return;
             }
@@ -384,19 +467,10 @@ $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
 
             msgVazia.style.display = 'none';
             containerLista.style.display = 'block';
-            acoesRapidas.style.display = 'block';
 
             validarFormulario();
         }
 
-        // Função que define o status em todos os selects individuais
-        function definirTodosStatus(status) {
-            if (!status) return;
-            const selects = document.querySelectorAll('.status-select');
-            selects.forEach(select => {
-                select.value = status;
-            });
-        }
 
         document.getElementById('Dis_date').addEventListener('focus', atualizarDataMinima);
         document.getElementById('Dis_date').addEventListener('input', validarFormulario);
@@ -412,6 +486,7 @@ $minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
 
         // Validação e configuração inicial ao carregar a página
         validarFormulario();
+        filtrarTabelaPorData();
     </script>
 </body>
 

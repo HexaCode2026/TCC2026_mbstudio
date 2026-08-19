@@ -47,5 +47,8 @@
     <div id="marcadorImagem"> </div>
     <h1 id="texto"> Espaço Reservado pra Imagens do Local </h1>
 
+    <a href="View/funcionario/Disponibilidade.php"> disponibilidade </a>
+    <a href="View/Cadastro.php"> cadastro teste </a>
+
 </body>
 </html>

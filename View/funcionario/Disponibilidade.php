@@ -52,64 +52,117 @@ if (!empty($minhasDisponibilidades)) {
         return strtotime($a) - strtotime($b);
     });
 }
+
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disponibilidade</title>
+
+    <link rel="stylesheet" href="../../assets/css/disponibilidade.css">
+
 </head>
 
 <body>
-    <h1>Definir Disponibilidade</h1>
+
+    <main class="pagina-disponibilidade"> 
+
+    <h1 class="tituloPagina"> Meus <span> Horários </span> </h1>
+    <p class="subtitulo"> Cadastre e Gerencie seus Horários </p> 
 
     <form action="../../controller/SalvarDisponibilidade.php" method="POST" id="formDisponibilidade">
+        
         <input type="hidden" name="Fun_id" value="<?= htmlspecialchars($_SESSION['User_id']) ?>">
         <input type="hidden" name="Emp_id" value="<?= htmlspecialchars($empId) ?>">
 
-        <table>
+        <table class="TabelaCadastro">
+            <!--
             <thead>
+
                 <tr>
+
                     <th>Data</th>
                     <th>Serviço</th>
                     <th>Início</th>
                     <th>Fim</th>
+
                 </tr>
-            </thead>
+
+            </thead> pode ser retirado depois -->
+
             <tbody>
+
                 <tr>
-                    <td>
+                    <td class="cards">
+
+                    <div class="campo-calendario">
+
+                    <div id="calendario-customizado"></div> <!-- chances altas deste trecho ser apagado -->
+                    <label for="Dis_date"> Data </label>
+
                         <input type="date" name="Dis_date" id="Dis_date" min="<?= date('Y-m-d') ?>" required>
+                    
+                        </div>
                     </td>
-                    <td>
+
+                    <td class="cards">
+
+                     <label for="Dis_ser"> Serviço </label>
+
                         <select name="Dis_ser" id="Dis_ser" required>
                             <option value="">Selecione um serviço</option>
+
                             <?php if (!empty($servicos)): ?>
+
                                 <?php foreach ($servicos as $ser): ?>
+
                                     <option value="<?= htmlspecialchars($ser['Ser_id']) ?>" 
+                                    
                                             data-duration="<?= htmlspecialchars($ser['Ser_duration']) ?>"
                                             data-empser="<?= htmlspecialchars($ser['EmpSer_id']) ?>">
+                                        
                                         <?= htmlspecialchars($ser['Ser_name']) ?> (<?= htmlspecialchars($ser['Ser_duration']) ?> min)
+                                    
                                     </option>
+
                                 <?php endforeach; ?>
                             <?php else: ?>
+
                                 <option value="" disabled>Nenhum serviço vinculado ao perfil</option>
-                            <?php endif; ?>
+                            
+                                <?php endif; ?>
+
                         </select>
+
                     </td>
-                    <td>
+
+                    <td class="cards">
+
+                     <label for="Dis_start"> Início </label>
+
                         <input type="time" name="Dis_start" id="Dis_start" min="08:00" max="19:00" required>
+                    
                     </td>
-                    <td>
+
+                    <td class="cards">
+                        <label for="Dis_end"> Fim </label>
+
                         <input type="time" name="Dis_end" id="Dis_end" min="08:00" max="19:00" required>
+                    
                     </td>
+
                 </tr>
+
             </tbody>
+
         </table>
 
-        <label for="Dis_scheduled-times"><strong>Horários de Atendimento</strong></label>
+        <label for="Dis_scheduled-times"> <strong> Horários de Atendimento </strong> </label>
         <br><br>
 
         <!-- CONTAINER DINÂMICO DOS HORÁRIOS DE ATENDIMENTO -->
@@ -128,6 +181,7 @@ if (!empty($minhasDisponibilidades)) {
             <button type="submit" id="btnSalvar" disabled>Salvar Disponibilidade</button>
         </div>
     </form>
+
 
     <hr>
 
@@ -197,20 +251,33 @@ if (!empty($minhasDisponibilidades)) {
                             </form>
                         </td>
                     </tr>
+
                 <?php endforeach; ?>
             </tbody>
         </table>
+
     <?php else: ?>
         <p>Nenhuma disponibilidade cadastrada.</p>
     <?php endif; ?>
 
+    </main>
+
     <script>
         function filtrarTabelaPorData() {
-            const filtro = document.getElementById('filtroData').value;
+           // const filtro = document.getElementById('filtroData').value; alteracao para calendario customizado
+
+           const filtroData = document.getElementById('filtroData');
+
+    if (!filtroData) return;
+
+    const filtro = filtroData.value;
+
+    // trecho acima foi adicionado para o calendario customizado, para voltar ao normal so apagar e desfazer o primeiro comentario
+
             const tabela = document.getElementById('tabelaDisponibilidades');
             const linhas = document.querySelectorAll('#tabelaDisponibilidades tbody tr');
             const divLote = document.getElementById('acoes-lote-data');
-            const inputLote = document.getElementById('inputLoteData');
+           // const inputLote = document.getElementById('inputLoteData');
             
             if (filtro === 'nenhuma') {
                 tabela.style.display = 'none';
@@ -487,7 +554,137 @@ if (!empty($minhasDisponibilidades)) {
         // Validação e configuração inicial ao carregar a página
         validarFormulario();
         filtrarTabelaPorData();
+
+
+
+        // parte adicionada pelo front para o calendario customizado
+
+        const calendario = document.getElementById('calendario-customizado');
+        console.log(calendario);
+
+if (calendario) {
+    calendario.innerHTML = `
+        <div class="calendario-header">
+            <button type="button" class="calendario-btn">‹</button>
+            <span class="calendario-mes"></span>
+            <button type="button" class="calendario-btn">›</button>
+        </div>
+
+        <div class="calendario-semana">
+            <span>Dom</span>
+            <span>Seg</span>
+            <span>Ter</span>
+            <span>Qua</span>
+            <span>Qui</span>
+            <span>Sex</span>
+            <span>Sáb</span>
+        </div>
+
+        <div class="calendario-dias"></div>
+    `;
+}
+
+let dataCalendario = new Date();
+
+function gerarCalendario() {
+    const mesElemento = document.querySelector('.calendario-mes');
+    const diasElemento = document.querySelector('.calendario-dias');
+
+    if (!mesElemento || !diasElemento) return;
+
+    const ano = dataCalendario.getFullYear();
+    const mes = dataCalendario.getMonth();
+
+    const nomeMeses = [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril',
+        'Maio', 'Junho', 'Julho', 'Agosto',
+        'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+
+    mesElemento.textContent = `${nomeMeses[mes]} ${ano}`;
+
+    diasElemento.innerHTML = '';
+
+    const primeiroDia = new Date(ano, mes, 1).getDay();
+    const ultimoDia = new Date(ano, mes + 1, 0).getDate();
+
+    for (let i = 0; i < primeiroDia; i++) {
+        diasElemento.appendChild(document.createElement('span'));
+    }
+
+    for (let dia = 1; dia <= ultimoDia; dia++) {
+        const elementoDia = document.createElement('button');
+
+        elementoDia.type = 'button';
+        elementoDia.textContent = dia;
+
+        const dataDia = new Date(ano, mes, dia);
+        const hoje = new Date();
+
+        dataDia.setHours(0, 0, 0, 0);
+        hoje.setHours(0, 0, 0, 0);
+
+        if (dataDia < hoje) {
+            elementoDia.disabled = true;
+        }
+
+       elementoDia.addEventListener('click', function () {
+    const mesFormatado = String(mes + 1).padStart(2, '0');
+    const diaFormatado = String(dia).padStart(2, '0');
+
+    const dataSelecionada = `${ano}-${mesFormatado}-${diaFormatado}`;
+
+    document.getElementById('Dis_date').value = dataSelecionada;
+
+    document.querySelectorAll('.calendario-dias button').forEach(botao => {
+        botao.classList.remove('dia-selecionado');
+    });
+
+    elementoDia.classList.add('dia-selecionado');
+
+    validarFormulario();
+    
+});
+
+
+        diasElemento.appendChild(elementoDia);
+    }
+}
+
+
+gerarCalendario();
+
+const botoesCalendario = document.querySelectorAll('.calendario-btn');
+
+// Botão mês anterior
+botoesCalendario[0].addEventListener('click', function () {
+    const hoje = new Date();
+
+    const mesAtual = hoje.getMonth();
+    const anoAtual = hoje.getFullYear();
+
+    const mesCalendario = dataCalendario.getMonth();
+    const anoCalendario = dataCalendario.getFullYear();
+
+    // Impede voltar para meses anteriores ao atual
+    if (
+        anoCalendario > anoAtual ||
+        (anoCalendario === anoAtual && mesCalendario > mesAtual)
+    ) {
+        dataCalendario.setMonth(dataCalendario.getMonth() - 1);
+        gerarCalendario();
+    }
+});
+
+// Botão próximo mês
+botoesCalendario[1].addEventListener('click', function () {
+    dataCalendario.setMonth(dataCalendario.getMonth() + 1);
+
+    gerarCalendario();
+});
+
     </script>
+
 </body>
 
 </html>

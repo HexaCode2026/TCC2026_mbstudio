@@ -61,7 +61,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $availabilityModel = new Availability($pdo);
-    $sucesso = $availabilityModel->editarPorId($avaId, $empId, $status, $date, $start, $end);
+    
+    if (is_array($avaId)) {
+        $sucesso = true;
+        foreach ($avaId as $id) {
+            $atualizou = $availabilityModel->editarPorId($id, $empId, $status, $date, $start, $end);
+            if (!$atualizou) $sucesso = false;
+        }
+    } else {
+        $sucesso = $availabilityModel->editarPorId($avaId, $empId, $status, $date, $start, $end);
+    }
 
     if ($sucesso) {
         echo "<script>
@@ -70,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </script>";
     } else {
         echo "<script>
-            alert('Erro ao atualizar a disponibilidade!');
+            alert('Aviso: Algumas atualizações falharam.');
             window.location='../View/funcionario/Disponibilidade.php';
         </script>";
     }

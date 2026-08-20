@@ -1,6 +1,10 @@
 <?php
 
+<<<<<<<<< Temporary merge branch 1
+
+=========
 //Men aranha gostoso//
+>>>>>>>>> Temporary merge branch 2
 class User{
 
 

@@ -70,6 +70,7 @@ if (!empty($minhasDisponibilidades)) {
 
 <body>
 
+    <a href=""></a>
     <main class="pagina-disponibilidade"> 
 
     <h1 class="tituloPagina"> Meus <span> Horários </span> </h1>
@@ -144,6 +145,8 @@ if (!empty($minhasDisponibilidades)) {
                     <td class="cards">
 
                      <label for="Dis_start"> Início </label>
+
+                     <!-- codigo da hr com setas e tals sera colocada aqui posteriormente -->
 
                         <input type="time" name="Dis_start" id="Dis_start" min="08:00" max="19:00" required>
                     
@@ -608,11 +611,14 @@ function gerarCalendario() {
     const primeiroDia = new Date(ano, mes, 1).getDay();
     const ultimoDia = new Date(ano, mes + 1, 0).getDate();
 
+    // Espaços antes do primeiro dia do mês
     for (let i = 0; i < primeiroDia; i++) {
         diasElemento.appendChild(document.createElement('span'));
     }
 
+    // Criação dos dias
     for (let dia = 1; dia <= ultimoDia; dia++) {
+
         const elementoDia = document.createElement('button');
 
         elementoDia.type = 'button';
@@ -624,32 +630,47 @@ function gerarCalendario() {
         dataDia.setHours(0, 0, 0, 0);
         hoje.setHours(0, 0, 0, 0);
 
+        // Bloqueia dias anteriores a hoje
         if (dataDia < hoje) {
             elementoDia.disabled = true;
         }
 
-       elementoDia.addEventListener('click', function () {
-    const mesFormatado = String(mes + 1).padStart(2, '0');
-    const diaFormatado = String(dia).padStart(2, '0');
+        // Clique no dia
+        elementoDia.addEventListener('click', function () {
 
-    const dataSelecionada = `${ano}-${mesFormatado}-${diaFormatado}`;
+            const campoData = document.getElementById('Dis_date');
 
-    document.getElementById('Dis_date').value = dataSelecionada;
+            const mesFormatado = String(mes + 1).padStart(2, '0');
+            const diaFormatado = String(dia).padStart(2, '0');
 
-    document.querySelectorAll('.calendario-dias button').forEach(botao => {
-        botao.classList.remove('dia-selecionado');
-    });
+            const dataSelecionada = `${ano}-${mesFormatado}-${diaFormatado}`;
 
-    elementoDia.classList.add('dia-selecionado');
+            // Se clicar novamente no mesmo dia, desmarca
+            if (elementoDia.classList.contains('dia-selecionado')) {
 
-    validarFormulario();
-    
-});
+                elementoDia.classList.remove('dia-selecionado');
+                campoData.value = '';
 
+            } else {
+
+                // Remove seleção de outros dias
+                document.querySelectorAll('.calendario-dias button')
+                    .forEach(botao => {
+                        botao.classList.remove('dia-selecionado');
+                    });
+
+                // Seleciona o novo dia
+                elementoDia.classList.add('dia-selecionado');
+                campoData.value = dataSelecionada;
+            }
+
+            validarFormulario();
+        });
 
         diasElemento.appendChild(elementoDia);
     }
 }
+
 
 
 gerarCalendario();
@@ -681,6 +702,7 @@ botoesCalendario[1].addEventListener('click', function () {
     dataCalendario.setMonth(dataCalendario.getMonth() + 1);
 
     gerarCalendario();
+    
 });
 
     </script>

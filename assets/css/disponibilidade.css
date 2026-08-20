@@ -275,3 +275,37 @@ label[for="Dis_scheduled-times"] strong {
 
 
 /* fim do calendario customizado */
+
+.cards select {
+
+    width: 100%;
+    padding: 12px 40px 12px 12px;
+    border: 1px solid #e5ddd3;
+    border-radius: 10px;
+    background-color: #fff;
+    color: #4a4540;
+    font-size: 14px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a66f2c' d='M2 4l4 4 4-4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+
+}
+
+.cards select:focus {
+
+    outline: none;
+    border-color: #c58a3a;
+    box-shadow: 0 0 0 3px rgba(197, 138, 58, 0.12);
+
+}
+
+.cards select {
+    
+    box-sizing: border-box;
+    min-height: 46px;
+    background-color: #fff;
+
+}
+

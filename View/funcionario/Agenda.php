@@ -196,8 +196,8 @@ if (!empty($appointments)) {
                                 <?php if (strpos($app['Appo_status'], 'Cancelado') === false && $app['Appo_status'] != 'Concluido'): ?>
                                     <form action="" method="POST" class="form-cancelar-inline" onsubmit="return confirm('Deseja realmente cancelar este agendamento?');">
                                         <input type="hidden" name="appo_id" value="<?= $app['Appo_id'] ?>">
-                                        <input type="text" name="cancel_reason" class="input-cancelar" placeholder="Motivo do cancelamento..." required>
-                                        <button type="submit" name="action" value="cancel" class="btn-acao btn-cancelar">Cancelar</button>
+                                        <input type="text" name="cancel_reason" class="input-cancelar" placeholder="Motivo do cancelamento..." required oninput="this.nextElementSibling.disabled = this.value.trim() === '';">
+                                        <button type="submit" name="action" value="cancel" class="btn-acao btn-cancelar" disabled>Cancelar</button>
                                     </form>
                                 <?php endif; ?>
                             </td>

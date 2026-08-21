@@ -49,6 +49,7 @@
 
     <a href="View/funcionario/Disponibilidade.php"> disponibilidade </a>
     <a href="View/Cadastro.php"> cadastro teste </a>
+    <a href="View/admin/Servicos.php"> atribuir serviços </a>
 
 </body>
 </html>

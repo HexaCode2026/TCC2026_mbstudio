@@ -1,236 +1,603 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    width: 100%;
+    min-height: 100%;
+}
+
 body {
+    position: relative;
 
-    background: white;
+    width: 100%;
+    min-height: 100vh;
 
+    background-color: white;
+    color: #000;
+
+    overflow-x: hidden;
+
+    font-family: "Candara", sans-serif;
 }
 
 #logo {
+    display: block;
 
-    position: absolute;
     width: 120px;
     height: 120px;
-    margin-left: 45%;
-    margin-top: -145px;
 
+    object-fit: contain;
+
+    margin: 5px auto 0;
 }
 
 .links {
-
     position: relative;
-    display: flex;
-    gap: 140px;
-    color: black;
-    font-size: 22px;
-    margin-top: 140px;
-    margin-left: 210px;
 
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: clamp(45px, 7vw, 140px);
+
+    margin-top: -2px;
+
+    padding: 18px 20px;
+
+    font-size: clamp(16px, 1.5vw, 22px);
+
+    z-index: 10;
 }
 
 .links a {
-
     text-decoration: none;
-    color: black;
-    transition: color 0.3s ease;
-  
+
+    color: #000;
+
+    white-space: nowrap;
+
+    transition:
+        color 0.3s ease,
+        transform 0.2s ease;
 }
 
-.links a.ativo{ /* marca a pagina atual com a cor amarela nos links */
-    
+.links a.ativo {
     color: #d6a110;
-
 }
 
-.links a:hover { /* muda a cor dos outros links quando mouse passa encima */
-
+.links a:hover {
     color: #d6a110;
 
+    transform: translateY(-2px);
 }
 
 #fundolinks {
+    position: relative;
 
-    background-color: white;
-    border: 2px solid #cec7b3;
-    width: 100.9%;
-    height: 70px;
-    margin-top: -50px;
-    margin-left: -10px;
+    width: 100%;
+    height: 2px;
 
+    margin-top: 0;
+
+    background-color: #cec7b3;
+
+    border: none;
+
+    z-index: 5;
 }
 
 #TxtMenor {
+    position: relative;
 
-    position: absolute;
-    margin-top: 70px;
+    width: 45%;
+
+    margin-top: 55px;
     margin-left: 13%;
-    color: #d6a110;
-    font-size: 19px;
-    font-family: georgia, serif;
 
+    color: #d6a110;
+
+    font-size: clamp(15px, 1.4vw, 19px);
+
+    font-family: Georgia, serif;
+
+    line-height: 1.3;
 }
 
+
 #TxtMaior {
+    position: relative;
 
-    position: absolute;
-    margin-top: 100px;
+    width: 45%;
+
+    margin-top: 8px;
     margin-left: 13%;
-    color: #000000;
-    font-size: 45px;
-    font-family: Didot, serif;
 
+    color: #000;
+
+    font-size: clamp(34px, 3.5vw, 45px);
+
+    line-height: 1.12;
+
+    font-family: Didot, Georgia, serif;
 }
 
 .Beleza {
-
     color: #d6a110;
-
 }
 
 #linha {
+    position: relative;
 
-    position: absolute;
-    width: 19%;
+    width: 250px;
+    max-width: 30%;
+
     height: 2px;
-    background-color: #C5A95F;
-    margin-top: 230px;
+
+    margin-top: 28px;
     margin-left: 13%;
 
+    background-color: #c5a95f;
 }
 
 #descricao {
+    position: relative;
 
-    position: absolute;
-    margin-top: 260px;
+    width: 400px;
+    max-width: 40%;
+
+    margin-top: 25px;
     margin-left: 14%;
-    color: #2f2d2d;
-    font-size: 15px;
-    font-family: "Candara", sans-serif;
 
+    color: #2f2d2d;
+
+    font-size: 15px;
+
+    line-height: 1.5;
+
+    font-family: "Candara", sans-serif;
 }
 
 #btn-servicos {
+    position: relative;
 
-    position: absolute;
-    margin-top: 340px;
+    display: inline-block;
+
+    margin-top: 30px;
     margin-left: 17%;
-    background-color: #C5A95F;
-    color: white;
-    font-size: 15px;
-    font-family: "Candara", sans-serif;
-    text-decoration: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease, color 0.3s ease;
 
+    padding: 10px 20px;
+
+    background-color: #c5a95f;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-family: "Candara", sans-serif;
+
+    text-decoration: none;
+
+    border-radius: 5px;
+
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        transform 0.2s ease;
+
+    z-index: 5;
 }
 
 #btn-servicos:hover {
-
-    background-color: #000000;
-    color: rgb(231, 215, 1);
-
+    background-color: #000;
+    color: #e7d701;
 }
 
 #btn-servicos:active {
+    transform: scale(0.92);
+}
 
-   transform: scale(0.92);
+#marcadorImagem {
+    position: absolute;
 
+    top: 209px;
+    right: 8%;
+
+    width: 360px;
+    height: 320px;
+
+    background-color: #c5a95f;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 1;
+}
+
+#texto {
+    position: absolute;
+
+    top: 325px;
+    right: 8%;
+
+    width: 360px;
+
+    text-align: center;
+
+    color: #000;
+
+    font-size: 16px;
+
+    font-family: "Candara", sans-serif;
+
+    z-index: 2;
 }
 
 /* inicio do rodapé */
 
 #separadorRodape {
+    position: relative;
 
-    position: fixed;
-    width: 99.4%;
+    width: 100%;
     height: 2px;
-    background-color: #cec7b3;
-    margin-top: 455px;
 
+    margin-top: 64px;
+
+    background-color: #cec7b3;
+
+    z-index: 3;
 }
 
-#fundoRodape { 
 
-    position: fixed;
-    width: 1200px;
+#fundoRodape {
+    position: relative;
+
+    width: 88%;
     height: 60px;
-    background-color: #C5A95F;
-    margin-top: 470px;
-    margin-left: 130px;
+
+    margin: 13px auto 0;
+
+    background-color: #c5a95f;
+
     border-radius: 5px;
 
+    z-index: 3;
 }
 
 #textoRodape {
+    position: absolute;
 
-    position: fixed;
-    margin-top: 490px;
-    margin-left: 290px;
-    color: White;
+    left: 15%;
+
+    margin-top: -42px;
+
+    color: white;
+
     font-size: 20px;
+
     font-family: "Candara", sans-serif;
 
+    z-index: 5;
 }
 
 #linhaRodape {
+    position: absolute;
 
-    position: fixed;
-    width: 400px;
+    left: 38%;
+
+    width: 30%;
     height: 2px;
-    background-color: rgb(243, 230, 230);
-    margin-top: 501px;
-    margin-left: 530px;
 
+    margin-top: -31px;
+
+    background-color: rgb(243, 230, 230);
+
+    z-index: 5;
 }
 
 #btn-agendar {
+    position: absolute;
 
-    position: fixed;
-    margin-top: 480px;
-    margin-left: 1000px;
-    background-color: #ffffffd0;
-    color: rgb(0, 0, 0);
+    right: 13%;
+
+    margin-top: -51px;
+
+    padding: 10px 40px;
+
+    background-color: rgba(255, 255, 255, 0.82);
+
+    color: #000;
+
     font-size: 15px;
-    font-family: "Candara", sans-serif;
-    text-decoration: none;
-    padding: 10px 60px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.01s ease;
 
+    font-family: "Candara", sans-serif;
+
+    text-decoration: none;
+
+    border-radius: 5px;
+
+    white-space: nowrap;
+
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        transform 0.2s ease;
+
+    z-index: 5;
 }
 
 #btn-agendar:hover {
+    background-color: #000;
 
-    background-color: #000000;
-    color: rgb(231, 215, 1);
-
+    color: #e7d701;
 }
 
 #btn-agendar:active {
-
-   transform: scale(0.92);
-
+    transform: scale(0.92);
 }
 
 /* fim do rodapé */
 
-#marcadorImagem { /* apagar esta parte dps, somente marcador de espaço reservado pra imagem*/
+/* TELA RESPONSIVA A SEGUIR :)*/
 
-    position: absolute;
-    width: 450px;
-    height: 400px;
-    margin-top: 30px;
-    margin-left: 800px;
-    background-color: #C5A95F;
+@media (max-width: 1000px) {
 
+    .links {
+        gap: 35px;
+
+        font-size: 17px;
+    }
+
+    #TxtMenor,
+    #TxtMaior {
+        margin-left: 7%;
+    }
+
+    #linha {
+        margin-left: 7%;
+    }
+
+    #descricao {
+        margin-left: 8%;
+    }
+
+    #btn-servicos {
+        margin-left: 10%;
+    }
+
+    #marcadorImagem {
+        right: 5%;
+
+        width: 330px;
+        height: 300px;
+    }
+
+    #texto {
+        right: 5%;
+
+        width: 330px;
+    }
+
+    #textoRodape {
+        left: 8%;
+    }
+
+    #linhaRodape {
+        left: 34%;
+        width: 28%;
+    }
+
+    #btn-agendar {
+        right: 7%;
+        padding: 10px 25px;
+    }
 }
 
-#texto { /* apagar esta parte dps, somente marcador de espaço reservado pra imagem*/
+@media (max-width: 700px) {
 
-    position: absolute;
-    margin-top: 200px;
-    margin-left: 850px;
-    color: #000000;
-    font-size: 20px;
-    font-family: "Candara", sans-serif;
+    #logo {
+        width: 100px;
+        height: 100px;
+    }
 
+    .links {
+        flex-wrap: wrap;
+
+        gap: 12px 22px;
+
+        padding: 15px 10px;
+
+        font-size: 15px;
+    }
+
+    #fundolinks {
+        height: 2px;
+    }
+
+    #TxtMenor {
+        width: 90%;
+
+        margin-top: 40px;
+        margin-left: 5%;
+
+        font-size: 15px;
+    }
+
+
+    #TxtMaior {
+        width: 90%;
+
+        margin-top: 8px;
+        margin-left: 5%;
+
+        font-size: 34px;
+    }
+
+
+    #linha {
+        width: 150px;
+        max-width: none;
+
+        margin-top: 25px;
+        margin-left: 5%;
+    }
+
+
+    #descricao {
+        width: 90%;
+        max-width: none;
+
+        margin-top: 22px;
+        margin-left: 5%;
+
+        font-size: 14px;
+    }
+
+
+    #btn-servicos {
+        margin-top: 25px;
+        margin-left: 5%;
+    }
+
+    #marcadorImagem {
+        position: relative;
+
+        top: auto;
+        right: auto;
+
+        width: 90%;
+        height: 280px;
+
+        margin: 45px auto 0;
+    }
+
+
+    #texto {
+        position: absolute;
+
+        top: auto;
+        right: auto;
+
+        width: 90%;
+
+        margin-top: -165px;
+        margin-left: 5%;
+
+        font-size: 16px;
+    }
+
+    #separadorRodape {
+        margin-top: 55px;
+    }
+
+
+    #fundoRodape {
+        width: 90%;
+        height: auto;
+
+        min-height: 150px;
+
+        margin-top: 15px;
+
+        padding: 20px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    #textoRodape {
+        position: relative;
+
+        left: auto;
+
+        margin: 0;
+
+        color: white;
+
+        font-size: 18px;
+
+        text-align: center;
+    }
+
+
+    #linhaRodape {
+        position: relative;
+
+        left: auto;
+
+        width: 70%;
+
+        margin: 10px 0;
+    }
+
+
+    #btn-agendar {
+        position: relative;
+
+        right: auto;
+
+        margin: 0;
+
+        padding: 10px 30px;
+    }
+}
+
+@media (max-width: 400px) {
+
+    #logo {
+        width: 90px;
+        height: 90px;
+    }
+
+
+    .links {
+        gap: 10px 15px;
+
+        font-size: 13px;
+    }
+
+
+    #TxtMenor {
+        font-size: 13px;
+    }
+
+
+    #TxtMaior {
+        font-size: 29px;
+    }
+
+
+    #descricao {
+        font-size: 13px;
+    }
+
+
+    #marcadorImagem {
+        height: 240px;
+    }
+
+
+    #texto {
+        font-size: 14px;
+    }
+
+
+    #fundoRodape {
+        min-height: 145px;
+    }
+
+
+    #btn-agendar {
+        width: 100%;
+
+        text-align: center;
+    } /* esse menorzinho aqui q fica do tamanho de um cll pequeno ta bugando o botao de agendar, mas é apenas isso que precisa ser consertado posteriormente!*/
 }

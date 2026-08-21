@@ -14,6 +14,11 @@ body {
 
 }
 
+
+/* =========================================
+   PÁGINA
+   ========================================= */
+
 .pagina-disponibilidade {
 
     width: 90%;
@@ -47,12 +52,24 @@ body {
 
 }
 
+
+/* =========================================
+   TABELA PRINCIPAL
+   ========================================= */
+
 .TabelaCadastro {
 
     width: 100%;
+    table-layout: fixed;
     border-collapse: separate;
     border-spacing: 12px;
     margin-top: 20px;
+
+}
+
+.TabelaCadastro tr {
+
+    vertical-align: top;
 
 }
 
@@ -72,6 +89,11 @@ body {
 
 }
 
+
+/* =========================================
+   INPUTS E SELECTS GERAIS
+   ========================================= */
+
 .TabelaCadastro input,
 .TabelaCadastro select {
 
@@ -87,74 +109,18 @@ body {
 
 }
 
-.tabela-cadastro input:focus,
-.tabela-cadastro select:focus {
+.TabelaCadastro input:focus,
+.TabelaCadastro select:focus {
 
     border-color: #c58a3a;
     box-shadow: 0 0 0 3px rgba(197, 138, 58, 0.12);
 
 }
 
-label[for="Dis_scheduled-times"] {
 
-    display: block;
-    margin-top: 25px;
-    margin-bottom: 12px;
-    font-size: 20px;
-    color: #2c2c2c;
-
-}
-
-label[for="Dis_scheduled-times"] strong {
-
-    font-weight: 600;
-
-}
-
-.cards {
-
-   background: #fff;
-    border: 1px solid #e5ddd3;
-    border-radius: 14px;
-    padding: 20px;
-    height: 120px;
-    vertical-align: top;
-
-}
-
-.cards label {
-
-    display: block;
-    margin-bottom: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #6f6860;
-
-}
-
-.cards input,
-.cards select {
-
-    width: 100%;
-    height: 42px;
-    padding: 0 12px;
-    border: 1px solid #ddd4c8;
-    border-radius: 8px;
-    background-color: #fff;
-    color: #4a4540;
-    font-size: 14px;
-    outline: none;
-    margin-top: 2px;
-
-}
-
-.cards input:focus,
-.cards select:focus {
-
-    border-color: #c58a3a;
-    box-shadow: 0 0 0 3px rgba(197, 138, 58, 0.12);
-
-}
+/* =========================================
+   CALENDÁRIO
+   ========================================= */
 
 .campo-calendario {
 
@@ -162,7 +128,12 @@ label[for="Dis_scheduled-times"] strong {
 
 }
 
-/* inicio do calendario customizado */
+.TabelaCadastro > tbody > tr > td:first-child {
+
+    width: 55%;
+
+}
+
 #calendario-customizado {
 
     width: 100%;
@@ -274,18 +245,106 @@ label[for="Dis_scheduled-times"] strong {
 }
 
 
-/* fim do calendario customizado */
+/* =========================================
+   CARDS
+   ========================================= */
 
+.cards {
+
+    background: #fff;
+    border: 1px solid #e5ddd3;
+    border-radius: 14px;
+    padding: 20px;
+    height: 120px;
+    vertical-align: top;
+
+}
+
+.cards label {
+
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6f6860;
+
+}
+
+.cards input,
 .cards select {
 
     width: 100%;
-    padding: 12px 40px 12px 12px;
-    border: 1px solid #e5ddd3;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #ddd4c8;
+    border-radius: 8px;
+    background-color: #fff;
+    color: #4a4540;
+    font-size: 14px;
+    outline: none;
+    margin-top: 2px;
+
+}
+
+.cards input:focus,
+.cards select:focus {
+
+    border-color: #c58a3a;
+    box-shadow: 0 0 0 3px rgba(197, 138, 58, 0.12);
+
+}
+
+
+/* =========================================
+   ÁREA DIREITA
+   ========================================= */
+
+.coluna-direita {
+
+    width: 45%;
+    max-width: 45%;
+    padding: 0;
+    vertical-align: top;
+    overflow: hidden;
+
+}
+
+
+/* =========================================
+   SELECT DE SERVIÇO
+   ========================================= */
+
+.area-servico {
+
+    width: 70%;
+    max-width: 380px;
+    margin: 35px 0 0 -20px;
+    text-align: center;
+    margin-left: 80px;
+
+}
+
+.titulo-servicos {
+
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c2c2c;
+
+}
+
+#Dis_ser {
+
+    width: 100%;
+    height: 46px;
+    padding: 0 40px 0 14px;
+    border: 1px solid #ddd4c8;
     border-radius: 10px;
     background-color: #fff;
     color: #4a4540;
     font-size: 14px;
     cursor: pointer;
+    outline: none;
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a66f2c' d='M2 4l4 4 4-4z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -293,19 +352,91 @@ label[for="Dis_scheduled-times"] strong {
 
 }
 
-.cards select:focus {
+#Dis_ser:focus {
 
-    outline: none;
     border-color: #c58a3a;
     box-shadow: 0 0 0 3px rgba(197, 138, 58, 0.12);
 
 }
 
-.cards select {
-    
-    box-sizing: border-box;
-    min-height: 46px;
-    background-color: #fff;
+
+/* =========================================
+   TÍTULO "HORÁRIOS"
+   ========================================= */
+
+.titulo-horarios {
+
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c2c2c;
+    margin-top: 60px;
+    margin-bottom: 20px;
+    margin-left: 230px;
 
 }
 
+
+/* =========================================
+   ÁREA DE HORÁRIOS
+   ========================================= */
+
+.area-horarios {
+
+    display: flex;
+    gap: 0px;
+    margin-top: 20px;
+    margin-left: 30px;
+
+}
+
+.campo-horario {
+
+    flex: 1;
+
+}
+
+.campo-horario label {
+
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #c58a3a;
+    margin-left: 100px;
+
+}
+
+.campo-horario input {
+
+    width: 80%;
+    height: 46px;
+    padding: 0 12px;
+    border: 1px solid #ddd4c8;
+    border-radius: 10px;
+    background: #fff;
+    color: #4a4540;
+    font-size: 14px;
+    outline: none;
+
+}
+
+
+/* =========================================
+   HORÁRIOS DE ATENDIMENTO
+   ========================================= */
+
+label[for="Dis_scheduled-times"] {
+
+    display: block;
+    margin-top: 25px;
+    margin-bottom: 12px;
+    font-size: 20px;
+    color: #2c2c2c;
+
+}
+
+label[for="Dis_scheduled-times"] strong {
+
+    font-weight: 600;
+
+}

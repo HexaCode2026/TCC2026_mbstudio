@@ -23,7 +23,7 @@ $_SESSION['User_perm'] != 'F'
 
 
     header(
-    "Location: ../Login.php"
+    "Location: ../Index.php"
     );
 
 

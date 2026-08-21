@@ -35,7 +35,7 @@ $_SESSION['User_perm'] != 'F'
 
 
     header(
-    "Location: ../View/Login.php"
+    "Location: ../Index.php"
     );
 
     exit;

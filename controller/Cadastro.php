@@ -79,7 +79,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
         alert('Cadastro realizado com sucesso!');
 
-        window.location='../View/Login.php';
+        window.location='../Index.php';
 
         </script>
 

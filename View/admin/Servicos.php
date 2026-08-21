@@ -7,7 +7,7 @@ Session::iniciar();
 
 // Proteção Admin
 if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'A') {
-    header("Location: ../Login.php");
+    header("Location: ../../Index.php");
     exit;
 }
 
@@ -27,7 +27,7 @@ $funcionarios = $stmtEmp->fetchAll(PDO::FETCH_ASSOC);
 </head>
 
 <body>
-
+    <?php include '../components/AuthButton.php'; ?>
     <h1>Gerenciamento de Serviços</h1>
     <a href="Dashboard.php">Voltar ao Dashboard</a>
     <hr>

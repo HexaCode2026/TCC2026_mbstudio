@@ -389,6 +389,33 @@ class Employee{
 
 
 
-}
+    // =====================================
+    // LISTAR EQUIPE COM DETALHES (ADMIN)
+    // =====================================
+    public function listarEquipeAdmin() {
+        $sql = "
+        SELECT 
+            e.Emp_id, 
+            u.User_name, 
+            e.Emp_photo, 
+            e.Emp_specialty, 
+            e.Emp_bio,
+            u.User_id,
+            u.User_active,
+            (SELECT COUNT(Ava_id) FROM availabilities a WHERE a.Emp_id = e.Emp_id) AS total_horarios,
+            GROUP_CONCAT(s.Ser_name SEPARATOR ', ') AS servicos_atribuidos
+        FROM employees e
+        JOIN users u ON e.User_id = u.User_id
+        LEFT JOIN employee_services es ON e.Emp_id = es.Emp_id
+        LEFT JOIN services s ON es.Ser_id = s.Ser_id
+        WHERE u.User_perm = 'F'
+        GROUP BY e.Emp_id, u.User_name, e.Emp_photo, e.Emp_specialty, e.Emp_bio, u.User_id, u.User_active
+        ORDER BY u.User_name ASC
+        ";
+        
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
+}
 ?>

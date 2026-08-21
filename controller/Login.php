@@ -65,7 +65,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 case "C":
 
                     header(
-                    "Location: ../View/cliente/Home.php"
+                    "Location: ../Index.php"
                     );
 
                 break;
@@ -90,7 +90,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     alert('Email ou senha incorretos');
 
-    window.location='../View/Login.php';
+    window.location='../Index.php';
 
     </script>
 

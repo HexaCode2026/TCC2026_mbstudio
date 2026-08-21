@@ -6,7 +6,7 @@ Session::iniciar();
 
 // Proteção para Cliente
 if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'C') {
-    header("Location: ../Login.php");
+    header("Location: ../../Index.php");
     exit;
 }
 
@@ -105,11 +105,15 @@ function gerarHorarios($inicio, $fim, $duracao_minutos)
             margin-right: 15px;
         }
     </style>
+    <link rel="stylesheet" href="../../assets/css/global.css">
 </head>
 
 <body>
+    <?php include '../components/Header.php'; ?>
+    <?php include '../components/LoginModal.php'; ?>
 
-    <h1>Agendamento - Passo 3: Horários Disponíveis</h1>
+    <div style="padding: 20px;">
+        <h1>Agendamento - Passo 3: Horários Disponíveis</h1>
     <a href="Data.php?Ser_id=<?= htmlspecialchars($ser_id) ?>">Voltar para a escolha de data</a>
     <hr>
 
@@ -158,6 +162,7 @@ function gerarHorarios($inicio, $fim, $duracao_minutos)
     <?php else: ?>
             <p>Infelizmente não há profissionais com agenda disponível ('Disponivel') para este serviço na data solicitada.</p>
     <?php endif; ?>
+    </div>
 
 </body>
 

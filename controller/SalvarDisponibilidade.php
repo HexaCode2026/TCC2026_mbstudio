@@ -6,7 +6,7 @@ require_once __DIR__ . "/../model/Availability.php";
 
 // Proteção para Funcionário
 if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'F') {
-    header("Location: ../View/Login.php");
+    header("Location: ../Index.php");
     exit;
 }
 

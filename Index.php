@@ -1,3 +1,17 @@
+<?php
+require_once 'core/Session.php';
+Session::iniciar();
+
+if (isset($_SESSION['User_perm'])) {
+    if ($_SESSION['User_perm'] === 'A') {
+        header("Location: View/admin/Home.php");
+        exit;
+    } elseif ($_SESSION['User_perm'] === 'F') {
+        header("Location: View/funcionario/Home.php");
+        exit;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -11,20 +25,9 @@
 
 </head>
 <body>
-
-    <img src="assets/img/Logo.png" id="logo">
-
-    <nav class="links">
-
-    <a href="View/cliente/Home.php" class="ativo"> INÍCIO </a>
-    <a href="View/cliente/Servicos.php"> SERVIÇOS </a>
-    <a href="View/cliente/Funcionarios.php"> EQUIPE </a>
-    <a href="View/cliente/Home.php"> CONTATO </a>
-    <a href="View/cliente/Home.php"> SOBRE NÓS </a>
-
-    </nav>
-
-    <div id="fundolinks"> </div>
+    <?php include 'View/components/Header.php'; ?>
+    
+    <div class="hero-container" style="padding: 60px 5% 40px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-height: 70vh;">
 
     <h2  id="TxtMenor"> BELEZA | CONFIANÇA | ELEGÂNCIA </h2>
     <h1 id="TxtMaior"> Realçando sua <span class="Beleza"> Beleza </span> <br> com <span class="Beleza"> Elegância </span></h1>
@@ -33,7 +36,9 @@
 
     <h2 id="descricao"> Serviços de Qualidade para Realçar <br> a sua Beleza no dia a dia </h2>
 
-    <a href="View/cliente/Servicos.php" id="btn-servicos"> conheça nossos serviços! </a>
+    <a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Servicos.php')" id="btn-servicos"> conheça nossos serviços! </a>
+
+    </div>
 
     <div id="separadorRodape"> </div>  
     <div id="fundoRodape"> </div>
@@ -42,13 +47,15 @@
 
     <div id="linhaRodape"> </div>
 
-    <a href="" id="btn-agendar"> AGENDAR AGORA </a>
+    <a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Servicos.php')" id="btn-agendar"> AGENDAR AGORA </a>
 
-    <div id="marcadorImagem"> </div>
-    <h1 id="texto"> Espaço Reservado pra Imagens do Local </h1>
+    <div id="marcadorImagem" style="top: 200px;"> 
+        <h1 id="texto" style="position: relative; margin-top: 0; right: 0; width: 100%; top: auto;"> Espaço Reservado pra Imagens do Local </h1>
+    </div>
 
     <a href="View/funcionario/Disponibilidade.php"> disponibilidade </a>
-    <a href="View/Cadastro.php"> cadastro teste </a>
+    <a href="View/admin/Servicos.php"> atribuir serviços </a>
 
+    <?php include 'View/components/LoginModal.php'; ?>
 </body>
 </html>

@@ -4,13 +4,6 @@ require_once "../../core/Session.php";
 
 Session::iniciar();
 
-// Proteção para Cliente
-if(!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'C'){
-    // Se não for cliente, redireciona (pode adaptar para redirecionar para a home respectiva)
-    header("Location: ../Login.php");
-    exit;
-}
-
 // Buscar apenas os serviços ativos para os clientes escolherem
 $sql = "SELECT * FROM services WHERE Ser_active = 1 ORDER BY Ser_name ASC";
 $stmt = $pdo->query($sql);
@@ -54,9 +47,10 @@ $servicos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </style>
 </head>
 <body>
+    <?php include '../components/Header.php'; ?>
 
     <h1>Agendamento - Passo 1: Escolha um Serviço</h1>
-    <a href="Home.php">Voltar para a Home</a>
+    <a href="../../Index.php">Voltar para a Home</a>
     <hr>
 
     <?php if(count($servicos) > 0): ?>
@@ -64,7 +58,7 @@ $servicos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php foreach($servicos as $s): ?>
                 
                 <!-- O SERVIÇO AGORA É CLICÁVEL E REDIRECIONA PARA A ESCOLHA DA DATA -->
-                <a href="Data.php?Ser_id=<?= $s['Ser_id'] ?>" class="service-card">
+                <a href="#" onclick="checkAuthAndExecute(event, 'Data.php?Ser_id=<?= $s['Ser_id'] ?>')" class="service-card">
                     
                     <?php if(!empty($s['Ser_image'])): ?>
                         <!-- Caminho da imagem deve ser ajustado dependendo de onde o View é chamado -->
@@ -87,5 +81,6 @@ $servicos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <p>No momento, não há serviços disponíveis.</p>
     <?php endif; ?>
 
+    <?php include '../components/LoginModal.php'; ?>
 </body>
 </html>

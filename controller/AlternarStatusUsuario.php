@@ -13,12 +13,12 @@ if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'A') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userId = $_POST['User_id'] ?? null;
+    $novoStatus = $_POST['User_active'] ?? null;
 
-    if ($userId) {
-        // Não deixar o admin se excluir acidentalmente (opcional, mas recomendado)
-        if ($userId != $_SESSION['User_id']) {
+    if ($userId && $novoStatus !== null) {
+        if ($userId != $_SESSION['User_id']) { // Proteger contra auto-inativação do admin atual
             $userModel = new User($pdo);
-            $userModel->excluir($userId);
+            $userModel->alternarStatus($userId, $novoStatus);
         }
     }
 }

@@ -6,7 +6,7 @@ Session::iniciar();
 
 // Proteção para Cliente
 if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'C') {
-    header("Location: ../Login.php");
+    header("Location: ../../Index.php");
     exit;
 }
 
@@ -35,12 +35,15 @@ $hoje = date("Y-m-d");
 <html>
 
 <head>
-    <title>Escolha a Data</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
 </head>
 
 <body>
+    <?php include '../components/Header.php'; ?>
+    <?php include '../components/LoginModal.php'; ?>
 
-    <h1>Agendamento - Passo 2: Escolha a Data</h1>
+    <div style="padding: 20px;">
+        <h1>Agendamento - Passo 2: Escolha a Data</h1>
     <a href="Servicos.php">Voltar para a escolha de serviços</a>
     <hr>
 
@@ -56,6 +59,7 @@ $hoje = date("Y-m-d");
 
         <button type="submit">Avançar para ver horários</button>
     </form>
+    </div>
 
 </body>
 

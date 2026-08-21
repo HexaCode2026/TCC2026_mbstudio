@@ -36,6 +36,8 @@ $dadosFuncionario = $employeeModel->buscarPorUserId($userId);
 
 
 <body class="employee-page">
+    <?php include '../components/AuthButton.php'; ?>
+    <?php include '../components/LoginModal.php'; ?>
 
 
     <!-- ========================================== -->

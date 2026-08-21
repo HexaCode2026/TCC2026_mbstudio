@@ -27,7 +27,7 @@ $_SESSION['User_perm'] != 'A'
 
 
 header(
-"Location: ../Login.php"
+"Location: ../../Index.php"
 );
 
 
@@ -91,10 +91,7 @@ Dashboard Admin
 
 
 <body>
-
-
-
-<h1>
+    <?php include '../components/AuthButton.php'; ?><h1>
 Dashboard Administrativo
 </h1>
 

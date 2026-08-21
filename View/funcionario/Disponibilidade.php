@@ -7,7 +7,7 @@ Session::iniciar();
 
 // Proteção para Funcionário
 if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'F') {
-    header("Location: ../Login.php");
+    header("Location: ../../Index.php");
     exit;
 }
 
@@ -69,6 +69,8 @@ if (!empty($minhasDisponibilidades)) {
 </head>
 
 <body>
+    <?php include '../components/AuthButton.php'; ?>
+    <?php include '../components/LoginModal.php'; ?>
 
     <a href=""></a>
     <main class="pagina-disponibilidade"> 
@@ -99,67 +101,105 @@ if (!empty($minhasDisponibilidades)) {
             <tbody>
 
                 <tr>
-                    <td class="cards">
 
-                    <div class="campo-calendario">
+    <!-- CALENDÁRIO -->
+    <td class="cards">
 
-                    <div id="calendario-customizado"></div> <!-- chances altas deste trecho ser apagado -->
-                    <label for="Dis_date"> Data </label>
+        <div class="campo-calendario">
 
-                        <input type="date" name="Dis_date" id="Dis_date" min="<?= date('Y-m-d') ?>" required>
-                    
-                        </div>
-                    </td>
+            <div id="calendario-customizado"></div>
 
-                    <td class="cards">
+            <input type="hidden"
+                   name="Dis_date"
+                   id="Dis_date"
+                   min="<?= date('Y-m-d') ?>"
+                   required>
 
-                     <label for="Dis_ser"> Serviço </label>
+        </div>
 
-                        <select name="Dis_ser" id="Dis_ser" required>
-                            <option value="">Selecione um serviço</option>
+    </td>
 
-                            <?php if (!empty($servicos)): ?>
 
-                                <?php foreach ($servicos as $ser): ?>
+    <!-- ÁREA DIREITA -->
+    <td class="coluna-direita">
 
-                                    <option value="<?= htmlspecialchars($ser['Ser_id']) ?>" 
-                                    
-                                            data-duration="<?= htmlspecialchars($ser['Ser_duration']) ?>"
-                                            data-empser="<?= htmlspecialchars($ser['EmpSer_id']) ?>">
-                                        
-                                        <?= htmlspecialchars($ser['Ser_name']) ?> (<?= htmlspecialchars($ser['Ser_duration']) ?> min)
-                                    
-                                    </option>
+        <!-- SERVIÇO -->
+        <div class="area-servico">
 
-                                <?php endforeach; ?>
-                            <?php else: ?>
+            <h2 class="titulo-servicos">Serviços</h2>
 
-                                <option value="" disabled>Nenhum serviço vinculado ao perfil</option>
-                            
-                                <?php endif; ?>
+            <select name="Dis_ser" id="Dis_ser" required>
 
-                        </select>
+                <option value="">Selecione um serviço</option>
 
-                    </td>
+                <?php if (!empty($servicos)): ?>
 
-                    <td class="cards">
+                    <?php foreach ($servicos as $ser): ?>
 
-                     <label for="Dis_start"> Início </label>
+                        <option value="<?= htmlspecialchars($ser['Ser_id']) ?>"
+                                data-duration="<?= htmlspecialchars($ser['Ser_duration']) ?>"
+                                data-empser="<?= htmlspecialchars($ser['EmpSer_id']) ?>">
 
-                     <!-- codigo da hr com setas e tals sera colocada aqui posteriormente -->
+                            <?= htmlspecialchars($ser['Ser_name']) ?>
+                            (<?= htmlspecialchars($ser['Ser_duration']) ?> min)
 
-                        <input type="time" name="Dis_start" id="Dis_start" min="08:00" max="19:00" required>
-                    
-                    </td>
+                        </option>
 
-                    <td class="cards">
-                        <label for="Dis_end"> Fim </label>
+                    <?php endforeach; ?>
 
-                        <input type="time" name="Dis_end" id="Dis_end" min="08:00" max="19:00" required>
-                    
-                    </td>
+                <?php else: ?>
 
-                </tr>
+                    <option value="" disabled>
+                        Nenhum serviço vinculado ao perfil
+                    </option>
+
+                <?php endif; ?>
+
+            </select>
+
+        </div>
+
+
+        <!-- TÍTULO HORÁRIOS -->
+        <h2 class="titulo-horarios">Horários</h2>
+
+
+        <!-- INÍCIO E FIM -->
+        <div class="area-horarios">
+
+            <div class="campo-horario">
+
+                <label for="Dis_start">Início</label>
+
+                <input type="time"
+                       name="Dis_start"
+                       id="Dis_start"
+                       min="08:00"
+                       max="19:00"
+                       required>
+
+            </div>
+
+
+            <div class="campo-horario">
+
+                <label for="Dis_end"> Fim </label>
+
+                <input type="time"
+                       name="Dis_end"
+                       id="Dis_end"
+                       min="08:00"
+                       max="19:00"
+                       required>
+
+            </div>
+
+        </div>
+
+    </td>
+
+</tr>
+
 
             </tbody>
 

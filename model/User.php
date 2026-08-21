@@ -1,18 +1,20 @@
 <?php
 
-<<<<<<<<< Temporary merge branch 1
 
-=========
+
+
 //Men aranha gostoso//
->>>>>>>>> Temporary merge branch 2
-class User{
+
+class User
+{
 
 
     private $pdo;
 
 
 
-    public function __construct($pdo){
+    public function __construct($pdo)
+    {
 
 
         $this->pdo = $pdo;
@@ -27,7 +29,8 @@ class User{
     // VERIFICAR EMAIL EXISTENTE
     // =====================================
 
-    public function emailExiste($email){
+    public function emailExiste($email)
+    {
 
 
 
@@ -55,7 +58,7 @@ class User{
 
 
 
-        if($consulta->rowCount() > 0){
+        if ($consulta->rowCount() > 0) {
 
 
             return true;
@@ -89,7 +92,7 @@ class User{
 
         $senha
 
-    ){
+    ) {
 
 
 
@@ -176,7 +179,8 @@ class User{
     // =====================================
 
 
-    public function login($email){
+    public function login($email)
+    {
 
 
 
@@ -219,7 +223,45 @@ class User{
 
 
 
+    // =====================================
+    // LISTAR TODOS OS USUÁRIOS (ADMIN)
+    // =====================================
+    public function listarTodos()
+    {
+        $sql = "SELECT User_id, User_name, User_email, User_perm, User_active FROM users ORDER BY User_name ASC";
+        $consulta = $this->pdo->query($sql);
+        return $consulta->fetchAll(PDO::FETCH_ASSOC);
+    }
 
+    // =====================================
+    // ALTERAR PERMISSÃO DE UM USUÁRIO
+    // =====================================
+    public function alterarPermissao($id, $novaPermissao)
+    {
+        $sql = "UPDATE users SET User_perm = ? WHERE User_id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$novaPermissao, $id]);
+    }
+
+    // =====================================
+    // ALTERNAR STATUS (ATIVO/INATIVO)
+    // =====================================
+    public function alternarStatus($id, $status)
+    {
+        $sql = "UPDATE users SET User_active = ? WHERE User_id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$status, $id]);
+    }
+
+    // =====================================
+    // EXCLUIR USUÁRIO
+    // =====================================
+    public function excluir($id)
+    {
+        $sql = "DELETE FROM users WHERE User_id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$id]);
+    }
 
 }
 

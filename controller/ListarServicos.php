@@ -6,7 +6,7 @@ require_once __DIR__ . "/../model/Service.php";
 
 // Apenas Administrador
 if (!isset($_SESSION['user_id']) || $_SESSION['user_perm'] !== 'A') {
-    header("Location: ../View/Login.php");
+    header("Location: ../Index.php");
     exit;
 }
 

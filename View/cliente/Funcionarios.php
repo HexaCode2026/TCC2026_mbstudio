@@ -4,114 +4,144 @@ require_once "../../core/Session.php";
 
 Session::iniciar();
 
-// Proteção para Cliente
-if(!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'C'){
-    header("Location: ../Login.php");
-    exit;
-}
-
-$ser_id = $_GET['Ser_id'] ?? null;
-
-if (!$ser_id) {
-    header("Location: Servicos.php");
-    exit;
-}
-
-// Buscar detalhes do Serviço escolhido (opcional, para exibir no topo)
-$sqlServico = "SELECT Ser_name FROM services WHERE Ser_id = ?";
-$stmtServico = $pdo->prepare($sqlServico);
-$stmtServico->execute([$ser_id]);
-$servico = $stmtServico->fetch(PDO::FETCH_ASSOC);
-
-if (!$servico) {
-    header("Location: Servicos.php");
-    exit;
-}
-
-// Buscar os funcionários habilitados para este serviço específico,
-// garantindo que são marcados como Funcionários (User_perm = 'F')
-$sql = "SELECT e.Emp_id, u.User_name, e.Emp_photo, e.Emp_specialty 
-        FROM employee_services es
-        JOIN employees e ON es.Emp_id = e.Emp_id
+// Buscar todos os funcionários habilitados (User_perm = 'F')
+$sql = "SELECT e.Emp_id, u.User_name, e.Emp_photo, e.Emp_specialty, e.Emp_bio 
+        FROM employees e
         JOIN users u ON e.User_id = u.User_id
-        WHERE es.Ser_id = ? AND u.User_perm = 'F'
+        WHERE u.User_perm = 'F'
         ORDER BY u.User_name ASC";
         
-$stmt = $pdo->prepare($sql);
-$stmt->execute([$ser_id]);
+$stmt = $pdo->query($sql);
 $funcionarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-    <title>Escolha o Funcionário</title>
-    <!-- Estilo mínimo sem depender de bibliotecas externas -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nossa Equipe</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
     <style>
-        .emp-card {
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: inline-block;
-            width: 250px;
+        body { background-color: #111; color: #fff; font-family: 'Inter', sans-serif; }
+        .team-container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
             text-align: center;
-            text-decoration: none;
-            color: #333;
-            transition: 0.3s;
-            cursor: pointer;
         }
-        .emp-card:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            background-color: #f9f9f9;
+        .team-title {
+            font-size: 36px;
+            background: linear-gradient(90deg, #d4af37, #f3e5ab);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            font-weight: bold;
         }
-        .emp-photo {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-bottom: 10px;
-        }
-        .emp-container {
+        .team-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 40px;
+            justify-content: center;
+        }
+        .team-card {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 16px;
+            padding: 40px 30px;
+            width: 340px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4);
+            border-color: #d4af37;
+        }
+        .team-photo-container {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 25px auto;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid #d4af37;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+        .team-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .team-name {
+            font-size: 26px;
+            color: #f3e5ab;
+            margin: 10px 0 5px;
+            font-weight: 600;
+        }
+        .team-specialty {
+            font-size: 16px;
+            color: #d4af37;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .team-bio {
+            font-size: 15px;
+            color: #ddd;
+            line-height: 1.6;
+            font-style: italic;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: #d4af37;
+            text-decoration: none;
+            font-size: 16px;
+            border: 1px solid #d4af37;
+            padding: 10px 20px;
+            border-radius: 30px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
         }
     </style>
 </head>
 <body>
+    <?php include '../components/Header.php'; ?>
+    <?php include '../components/LoginModal.php'; ?>
 
-    <h1>Agendamento - Passo 2: Escolha o Profissional</h1>
-    <a href="Servicos.php">Voltar para a escolha de serviços</a>
-    <hr>
-    
-    <h2>Profissionais que realizam: <u><?= htmlspecialchars($servico['Ser_name']) ?></u></h2>
+    <div class="team-container">
+        <a href="../../Index.php" class="back-link">← Voltar para a Home</a>
+        <h1 class="team-title">Conheça Nossa Equipe</h1>
 
-    <?php if(count($funcionarios) > 0): ?>
-        <div class="emp-container">
-            <?php foreach($funcionarios as $f): ?>
-                
-                <!-- Redireciona para o passo 3: Escolha do Horário -->
-                <a href="Horarios.php?Ser_id=<?= $ser_id ?>&Emp_id=<?= $f['Emp_id'] ?>" class="emp-card">
-                    
-                    <?php if(!empty($f['Emp_photo'])): ?>
-                        <img src="../../<?= htmlspecialchars($f['Emp_photo']) ?>" alt="<?= htmlspecialchars($f['User_name']) ?>" class="emp-photo">
-                    <?php else: ?>
-                        <!-- Placeholder se o funcionário não tiver foto -->
-                        <div style="width:100px; height:100px; background:#e0e0e0; border-radius:50%; margin:0 auto 10px auto; display:flex; align-items:center; justify-content:center;">
-                            <span>Sem Foto</span>
+        <?php if(count($funcionarios) > 0): ?>
+            <div class="team-grid">
+                <?php foreach($funcionarios as $f): ?>
+                    <div class="team-card">
+                        <div class="team-photo-container">
+                            <?php if(!empty($f['Emp_photo'])): ?>
+                                <img src="../../<?= htmlspecialchars($f['Emp_photo']) ?>" alt="<?= htmlspecialchars($f['User_name']) ?>" class="team-photo">
+                            <?php else: ?>
+                                <div style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center; color:#888;">
+                                    <span>Sem Foto</span>
+                                </div>
+                            <?php endif; ?>
                         </div>
-                    <?php endif; ?>
-
-                    <h3><?= htmlspecialchars($f['User_name']) ?></h3>
-                    <p><em><?= htmlspecialchars($f['Emp_specialty'] ?: 'Especialista') ?></em></p>
-                </a>
-                
-            <?php endforeach; ?>
-        </div>
-    <?php else: ?>
-        <p>No momento, não há funcionários (F) disponíveis para este serviço.</p>
-    <?php endif; ?>
-
+                        <h3 class="team-name"><?= htmlspecialchars($f['User_name']) ?></h3>
+                        <p class="team-specialty"><?= htmlspecialchars($f['Emp_specialty'] ?: 'Profissional da Beleza') ?></p>
+                        <?php if(!empty($f['Emp_bio'])): ?>
+                            <p class="team-bio">"<?= htmlspecialchars($f['Emp_bio']) ?>"</p>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <p style="color:#aaa;">No momento, não temos profissionais cadastrados.</p>
+        <?php endif; ?>
+    </div>
 </body>
 </html>

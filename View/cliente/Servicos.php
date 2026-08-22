@@ -4,10 +4,11 @@ require_once "../../core/Session.php";
 
 Session::iniciar();
 
+require_once "../../model/Service.php";
+
 // Buscar apenas os serviços ativos para os clientes escolherem
-$sql = "SELECT * FROM services WHERE Ser_active = 1 ORDER BY Ser_name ASC";
-$stmt = $pdo->query($sql);
-$servicos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$serviceModel = new Service($pdo);
+$servicos = $serviceModel->listarAtivos();
 
 ?>
 <!DOCTYPE html>

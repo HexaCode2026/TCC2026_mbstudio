@@ -48,9 +48,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Buscar o Emp_id do funcionário logado
-    $stmtEmp = $pdo->prepare("SELECT Emp_id FROM employees WHERE User_id = ?");
-    $stmtEmp->execute([$userId]);
-    $empId = $stmtEmp->fetchColumn();
+    require_once __DIR__ . "/../model/Employee.php";
+    $employeeModel = new Employee($pdo);
+    $empId = $employeeModel->getEmpIdByUserId($userId);
 
     if (!$empId) {
         echo "<script>

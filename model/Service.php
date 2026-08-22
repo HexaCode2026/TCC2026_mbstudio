@@ -141,5 +141,43 @@ class Service {
         return $empId;
     }
 
+    // =====================================
+    // LISTAR SERVIÇOS ATIVOS (PARA O CLIENTE)
+    // =====================================
+    public function listarAtivos() {
+        $sql = "SELECT * FROM services WHERE Ser_active = 1 ORDER BY Ser_name ASC";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // =====================================
+    // BUSCAR SERVIÇO POR ID
+    // =====================================
+    public function buscarPorId($id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM services WHERE Ser_id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // =====================================
+    // LISTAR SERVIÇOS POR FUNCIONÁRIO
+    // =====================================
+    public function listarPorFuncionario($empId) {
+        $sql = "SELECT
+                    es.EmpSer_id,
+                    es.Emp_id,
+                    es.Ser_id,
+                    s.Ser_name,
+                    s.Ser_duration
+                FROM employee_services es
+                INNER JOIN services s
+                    ON es.Ser_id = s.Ser_id
+                WHERE es.Emp_id = ?
+                  AND (s.Ser_active = 1 OR s.Ser_active IS NULL)
+                ORDER BY s.Ser_name ASC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$empId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

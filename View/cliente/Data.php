@@ -17,11 +17,11 @@ if (!$ser_id) {
     exit;
 }
 
+require_once "../../model/Service.php";
+
 // Buscar detalhes do Serviço (para mostrar ao usuário)
-$sqlServico = "SELECT Ser_name FROM services WHERE Ser_id = ?";
-$stmtServico = $pdo->prepare($sqlServico);
-$stmtServico->execute([$ser_id]);
-$servico = $stmtServico->fetch(PDO::FETCH_ASSOC);
+$serviceModel = new Service($pdo);
+$servico = $serviceModel->buscarPorId($ser_id);
 
 if (!$servico) {
     header("Location: Servicos.php");

@@ -18,11 +18,16 @@ if (!$ser_id || !$data) {
     exit;
 }
 
+require_once "../../model/Service.php";
+require_once "../../model/Availability.php";
+require_once "../../model/Appointment.php";
+
+$serviceModel = new Service($pdo);
+$availabilityModel = new Availability($pdo);
+$appointmentModel = new Appointment($pdo);
+
 // Buscar detalhes do Serviço
-$sqlServico = "SELECT Ser_name, Ser_duration FROM services WHERE Ser_id = ?";
-$stmtServico = $pdo->prepare($sqlServico);
-$stmtServico->execute([$ser_id]);
-$servico = $stmtServico->fetch(PDO::FETCH_ASSOC);
+$servico = $serviceModel->buscarPorId($ser_id);
 
 if (!$servico) {
     header("Location: Servicos.php");
@@ -30,28 +35,10 @@ if (!$servico) {
 }
 
 // Buscar as disponibilidades de todos os funcionários que fazem esse serviço naquela data
-$sql = "SELECT a.Ava_start, a.Ava_end, e.Emp_id, u.User_name, e.Emp_photo
-        FROM availabilities a
-        JOIN employees e ON a.Emp_id = e.Emp_id
-        JOIN users u ON e.User_id = u.User_id
-        JOIN employee_services es ON e.Emp_id = es.Emp_id
-        WHERE a.Ava_date = ? 
-          AND a.Ava_status = 'Disponivel' 
-          AND es.Ser_id = ? 
-          AND u.User_perm = 'F'
-        ORDER BY a.Ava_start ASC, u.User_name ASC";
-
-$stmt = $pdo->prepare($sql);
-$stmt->execute([$data, $ser_id]);
-$disponibilidades = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$disponibilidades = $availabilityModel->listarHorariosDisponiveis($data, $ser_id);
 
 // Buscar todos os agendamentos ativos para a data selecionada
-$sqlAppo = "SELECT Emp_id, Appo_start, Appo_end FROM appointments 
-            WHERE Appo_date = ? 
-            AND Appo_status NOT IN ('Cancelado pelo Cliente', 'Cancelado pelo Funcionario', 'Cancelado pelo Administrador', 'Nao Compareceu')";
-$stmtAppo = $pdo->prepare($sqlAppo);
-$stmtAppo->execute([$data]);
-$agendamentosDoDia = $stmtAppo->fetchAll(PDO::FETCH_ASSOC);
+$agendamentosDoDia = $appointmentModel->buscarTodosAgendamentosAtivosDoDia($data);
 
 // Função para gerar blocos de horários e filtrar os já ocupados
 function gerarHorariosDisponiveis($inicio, $fim, $duracao_minutos, $emp_id, $agendamentosDoDia)

@@ -14,10 +14,11 @@ if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'A') {
 $serviceModel = new Service($pdo);
 $servicos = $serviceModel->index();
 
+require_once "../../model/User.php";
+
+$userModel = new User($pdo);
 // Obter todos os usuários marcados como 'F' (Funcionário), ignorando a tabela employees inicialmente
-$sqlEmp = "SELECT User_id, User_name FROM users WHERE User_perm = 'F'";
-$stmtEmp = $pdo->query($sqlEmp);
-$funcionarios = $stmtEmp->fetchAll(PDO::FETCH_ASSOC);
+$funcionarios = $userModel->buscarPorPermissao('F');
 ?>
 <!DOCTYPE html>
 <html>

@@ -4,15 +4,11 @@ require_once "../../core/Session.php";
 
 Session::iniciar();
 
+require_once "../../model/Employee.php";
+
 // Buscar todos os funcionários habilitados (User_perm = 'F')
-$sql = "SELECT e.Emp_id, u.User_name, e.Emp_photo, e.Emp_specialty, e.Emp_bio 
-        FROM employees e
-        JOIN users u ON e.User_id = u.User_id
-        WHERE u.User_perm = 'F'
-        ORDER BY u.User_name ASC";
-        
-$stmt = $pdo->query($sql);
-$funcionarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$employeeModel = new Employee($pdo);
+$funcionarios = $employeeModel->listarFuncionariosAtivos();
 
 ?>
 <!DOCTYPE html>

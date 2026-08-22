@@ -69,14 +69,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Buscar ou garantir o Emp_id do funcionário logado
-    $stmtEmp = $pdo->prepare("SELECT Emp_id FROM employees WHERE User_id = ?");
-    $stmtEmp->execute([$userId]);
-    $empId = $stmtEmp->fetchColumn();
+    require_once __DIR__ . "/../model/Employee.php";
+    $employeeModel = new Employee($pdo);
+    $empId = $employeeModel->getEmpIdByUserId($userId);
 
     if (!$empId) {
-        $insertEmp = $pdo->prepare("INSERT INTO employees (User_id) VALUES (?)");
-        $insertEmp->execute([$userId]);
-        $empId = $pdo->lastInsertId();
+        $empId = $employeeModel->inserirEmpregado($userId);
     }
 
     $availabilityModel = new Availability($pdo);

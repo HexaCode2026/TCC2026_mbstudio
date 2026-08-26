@@ -17,11 +17,11 @@ if (!$ser_id) {
     exit;
 }
 
-// Buscar detalhes completos do Serviço
-$sqlServico = "SELECT Ser_name, Ser_price, Ser_duration, Ser_image, Ser_description FROM services WHERE Ser_id = ?";
-$stmtServico = $pdo->prepare($sqlServico);
-$stmtServico->execute([$ser_id]);
-$servico = $stmtServico->fetch(PDO::FETCH_ASSOC);
+require_once "../../model/Service.php";
+
+// Buscar detalhes do Serviço (para mostrar ao usuário)
+$serviceModel = new Service($pdo);
+$servico = $serviceModel->buscarPorId($ser_id);
 
 if (!$servico) {
     header("Location: Servicos.php");
@@ -46,7 +46,9 @@ $depoisAmanha = date("Y-m-d", strtotime("+2 days"));
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
@@ -59,11 +61,11 @@ $depoisAmanha = date("Y-m-d", strtotime("+2 days"));
             --card-alt: #f8f2e9;
             --borda: #eee8df;
             --borda-gold: rgba(185, 133, 39, 0.25);
-            
+
             --font-heading: 'Playfair Display', Georgia, "Times New Roman", serif;
             --font-cursive: 'Alex Brush', cursive;
             --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            
+
             --shadow-subtle: 0 4px 20px rgba(185, 133, 39, 0.07), 0 1px 4px rgba(0, 0, 0, 0.03);
             --shadow-hover: 0 10px 30px rgba(185, 133, 39, 0.15);
             --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
@@ -99,16 +101,12 @@ $depoisAmanha = date("Y-m-d", strtotime("+2 days"));
             overflow: hidden;
             padding: 40px 20px 80px;
             background:
-                radial-gradient(
-                    circle at 15% 80%,
+                radial-gradient(circle at 15% 80%,
                     rgba(185, 133, 39, 0.035),
-                    transparent 30%
-                ),
-                radial-gradient(
-                    circle at 85% 20%,
+                    transparent 30%),
+                radial-gradient(circle at 85% 20%,
                     rgba(214, 181, 110, 0.03),
-                    transparent 35%
-                ),
+                    transparent 35%),
                 var(--fundo);
         }
 
@@ -543,7 +541,8 @@ $depoisAmanha = date("Y-m-d", strtotime("+2 days"));
             <!-- Navegação Superior -->
             <div class="top-nav">
                 <a href="Servicos.php" class="btn-voltar" title="Voltar para a lista de serviços">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
@@ -578,14 +577,16 @@ $depoisAmanha = date("Y-m-d", strtotime("+2 days"));
             <div class="page-header-box">
                 <span class="tag-subtitulo">✦ Agendamento Online ✦</span>
                 <h1 class="page-title">Qual o melhor dia para seu atendimento?</h1>
-                <p class="page-desc">Selecione uma data no calendário abaixo para consultar os horários e especialistas disponíveis no MB Studio.</p>
+                <p class="page-desc">Selecione uma data no calendário abaixo para consultar os horários e especialistas
+                    disponíveis no MB Studio.</p>
             </div>
 
             <!-- Resumo do Serviço Selecionado -->
             <div class="service-summary-card">
                 <div class="service-summary-left">
                     <?php if (!empty($servico['Ser_image'])): ?>
-                        <img src="../../<?= htmlspecialchars($servico['Ser_image']) ?>" alt="<?= htmlspecialchars($servico['Ser_name']) ?>" class="service-summary-img">
+                        <img src="../../<?= htmlspecialchars($servico['Ser_image']) ?>"
+                            alt="<?= htmlspecialchars($servico['Ser_name']) ?>" class="service-summary-img">
                     <?php else: ?>
                         <div class="service-summary-img">✂</div>
                     <?php endif; ?>
@@ -593,9 +594,11 @@ $depoisAmanha = date("Y-m-d", strtotime("+2 days"));
                     <div class="service-summary-info">
                         <h3><?= htmlspecialchars($servico['Ser_name']) ?></h3>
                         <div class="service-summary-meta">
-                            <span>Preço: <strong>R$ <?= number_format($servico['Ser_price'] ?? 0, 2, ',', '.') ?></strong></span>
+                            <span>Preço: <strong>R$
+                                    <?= number_format($servico['Ser_price'] ?? 0, 2, ',', '.') ?></strong></span>
                             <span>•</span>
-                            <span>Duração: <strong><?= htmlspecialchars($servico['Ser_duration'] ?? 0) ?> min</strong></span>
+                            <span>Duração: <strong><?= htmlspecialchars($servico['Ser_duration'] ?? 0) ?>
+                                    min</strong></span>
                         </div>
                     </div>
                 </div>
@@ -629,20 +632,14 @@ $depoisAmanha = date("Y-m-d", strtotime("+2 days"));
 
                     <div class="date-input-wrap">
                         <label for="data">Data do Agendamento:</label>
-                        <input 
-                            type="date" 
-                            id="data" 
-                            name="data" 
-                            min="<?= $hoje ?>" 
-                            value="<?= $hoje ?>" 
-                            class="input-date-luxury" 
-                            required
-                        >
+                        <input type="date" id="data" name="data" min="<?= $hoje ?>" value="<?= $hoje ?>"
+                            class="input-date-luxury" required>
                     </div>
 
                     <button type="submit" class="btn-submit-date">
                         <span>Avançar para Ver Horários</span>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                             <polyline points="12 5 19 12 12 19"></polyline>
                         </svg>
@@ -670,7 +667,7 @@ $depoisAmanha = date("Y-m-d", strtotime("+2 days"));
         }
 
         // Sincronizar botões rápidos caso o usuário use o calendário manual
-        document.getElementById('data').addEventListener('change', function() {
+        document.getElementById('data').addEventListener('change', function () {
             const val = this.value;
             const quickButtons = document.querySelectorAll('.quick-date-btn');
             quickButtons.forEach(btn => btn.classList.remove('active'));

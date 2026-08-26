@@ -19,18 +19,20 @@ if (!$ser_id || !$data || !$emp_id || !$hora) {
     exit;
 }
 
-require_once "../../model/Service.php";
-require_once "../../model/Employee.php";
-
-$serviceModel = new Service($pdo);
-$employeeModel = new Employee($pdo);
-
 // Buscar dados do serviço
-$servico = $serviceModel->buscarPorId($ser_id);
+$stmtSer = $pdo->prepare("SELECT Ser_name, Ser_duration, Ser_price FROM services WHERE Ser_id = ?");
+$stmtSer->execute([$ser_id]);
+$servico = $stmtSer->fetch(PDO::FETCH_ASSOC);
 
 // Buscar dados do funcionário
-$funcionarioNome = $employeeModel->buscarNomePorEmpId($emp_id);
-$funcionario = ['User_name' => $funcionarioNome];
+$stmtEmp = $pdo->prepare("
+    SELECT u.User_name 
+    FROM employees e 
+    JOIN users u ON e.User_id = u.User_id 
+    WHERE e.Emp_id = ?
+");
+$stmtEmp->execute([$emp_id]);
+$funcionario = $stmtEmp->fetch(PDO::FETCH_ASSOC);
 
 if (!$servico || !$funcionario) {
     echo "Dados inválidos.";

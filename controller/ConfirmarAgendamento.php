@@ -1,8 +1,6 @@
 <?php
 require_once "../config/conexao.php";
 require_once "../core/Session.php";
-require_once "../model/Client.php";
-require_once "../model/Appointment.php";
 
 Session::iniciar();
 
@@ -30,22 +28,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
-        // 1. Obter ou criar o ID do Cliente
-        $clientModel = new Client($pdo);
-        $cli_id = $clientModel->getOrCreateClientId($userId);
+        // 1. Buscar o Cli_id correspondente ao usuário logado
+        $stmtCli = $pdo->prepare("SELECT Cli_id FROM clients WHERE User_id = ?");
+        $stmtCli->execute([$userId]);
+        $cliente = $stmtCli->fetch(PDO::FETCH_ASSOC);
 
-        // 2. Verificar conflito de horário
-        $appointmentModel = new Appointment($pdo);
-        $conflito = $appointmentModel->verificarConflitoHorario($emp_id, $data, $hora_inicio, $hora_fim);
+        if (!$cliente) {
+            // Se o usuário não estiver na tabela clients por algum motivo (ex: erro no cadastro), cria um registro
+            $stmtInsertCli = $pdo->prepare("INSERT INTO clients (User_id) VALUES (?)");
+            $stmtInsertCli->execute([$userId]);
+            $cli_id = $pdo->lastInsertId();
+        } else {
+            $cli_id = $cliente['Cli_id'];
+        }
+
+        // 2. Opcional: Verificar se o horário ainda está disponível para evitar race condition
+        $sqlCheck = "SELECT Appo_id FROM appointments 
+                     WHERE Emp_id = ? AND Appo_date = ? 
+                       AND Appo_status NOT IN ('Cancelado pelo Cliente', 'Cancelado pelo Funcionario', 'Cancelado pelo Administrador', 'Nao Compareceu')
+                       AND (
+                           (Appo_start <= ? AND Appo_end > ?) OR
+                           (Appo_start < ? AND Appo_end >= ?) OR
+                           (? <= Appo_start AND ? >= Appo_end)
+                       )";
+        $stmtCheck = $pdo->prepare($sqlCheck);
+        $stmtCheck->execute([
+            $emp_id, $data, 
+            $hora_inicio, $hora_inicio, 
+            $hora_fim, $hora_fim, 
+            $hora_inicio, $hora_fim
+        ]);
         
-        if ($conflito) {
+        if ($stmtCheck->rowCount() > 0) {
             $pdo->rollBack();
             echo "<script>alert('Desculpe, este horário acabou de ser reservado. Por favor, escolha outro.'); window.location.href='../View/cliente/Horarios.php?Ser_id=$ser_id&data=$data';</script>";
             exit;
         }
 
         // 3. Inserir o agendamento
-        $appointmentModel->criarAgendamento($cli_id, $emp_id, $ser_id, $data, $hora_inicio, $hora_fim);
+        $sqlInsert = "INSERT INTO appointments (Cli_id, Emp_id, Ser_id, Appo_date, Appo_start, Appo_end, Appo_status) 
+                      VALUES (?, ?, ?, ?, ?, ?, 'Pendente')";
+        $stmtInsert = $pdo->prepare($sqlInsert);
+        $stmtInsert->execute([$cli_id, $emp_id, $ser_id, $data, $hora_inicio, $hora_fim]);
 
         $pdo->commit();
 

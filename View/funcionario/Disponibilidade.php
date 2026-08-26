@@ -13,31 +13,24 @@ if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'F') {
 
 // Buscar ou garantir o Emp_id do funcionário logado
 $userId = $_SESSION['User_id'];
-$stmtEmp = $pdo->prepare("SELECT Emp_id FROM employees WHERE User_id = ?");
-$stmtEmp->execute([$userId]);
-$empId = $stmtEmp->fetchColumn();
+$empId = $employeeModel->getEmpIdByUserId($userId);
 
 if (!$empId) {
-    $insertEmp = $pdo->prepare("INSERT INTO employees (User_id) VALUES (?)");
-    $insertEmp->execute([$userId]);
-    $empId = $pdo->lastInsertId();
+    $empId = $employeeModel->inserirEmpregado($userId);
 }
 
-// Buscar serviços vinculados ao funcionário através da tabela employee_services
-// Seleciona EmpSer_id, a chave estrangeira Ser_id e dados do serviço para o Emp_id do funcionário logado
-$sqlServicos = "SELECT es.EmpSer_id, es.Emp_id, es.Ser_id, s.Ser_name, s.Ser_duration 
-                FROM employee_services es
-                INNER JOIN services s ON es.Ser_id = s.Ser_id
-                WHERE es.Emp_id = ? AND (s.Ser_active = 1 OR s.Ser_active IS NULL)
-                ORDER BY s.Ser_name ASC";
-$stmtServicos = $pdo->prepare($sqlServicos);
-$stmtServicos->execute([$empId]);
-$servicos = $stmtServicos->fetchAll(PDO::FETCH_ASSOC);
+// ======================================================
+// SERVIÇOS DO FUNCIONÁRIO
+// ======================================================
+$servicos = $serviceModel->listarPorFuncionario($empId);
 
-// Buscar todas as disponibilidades já cadastradas para o funcionário (incluindo datas passadas)
-require_once "../../model/Availability.php";
-$availabilityModel = new Availability($pdo);
-$minhasDisponibilidades = $availabilityModel->listarPorFuncionario($empId);
+
+// ======================================================
+// DISPONIBILIDADES
+// ======================================================
+
+$minhasDisponibilidades =
+    $availabilityModel->listarPorFuncionario($empId);
 
 // Obter datas únicas das disponibilidades para o filtro
 $datasCadastradas = [];

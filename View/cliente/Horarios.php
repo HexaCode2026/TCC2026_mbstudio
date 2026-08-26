@@ -18,11 +18,16 @@ if (!$ser_id || !$data) {
     exit;
 }
 
-// Buscar detalhes completos do Serviço
-$sqlServico = "SELECT Ser_name, Ser_duration, Ser_price, Ser_image FROM services WHERE Ser_id = ?";
-$stmtServico = $pdo->prepare($sqlServico);
-$stmtServico->execute([$ser_id]);
-$servico = $stmtServico->fetch(PDO::FETCH_ASSOC);
+require_once "../../model/Service.php";
+require_once "../../model/Availability.php";
+require_once "../../model/Appointment.php";
+
+$serviceModel = new Service($pdo);
+$availabilityModel = new Availability($pdo);
+$appointmentModel = new Appointment($pdo);
+
+// Buscar detalhes do Serviço
+$servico = $serviceModel->buscarPorId($ser_id);
 
 if (!$servico) {
     header("Location: Servicos.php");
@@ -30,20 +35,10 @@ if (!$servico) {
 }
 
 // Buscar as disponibilidades de todos os funcionários que fazem esse serviço naquela data
-$sql = "SELECT a.Ava_start, a.Ava_end, e.Emp_id, u.User_name, e.Emp_photo, e.Emp_specialty
-        FROM availabilities a
-        JOIN employees e ON a.Emp_id = e.Emp_id
-        JOIN users u ON e.User_id = u.User_id
-        JOIN employee_services es ON e.Emp_id = es.Emp_id
-        WHERE a.Ava_date = ? 
-          AND a.Ava_status = 'Disponivel' 
-          AND es.Ser_id = ? 
-          AND u.User_perm = 'F'
-        ORDER BY a.Ava_start ASC, u.User_name ASC";
+$disponibilidades = $availabilityModel->listarHorariosDisponiveis($data, $ser_id);
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute([$data, $ser_id]);
-$disponibilidades = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Buscar todos os agendamentos ativos para a data selecionada
+$agendamentosDoDia = $appointmentModel->buscarTodosAgendamentosAtivosDoDia($data);
 
 // Função para gerar blocos de horários com base na duração do serviço
 function gerarHorarios($inicio, $fim, $duracao_minutos)
@@ -61,7 +56,8 @@ function gerarHorarios($inicio, $fim, $duracao_minutos)
 }
 
 // Função auxiliar para gerar iniciais quando não houver foto
-function getIniciais($nome) {
+function getIniciais($nome)
+{
     $partes = preg_split('/\s+/', trim($nome));
     $iniciais = '';
     if (count($partes) >= 2) {
@@ -92,7 +88,9 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
@@ -105,11 +103,11 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
             --card-alt: #f8f2e9;
             --borda: #eee8df;
             --borda-gold: rgba(185, 133, 39, 0.25);
-            
+
             --font-heading: 'Playfair Display', Georgia, "Times New Roman", serif;
             --font-cursive: 'Alex Brush', cursive;
             --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            
+
             --shadow-subtle: 0 4px 20px rgba(185, 133, 39, 0.07), 0 1px 4px rgba(0, 0, 0, 0.03);
             --shadow-hover: 0 12px 32px rgba(185, 133, 39, 0.16);
             --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
@@ -145,16 +143,12 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
             overflow: hidden;
             padding: 40px 20px 80px;
             background:
-                radial-gradient(
-                    circle at 15% 80%,
+                radial-gradient(circle at 15% 80%,
                     rgba(185, 133, 39, 0.035),
-                    transparent 30%
-                ),
-                radial-gradient(
-                    circle at 85% 20%,
+                    transparent 30%),
+                radial-gradient(circle at 85% 20%,
                     rgba(214, 181, 110, 0.03),
-                    transparent 35%
-                ),
+                    transparent 35%),
                 var(--fundo);
         }
 
@@ -689,8 +683,10 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
 
             <!-- Navegação Superior -->
             <div class="top-nav">
-                <a href="Data.php?Ser_id=<?= htmlspecialchars($ser_id) ?>" class="btn-voltar" title="Retornar à seleção de data">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <a href="Data.php?Ser_id=<?= htmlspecialchars($ser_id) ?>" class="btn-voltar"
+                    title="Retornar à seleção de data">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
@@ -730,7 +726,7 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
                         <div class="summary-val"><?= htmlspecialchars($servico['Ser_name']) ?></div>
                         <div class="summary-subval">
                             Duração: <strong><?= $servico['Ser_duration'] ?> min</strong>
-                            <?php if(!empty($servico['Ser_price'])): ?>
+                            <?php if (!empty($servico['Ser_price'])): ?>
                                 • R$ <strong><?= number_format($servico['Ser_price'], 2, ',', '.') ?></strong>
                             <?php endif; ?>
                         </div>
@@ -739,7 +735,8 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
 
                 <div class="summary-block">
                     <div class="summary-icon-wrap">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                             <line x1="16" y1="2" x2="16" y2="6"></line>
                             <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -763,7 +760,8 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
             <div class="section-header-box">
                 <span class="tag-subtitulo">✦ Profissionais & Disponibilidade ✦</span>
                 <h1 class="section-title">Escolha o Profissional e Horário</h1>
-                <p class="section-desc">Clique no horário mais conveniente abaixo para avançar para a confirmação do seu agendamento.</p>
+                <p class="section-desc">Clique no horário mais conveniente abaixo para avançar para a confirmação do seu
+                    agendamento.</p>
             </div>
 
             <!-- Lista de Profissionais Disponíveis -->
@@ -771,13 +769,14 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
                 <div class="professionals-grid">
                     <?php foreach ($disponibilidades as $disp): ?>
                         <div class="professional-card">
-                            
+
                             <!-- Cabeçalho do Especialista -->
                             <div class="professional-header">
                                 <div class="prof-info-left">
                                     <div class="prof-photo-frame">
                                         <?php if (!empty($disp['Emp_photo'])): ?>
-                                            <img src="../../<?= htmlspecialchars($disp['Emp_photo']) ?>" class="prof-photo-img" alt="<?= htmlspecialchars($disp['User_name']) ?>">
+                                            <img src="../../<?= htmlspecialchars($disp['Emp_photo']) ?>" class="prof-photo-img"
+                                                alt="<?= htmlspecialchars($disp['User_name']) ?>">
                                         <?php else: ?>
                                             <span><?= getIniciais($disp['User_name']) ?></span>
                                         <?php endif; ?>
@@ -785,24 +784,28 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
                                     <div>
                                         <h2 class="prof-name-text"><?= htmlspecialchars($disp['User_name']) ?></h2>
                                         <?php if (!empty($disp['Emp_specialty'])): ?>
-                                            <span class="prof-specialty-badge"><?= htmlspecialchars($disp['Emp_specialty']) ?></span>
+                                            <span
+                                                class="prof-specialty-badge"><?= htmlspecialchars($disp['Emp_specialty']) ?></span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
 
                                 <div class="shift-badge">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <polyline points="12 6 12 12 16 14"></polyline>
                                     </svg>
-                                    <span>Expediente: <?= date('H:i', strtotime($disp['Ava_start'])) ?> às <?= date('H:i', strtotime($disp['Ava_end'])) ?></span>
+                                    <span>Expediente: <?= date('H:i', strtotime($disp['Ava_start'])) ?> às
+                                        <?= date('H:i', strtotime($disp['Ava_end'])) ?></span>
                                 </div>
                             </div>
 
                             <!-- Grade de Horários Disponíveis -->
                             <div class="time-slots-container">
                                 <div class="time-slots-title">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <polyline points="12 6 12 12 16 14"></polyline>
                                     </svg>
@@ -812,16 +815,15 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
                                 <?php
                                 $horarios_gerados = gerarHorarios($disp['Ava_start'], $disp['Ava_end'], $servico['Ser_duration']);
                                 if (count($horarios_gerados) > 0):
-                                ?>
+                                    ?>
                                     <div class="time-slots-grid">
                                         <?php foreach ($horarios_gerados as $h): ?>
                                             <!-- Link que envia os dados para Confirmar.php -->
-                                            <a 
-                                                href="Confirmar.php?Ser_id=<?= $ser_id ?>&data=<?= $data ?>&Emp_id=<?= $disp['Emp_id'] ?>&hora=<?= $h ?>" 
+                                            <a href="Confirmar.php?Ser_id=<?= $ser_id ?>&data=<?= $data ?>&Emp_id=<?= $disp['Emp_id'] ?>&hora=<?= $h ?>"
                                                 class="time-slot-btn"
-                                                title="Agendar com <?= htmlspecialchars($disp['User_name']) ?> às <?= $h ?>"
-                                            >
-                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                title="Agendar com <?= htmlspecialchars($disp['User_name']) ?> às <?= $h ?>">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                                     <circle cx="12" cy="12" r="10"></circle>
                                                     <polyline points="12 6 12 12 16 14"></polyline>
                                                 </svg>
@@ -831,7 +833,8 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
                                     </div>
                                 <?php else: ?>
                                     <p class="warning-duration-notice">
-                                        <em>O tempo deste procedimento (<?= $servico['Ser_duration'] ?> min) ultrapassa a janela disponível deste profissional.</em>
+                                        <em>O tempo deste procedimento (<?= $servico['Ser_duration'] ?> min) ultrapassa a janela
+                                            disponível deste profissional.</em>
                                     </p>
                                 <?php endif; ?>
                             </div>
@@ -846,10 +849,13 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
                     <div class="empty-icon-circle">📅</div>
                     <h2 class="empty-title">Nenhum horário disponível para esta data</h2>
                     <p class="empty-desc">
-                        Não encontramos nenhum especialista com horários livres para o procedimento <strong>"<?= htmlspecialchars($servico['Ser_name']) ?>"</strong> no dia <strong><?= $dataFormatada ?></strong>.
+                        Não encontramos nenhum especialista com horários livres para o procedimento
+                        <strong>"<?= htmlspecialchars($servico['Ser_name']) ?>"</strong> no dia
+                        <strong><?= $dataFormatada ?></strong>.
                     </p>
                     <a href="Data.php?Ser_id=<?= htmlspecialchars($ser_id) ?>" class="btn-choose-other-date">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round" stroke-linejoin="round">
                             <line x1="19" y1="12" x2="5" y2="12"></line>
                             <polyline points="12 19 5 12 12 5"></polyline>
                         </svg>

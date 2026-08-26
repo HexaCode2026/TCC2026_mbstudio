@@ -5,9 +5,9 @@ require_once "../../core/Session.php";
 Session::iniciar();
 
 // Buscar apenas os serviços ativos para os clientes escolherem
-$sql = "SELECT * FROM services WHERE Ser_active = 1 ORDER BY Ser_name ASC";
-$stmt = $pdo->query($sql);
-$servicos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$serviceModel = new Service($pdo);
+$servicos = $serviceModel->listarAtivos();
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -59,11 +59,9 @@ $servicos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             overflow: hidden;
             padding: 42px 9% 60px;
             background:
-                radial-gradient(
-                    circle at 15% 80%,
+                radial-gradient(circle at 15% 80%,
                     rgba(185, 133, 39, 0.035),
-                    transparent 28%
-                ),
+                    transparent 28%),
                 var(--fundo);
         }
 
@@ -261,11 +259,9 @@ $servicos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .servico-card {
             min-height: 380px;
             background:
-                linear-gradient(
-                    145deg,
+                linear-gradient(145deg,
                     rgba(255, 255, 255, 0.65),
-                    rgba(248, 242, 233, 0.95)
-                );
+                    rgba(248, 242, 233, 0.95));
             border: 1px solid rgba(214, 181, 110, 0.45);
             border-radius: 18px;
             display: flex;
@@ -497,11 +493,13 @@ $servicos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <section class="servicos-grid" id="catalogo-servicos">
                 <?php foreach ($servicos as $s): ?>
                     <!-- Card de Serviço Clicável que Redireciona para o Agendamento -->
-                    <a href="#" onclick="checkAuthAndExecute(event, 'Data.php?Ser_id=<?= $s['Ser_id'] ?>')" class="servico-card" title="Clique para agendar <?= htmlspecialchars($s['Ser_name']) ?>">
-                        
+                    <a href="#" onclick="checkAuthAndExecute(event, 'Data.php?Ser_id=<?= $s['Ser_id'] ?>')" class="servico-card"
+                        title="Clique para agendar <?= htmlspecialchars($s['Ser_name']) ?>">
+
                         <div class="servico-icone">
                             <?php if (!empty($s['Ser_image'])): ?>
-                                <img src="../../<?= htmlspecialchars($s['Ser_image']) ?>" alt="<?= htmlspecialchars($s['Ser_name']) ?>">
+                                <img src="../../<?= htmlspecialchars($s['Ser_image']) ?>"
+                                    alt="<?= htmlspecialchars($s['Ser_name']) ?>">
                             <?php else: ?>
                                 <span class="icone-tesoura">✂</span>
                             <?php endif; ?>
@@ -514,7 +512,8 @@ $servicos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php endif; ?>
 
                         <div class="servico-info-meta">
-                            <span class="meta-preco"><strong>Preço:</strong> R$ <?= number_format($s['Ser_price'], 2, ',', '.') ?></span>
+                            <span class="meta-preco"><strong>Preço:</strong> R$
+                                <?= number_format($s['Ser_price'], 2, ',', '.') ?></span>
                             <span class="meta-duracao"><strong>Tempo:</strong> <?= $s['Ser_duration'] ?> min</span>
                         </div>
                     </a>

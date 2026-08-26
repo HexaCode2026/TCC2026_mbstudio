@@ -13,12 +13,6 @@ if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'C') {
 
 $userId = $_SESSION['User_id'];
 
-require_once "../../model/Client.php";
-require_once "../../model/Appointment.php";
-
-$clientModel = new Client($pdo);
-$appointmentModel = new Appointment($pdo);
-
 // Processa cancelamento do lado do cliente
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'cancel' && isset($_POST['appo_id']) && isset($_POST['cancel_reason'])) {
@@ -27,8 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if (!empty($reason)) {
             // Verificar se o agendamento pertence ao cliente
-            if ($appointmentModel->verificarDonoAgendamento($appoId, $userId)) {
-                $appointmentModel->atualizarStatus($appoId, null, 'Cancelado pelo Cliente', 'Cliente', $reason);
+            $check = $pdo->prepare("SELECT a.Appo_id FROM appointments a JOIN clients c ON a.Cli_id = c.Cli_id WHERE a.Appo_id = ? AND c.User_id = ?");
+            $check->execute([$appoId, $userId]);
+            if ($check->rowCount() > 0) {
+                $stmt = $pdo->prepare("UPDATE appointments SET Appo_status = 'Cancelado pelo Cliente', Appo_cancel_by = 'Cliente', Appo_cancel_reason = :reason WHERE Appo_id = :id");
+                $stmt->bindParam(':reason', $reason, PDO::PARAM_STR);
+                $stmt->bindParam(':id', $appoId, PDO::PARAM_INT);
+                $stmt->execute();
             }
         }
         
@@ -38,8 +37,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Busca os agendamentos do cliente logado
-$cliId = $clientModel->getOrCreateClientId($userId);
-$appointments = $appointmentModel->listarMeusAgendamentos($cliId);
+$query = "SELECT a.*, 
+                 u.User_name as employee_name, 
+                 s.Ser_name, 
+                 s.Ser_price, 
+                 s.Ser_duration 
+          FROM appointments a
+          JOIN clients c ON a.Cli_id = c.Cli_id
+          JOIN services s ON a.Ser_id = s.Ser_id
+          JOIN employees e ON a.Emp_id = e.Emp_id
+          JOIN users u ON e.User_id = u.User_id
+          WHERE c.User_id = :user_id
+          ORDER BY a.Appo_date DESC, a.Appo_start ASC";
+
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+$stmt->execute();
+$appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 <!DOCTYPE html>

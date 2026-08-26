@@ -14,17 +14,15 @@ if (!isset($_SESSION['User_perm']) || ($_SESSION['User_perm'] != 'F' && $_SESSIO
 // Pega o ID do usuário logado
 $userId = $_SESSION['User_id'] ?? 0;
 
-require_once "../../model/Employee.php";
-require_once "../../model/Appointment.php";
-
-$employeeModel = new Employee($pdo);
-$appointmentModel = new Appointment($pdo);
-
 // Busca ou garante o Emp_id do funcionário logado
-$empId = $employeeModel->getEmpIdByUserId($userId);
+$stmtEmp = $pdo->prepare("SELECT Emp_id FROM employees WHERE User_id = ?");
+$stmtEmp->execute([$userId]);
+$empId = $stmtEmp->fetchColumn();
 
 if (!$empId && $_SESSION['User_perm'] == 'F') {
-    $empId = $employeeModel->inserirEmpregado($userId);
+    $insertEmp = $pdo->prepare("INSERT INTO employees (User_id) VALUES (?)");
+    $insertEmp->execute([$userId]);
+    $empId = $pdo->lastInsertId();
 }
 
 // Processa formulários de ações (aceitar, cancelar, iniciar, finalizar)
@@ -33,17 +31,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $appoId = (int) $_POST['appo_id'];
 
         if ($_POST['action'] === 'accept') {
-            $appointmentModel->atualizarStatus($appoId, $empId, 'Confirmado');
+            $stmt = $pdo->prepare("UPDATE appointments SET Appo_status = 'Confirmado' WHERE Appo_id = :id");
+            $stmt->bindParam(':id', $appoId, PDO::PARAM_INT);
+            $stmt->execute();
         } elseif ($_POST['action'] === 'start') {
-            $appointmentModel->atualizarStatus($appoId, $empId, 'Em Atendimento');
+            $stmt = $pdo->prepare("UPDATE appointments SET Appo_status = 'Em Atendimento' WHERE Appo_id = :id");
+            $stmt->bindParam(':id', $appoId, PDO::PARAM_INT);
+            $stmt->execute();
         } elseif ($_POST['action'] === 'finish') {
-            $appointmentModel->atualizarStatus($appoId, $empId, 'Concluido');
+            $stmt = $pdo->prepare("UPDATE appointments SET Appo_status = 'Concluido' WHERE Appo_id = :id");
+            $stmt->bindParam(':id', $appoId, PDO::PARAM_INT);
+            $stmt->execute();
         } elseif ($_POST['action'] === 'noshow') {
-            $appointmentModel->atualizarStatus($appoId, $empId, 'Nao Compareceu');
+            $stmt = $pdo->prepare("UPDATE appointments SET Appo_status = 'Nao Compareceu' WHERE Appo_id = :id");
+            $stmt->bindParam(':id', $appoId, PDO::PARAM_INT);
+            $stmt->execute();
         } elseif ($_POST['action'] === 'cancel' && isset($_POST['cancel_reason'])) {
             $reason = trim($_POST['cancel_reason']);
             if (!empty($reason)) {
-                $appointmentModel->atualizarStatus($appoId, $empId, 'Cancelado pelo Funcionario', 'Funcionario', $reason);
+                $stmt = $pdo->prepare("UPDATE appointments SET Appo_status = 'Cancelado pelo Funcionario', Appo_cancel_by = 'Funcionario', Appo_cancel_reason = :reason WHERE Appo_id = :id");
+                $stmt->bindParam(':reason', $reason, PDO::PARAM_STR);
+                $stmt->bindParam(':id', $appoId, PDO::PARAM_INT);
+                $stmt->execute();
             }
         }
 
@@ -53,7 +62,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Busca os agendamentos do funcionário vinculado ao usuário logado
-$appointments = $appointmentModel->listarPorFuncionario($empId);
+// appointments (Cli_id) -> clients (User_id) -> users (User_name)
+$query = "SELECT a.*, 
+                 users.User_name as client_name, 
+                 s.Ser_name, 
+                 s.Ser_price, 
+                 s.Ser_duration 
+          FROM appointments a
+          JOIN clients c ON a.Cli_id = c.Cli_id
+          JOIN users ON c.User_id = users.User_id
+          JOIN services s ON a.Ser_id = s.Ser_id
+          JOIN employees e ON a.Emp_id = e.Emp_id
+          WHERE e.User_id = :user_id
+          ORDER BY a.Appo_date DESC, a.Appo_start ASC";
+
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+$stmt->execute();
+$appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Obter datas únicas dos agendamentos para o filtro
 $datasCadastradas = [];

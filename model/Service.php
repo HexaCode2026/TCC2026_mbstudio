@@ -49,13 +49,13 @@ class Service {
     // =====================================
     public function index() {
         $sql = "SELECT 
-                    s.Ser_id, s.Ser_name, s.Ser_description, s.Ser_price, s.Ser_duration, s.Ser_image, s.Ser_active,
+                    s.Ser_id, s.Ser_name, s.Ser_description, s.Ser_price, s.Ser_duration, s.Ser_active,
                     GROUP_CONCAT(u.User_name SEPARATOR ', ') AS Employees
                 FROM services s
                 LEFT JOIN employee_services es ON s.Ser_id = es.Ser_id
                 LEFT JOIN employees e ON es.Emp_id = e.Emp_id
                 LEFT JOIN users u ON e.User_id = u.User_id
-                GROUP BY s.Ser_id, s.Ser_name, s.Ser_description, s.Ser_price, s.Ser_duration, s.Ser_image, s.Ser_active
+                GROUP BY s.Ser_id
                 ORDER BY s.Ser_id DESC";
                 
         $stmt = $this->pdo->prepare($sql);

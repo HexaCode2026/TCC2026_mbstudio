@@ -117,7 +117,7 @@ $basePath = '/TCC2026_mbstudio';
             <div class="auth-dropdown-content">
                 <div class="auth-dropdown-menu">
                     <?php if (isset($_SESSION['User_perm']) && $_SESSION['User_perm'] == 'F'): ?>
-                        <a href="<?= $basePath ?>/View/funcionario/Agenda.php" class="auth-dropdown-item">Minha Agenda</a>
+                        <a href="<?= $basePath ?>/View/funcionario/Agendamentos.php" class="auth-dropdown-item">Minha Agenda</a>
                     <?php elseif (isset($_SESSION['User_perm']) && $_SESSION['User_perm'] == 'A'): ?>
                         <a href="<?= $basePath ?>/View/admin/Dashboard.php" class="auth-dropdown-item">Painel Administrativo</a>
                     <?php else: ?>

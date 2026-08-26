@@ -45,17 +45,46 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute([$data, $ser_id]);
 $disponibilidades = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Função simples para gerar blocos de horários com base na duração do serviço
-function gerarHorarios($inicio, $fim, $duracao_minutos)
+// Buscar todos os agendamentos ativos para a data selecionada
+$sqlAppo = "SELECT Emp_id, Appo_start, Appo_end FROM appointments 
+            WHERE Appo_date = ? 
+            AND Appo_status NOT IN ('Cancelado pelo Cliente', 'Cancelado pelo Funcionario', 'Cancelado pelo Administrador', 'Nao Compareceu')";
+$stmtAppo = $pdo->prepare($sqlAppo);
+$stmtAppo->execute([$data]);
+$agendamentosDoDia = $stmtAppo->fetchAll(PDO::FETCH_ASSOC);
+
+// Função para gerar blocos de horários e filtrar os já ocupados
+function gerarHorariosDisponiveis($inicio, $fim, $duracao_minutos, $emp_id, $agendamentosDoDia)
 {
     $horarios = [];
     $atual = strtotime($inicio);
     $final = strtotime($fim);
+    $duracao_segundos = $duracao_minutos * 60;
 
     // Subtrai a duração para garantir que o último horário tenha tempo de terminar antes do "fim" do expediente
-    while ($atual + ($duracao_minutos * 60) <= $final) {
-        $horarios[] = date('H:i', $atual);
-        $atual += ($duracao_minutos * 60);
+    while ($atual + $duracao_segundos <= $final) {
+        $hora_inicio_str = date('H:i:s', $atual);
+        $hora_fim_str = date('H:i:s', $atual + $duracao_segundos);
+        
+        $conflito = false;
+        foreach ($agendamentosDoDia as $ag) {
+            if ($ag['Emp_id'] == $emp_id) {
+                // Se houver sobreposição, há conflito
+                if (
+                    ($hora_inicio_str < $ag['Appo_end']) && 
+                    ($hora_fim_str > $ag['Appo_start'])
+                ) {
+                    $conflito = true;
+                    break;
+                }
+            }
+        }
+        
+        if (!$conflito) {
+            $horarios[] = date('H:i', $atual);
+        }
+        
+        $atual += $duracao_segundos;
     }
     return $horarios;
 }
@@ -139,7 +168,7 @@ function gerarHorarios($inicio, $fim, $duracao_minutos)
                 <p>Selecione um horário:</p>
 
                 <?php
-                $horarios_gerados = gerarHorarios($disp['Ava_start'], $disp['Ava_end'], $servico['Ser_duration']);
+                $horarios_gerados = gerarHorariosDisponiveis($disp['Ava_start'], $disp['Ava_end'], $servico['Ser_duration'], $disp['Emp_id'], $agendamentosDoDia);
                 if (count($horarios_gerados) > 0):
                     foreach ($horarios_gerados as $h):
                         ?>
@@ -148,12 +177,11 @@ function gerarHorarios($inicio, $fim, $duracao_minutos)
                             class="time-btn">
                                 <?= $h ?>
                         </a>
-                            <?php
+                    <?php
                     endforeach;
                 else:
                     ?>
-                    <p><em>O tempo do serviço (<?= $servico['Ser_duration'] ?> min) é maior que o expediente disponível deste
-                            profissional.</em></p>
+                    <p><em>Nenhum horário disponível para este profissional no momento (ocupado ou tempo insuficiente).</em></p>
                 <?php endif; ?>
 
                     </div>

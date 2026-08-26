@@ -1,14 +1,16 @@
 <?php
 
 
-class Employee{
+class Employee
+{
 
 
     private $pdo;
 
 
 
-    public function __construct($pdo){
+    public function __construct($pdo)
+    {
 
 
         $this->pdo = $pdo;
@@ -23,7 +25,8 @@ class Employee{
     // BUSCAR FUNCIONÁRIO POR USER_ID
     // =====================================
 
-    public function buscarPorUserId($userId){
+    public function buscarPorUserId($userId)
+    {
 
 
 
@@ -89,9 +92,9 @@ class Employee{
 
         $bio
 
-    ){
+    ) {
 
-        try{
+        try {
 
             $this->pdo->beginTransaction();
 
@@ -157,9 +160,9 @@ class Employee{
             return true;
 
 
-        }catch(PDOException $e){
+        } catch (PDOException $e) {
 
-            if($this->pdo->inTransaction()){
+            if ($this->pdo->inTransaction()) {
 
                 $this->pdo->rollBack();
 
@@ -192,9 +195,9 @@ class Employee{
 
         $senhaHash = null
 
-    ){
+    ) {
 
-        try{
+        try {
 
             $this->pdo->beginTransaction();
 
@@ -261,7 +264,7 @@ class Employee{
 
             // 3. Se houver nova senha, atualizar na mesma transação
 
-            if($senhaHash !== null){
+            if ($senhaHash !== null) {
 
                 $sqlSenha = "
 
@@ -292,9 +295,9 @@ class Employee{
             return true;
 
 
-        }catch(PDOException $e){
+        } catch (PDOException $e) {
 
-            if($this->pdo->inTransaction()){
+            if ($this->pdo->inTransaction()) {
 
                 $this->pdo->rollBack();
 
@@ -313,7 +316,8 @@ class Employee{
     // ATUALIZAR SENHA
     // =====================================
 
-    public function atualizarSenha($userId, $senhaHash){
+    public function atualizarSenha($userId, $senhaHash)
+    {
 
 
 
@@ -352,7 +356,8 @@ class Employee{
     // BUSCAR SENHA ATUAL
     // =====================================
 
-    public function buscarSenha($userId){
+    public function buscarSenha($userId)
+    {
 
 
 
@@ -392,7 +397,8 @@ class Employee{
     // =====================================
     // LISTAR EQUIPE COM DETALHES (ADMIN)
     // =====================================
-    public function listarEquipeAdmin() {
+    public function listarEquipeAdmin()
+    {
         $sql = "
         SELECT 
             e.Emp_id, 
@@ -412,7 +418,7 @@ class Employee{
         GROUP BY e.Emp_id, u.User_name, e.Emp_photo, e.Emp_specialty, e.Emp_bio, u.User_id, u.User_active
         ORDER BY u.User_name ASC
         ";
-        
+
         $stmt = $this->pdo->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

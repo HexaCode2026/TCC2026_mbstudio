@@ -1,16 +1,19 @@
 <?php
 
-class Appointment {
+class Appointment
+{
     private $pdo;
 
-    public function __construct($pdo) {
+    public function __construct($pdo)
+    {
         $this->pdo = $pdo;
     }
 
     /**
      * Lista todos os agendamentos de um determinado funcionário com dados complementares do cliente e serviço.
      */
-    public function listarPorFuncionario($empId, $filtroData = null, $filtroStatus = null) {
+    public function listarPorFuncionario($empId, $filtroData = null, $filtroStatus = null)
+    {
         $sql = "SELECT 
                     a.Appo_id,
                     a.Cli_id,
@@ -58,7 +61,8 @@ class Appointment {
     /**
      * Busca dados detalhados de um agendamento específico.
      */
-    public function buscarPorId($appoId) {
+    public function buscarPorId($appoId)
+    {
         $sql = "SELECT 
                     a.*,
                     c_user.User_name AS client_name,
@@ -84,13 +88,26 @@ class Appointment {
     /**
      * Atualiza o status de um agendamento.
      */
-    public function atualizarStatus($appoId, $empId, $status, $cancelBy = null, $cancelReason = null) {
-        // Garantir que o funcionário só atualize seus próprios agendamentos (ou admin)
-        $sqlCheck = "SELECT Appo_id FROM appointments WHERE Appo_id = :id AND Emp_id = :emp_id";
-        $stmtCheck = $this->pdo->prepare($sqlCheck);
-        $stmtCheck->execute([':id' => $appoId, ':emp_id' => $empId]);
-        if (!$stmtCheck->fetch()) {
-            return false;
+    public function atualizarStatus($appoId, $empId = null, $status, $cancelBy = null, $cancelReason = null, $cliId = null)
+    {
+        // Garantir que o funcionário só atualize seus próprios agendamentos
+        if ($empId !== null) {
+            $sqlCheck = "SELECT Appo_id FROM appointments WHERE Appo_id = :id AND Emp_id = :emp_id";
+            $stmtCheck = $this->pdo->prepare($sqlCheck);
+            $stmtCheck->execute([':id' => $appoId, ':emp_id' => $empId]);
+            if (!$stmtCheck->fetch()) {
+                return false;
+            }
+        }
+        
+        // Garantir que o cliente só cancele seus próprios agendamentos
+        if ($cliId !== null) {
+            $sqlCheck = "SELECT Appo_id FROM appointments WHERE Appo_id = :id AND Cli_id = :cli_id";
+            $stmtCheck = $this->pdo->prepare($sqlCheck);
+            $stmtCheck->execute([':id' => $appoId, ':cli_id' => $cliId]);
+            if (!$stmtCheck->fetch()) {
+                return false;
+            }
         }
 
         if ($cancelBy !== null) {
@@ -121,9 +138,10 @@ class Appointment {
     /**
      * Retorna contadores e estatísticas da agenda para o dashboard.
      */
-    public function obterEstatisticas($empId) {
+    public function obterEstatisticas($empId)
+    {
         $hoje = date('Y-m-d');
-        
+
         $sql = "SELECT 
                     COUNT(*) AS total,
                     SUM(CASE WHEN Appo_date = :hoje AND Appo_status NOT LIKE 'Cancelado%' THEN 1 ELSE 0 END) AS hoje,
@@ -140,13 +158,13 @@ class Appointment {
         $stats = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return [
-            'total' => (int)($stats['total'] ?? 0),
-            'hoje' => (int)($stats['hoje'] ?? 0),
-            'pendentes' => (int)($stats['pendentes'] ?? 0),
-            'confirmados' => (int)($stats['confirmados'] ?? 0),
-            'em_atendimento' => (int)($stats['em_atendimento'] ?? 0),
-            'concluidos' => (int)($stats['concluidos'] ?? 0),
-            'cancelados' => (int)($stats['cancelados'] ?? 0)
+            'total' => (int) ($stats['total'] ?? 0),
+            'hoje' => (int) ($stats['hoje'] ?? 0),
+            'pendentes' => (int) ($stats['pendentes'] ?? 0),
+            'confirmados' => (int) ($stats['confirmados'] ?? 0),
+            'em_atendimento' => (int) ($stats['em_atendimento'] ?? 0),
+            'concluidos' => (int) ($stats['concluidos'] ?? 0),
+            'cancelados' => (int) ($stats['cancelados'] ?? 0)
         ];
     }
 }

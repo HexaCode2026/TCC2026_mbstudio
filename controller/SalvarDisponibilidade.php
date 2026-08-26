@@ -55,16 +55,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Validar se todos os horários estão entre 08:00 e 19:00 e início menor que o fim
-    foreach ($horarios as $h) {
-        $start = $h['start'] ?? '';
-        $end = $h['end'] ?? '';
-        if ($start < '08:00' || $end > '19:00' || $start >= $end) {
+    // Validar sobreposições entre os próprios horários informados
+    $numHorarios = count($horarios);
+    for ($i = 0; $i < $numHorarios; $i++) {
+        $start1 = $horarios[$i]['start'] ?? '';
+        $end1 = $horarios[$i]['end'] ?? '';
+        
+        if ($start1 < '08:00' || $end1 > '19:00' || $start1 >= $end1) {
             echo "<script>
                 alert('Os horários devem estar entre 08:00 e 19:00 e o horário de início deve ser menor que o de término.');
                 window.location='../View/funcionario/Disponibilidade.php';
             </script>";
             exit;
+        }
+
+        for ($j = $i + 1; $j < $numHorarios; $j++) {
+            $start2 = $horarios[$j]['start'] ?? '';
+            $end2 = $horarios[$j]['end'] ?? '';
+            if ($start1 < $end2 && $end1 > $start2) {
+                echo "<script>
+                    alert('Existem horários conflitantes/sobrepostos. Corrija-os antes de salvar.');
+                    window.location='../View/funcionario/Disponibilidade.php';
+                </script>";
+                exit;
+            }
         }
     }
 

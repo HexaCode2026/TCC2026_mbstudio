@@ -36,50 +36,9 @@ $dadosFuncionario = $employeeModel->buscarPorUserId($userId);
 
 
 <body class="employee-page">
-    <?php include '../components/AuthButton.php'; ?>
+    <!-- Cabeçalho Global MB Studio -->
+    <?php include '../components/Header.php'; ?>
     <?php include '../components/LoginModal.php'; ?>
-
-
-    <!-- ========================================== -->
-    <!-- CABEÇALHO                                  -->
-    <!-- ========================================== -->
-
-    <header class="employee-header">
-
-        <div class="header-container">
-
-            <div class="employee-brand">
-
-                <div class="employee-logo">
-
-                    <img 
-                        src="../../assets/img/mblogo.jpg" 
-                        alt="MB Studio" 
-                        class="employee-logo-img"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <div class="employee-user-area">
-
-                <span class="user-greeting">Olá,</span>
-
-                <span class="user-name">
-                    <?= htmlspecialchars($_SESSION['User_name'] ?? 'Profissional', ENT_QUOTES, 'UTF-8'); ?>
-                </span>
-
-            </div>
-
-        </div>
-
-    </header>
-
-
-
-
     <!-- ========================================== -->
     <!-- CONTEÚDO PRINCIPAL                         -->
     <!-- ========================================== -->

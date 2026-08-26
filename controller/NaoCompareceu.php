@@ -3,30 +3,30 @@ session_start();
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/Appointment.php";
 
-if (!isset($_SESSION['User_id']) || !in_array($_SESSION['User_perm'], ['A', 'F'])) {
+if (!isset($_SESSION['User_id']) || !isset($_SESSION['User_perm'])) {
     header("Location: ../Index.php");
     exit;
 }
 
+$userId = $_SESSION['User_id'];
+$userPerm = $_SESSION['User_perm'];
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $appoId = $_POST['appo_id'] ?? null;
-    $userId = $_SESSION['User_id'];
-    $userPerm = $_SESSION['User_perm'];
 
     if (!$appoId) {
-        $redirect = ($userPerm === 'A') ? "../View/admin/Agenda.php" : "../View/funcionario/Agenda.php";
-        header("Location: $redirect?erro=id_invalido");
+        header("Location: ../Index.php?erro=id_invalido");
         exit;
     }
 
     $appointmentModel = new Appointment($pdo);
     
-    // Verificação da máquina de estados: Só pode iniciar se estiver Confirmado
+    // Verificação da máquina de estados: Só pode marcar como Não Compareceu se estiver Confirmado
     $currentAppo = $appointmentModel->buscarPorId($appoId);
     $redirect = ($userPerm === 'A') ? "../View/admin/Agenda.php" : "../View/funcionario/Agenda.php";
     
     if (!$currentAppo || $currentAppo['Appo_status'] !== 'Confirmado') {
-        header("Location: $redirect?erro=status_invalido_para_iniciar");
+        header("Location: $redirect?erro=status_invalido_para_falta");
         exit;
     }
 
@@ -38,12 +38,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $empId = $stmtEmp->fetchColumn();
     }
 
-    $success = $appointmentModel->atualizarStatus($appoId, $empId, 'Em Atendimento');
-
-    $redirect = ($userPerm === 'A') ? "../View/admin/Agenda.php" : "../View/funcionario/Agenda.php";
+    // atualizarStatus(Appo_id, Emp_id, NovoStatus, CancelBy, CancelReason)
+    $success = $appointmentModel->atualizarStatus($appoId, $empId, 'Nao Compareceu');
 
     if ($success) {
-        header("Location: $redirect?sucesso=atendimento_iniciado");
+        header("Location: $redirect?sucesso=falta_registrada");
     } else {
         header("Location: $redirect?erro=falha_permissao");
     }

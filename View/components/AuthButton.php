@@ -122,6 +122,7 @@ $basePath = '/TCC2026_mbstudio';
                         <a href="<?= $basePath ?>/View/admin/Dashboard.php" class="auth-dropdown-item">Painel Administrativo</a>
                     <?php else: ?>
                         <a href="<?= $basePath ?>/View/cliente/MeusAgendamentos.php" class="auth-dropdown-item">Meus Agendamentos</a>
+                        <a href="<?= $basePath ?>/View/cliente/Perfil.php" class="auth-dropdown-item">Meu Perfil</a>
                     <?php endif; ?>
                     <a href="<?= $basePath ?>/controller/Logout.php" class="auth-dropdown-item logout">Sair</a>
                 </div>

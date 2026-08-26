@@ -1,3 +1,26 @@
+/* ==========================================================================
+   MB STUDIO - ESTILOS DA DISPONIBILIDADE DE FUNCIONÁRIOS
+   Design de Luxo alinhado à identidade visual da Index e Painel MB Studio
+   ========================================================================== */
+
+:root {
+    --gold-primary: #d4af37;
+    --gold-light: #f3e5ab;
+    --gold-dark: #8a6508;
+    --gold-darker: #6e5005;
+    --gold-border: rgba(212, 175, 55, 0.35);
+    --bg-dark: #0f0f11;
+    --bg-card: #161619;
+    --bg-card-hover: #1e1e24;
+    --text-light: #ffffff;
+    --text-muted: #a0a0a8;
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-cursive: 'Alex Brush', 'Brush Script MT', cursive;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --transition-smooth: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    --shadow-card: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -5,319 +28,317 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f7f5f2;
-    color: #2c2c2c;
+    font-family: var(--font-body);
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    min-height: 100vh;
+    padding-top: 70px;
+    overflow-x: hidden;
 }
 
+.cursiva-gold {
+    font-family: var(--font-cursive);
+    color: var(--gold-primary);
+    font-style: italic;
+    font-size: 1.25em;
+    line-height: 1;
+    display: inline-block;
+    padding: 0 4px;
+}
 
 /* =========================================
-   PÁGINA
+   CONTAINER PRINCIPAL
    ========================================= */
-
 .pagina-disponibilidade {
-    width: 90%;
-    max-width: 1400px;
+    width: 92%;
+    max-width: 1300px;
     margin: 0 auto;
-    padding: 40px 0;
+    padding: 40px 0 80px;
+    box-sizing: border-box;
+}
+
+/* Top Navigation */
+.disp-top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.btn-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gold-light);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--gold-border);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+}
+
+.btn-back-link:hover {
+    background: rgba(212, 175, 55, 0.15);
+    border-color: var(--gold-primary);
+    color: #ffffff;
+    transform: translateX(-3px);
+}
+
+/* Header da Página */
+.disp-header-box {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.disp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 16px;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid var(--gold-border);
+    border-radius: 30px;
+    color: var(--gold-light);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
 }
 
 .tituloPagina {
-    font-size: 32px;
+    font-family: var(--font-heading);
+    font-size: clamp(28px, 4vw, 42px);
     font-weight: 600;
-    color: #2c2c2c;
-    margin-bottom: 8px;
+    color: #ffffff;
+    margin: 0 0 10px 0;
+    line-height: 1.2;
 }
 
 .tituloPagina span {
-    color: #d6a110;
+    color: var(--gold-primary);
 }
 
 .subtitulo {
-    margin-top: 8px;
-    margin-bottom: 30px;
-    color: #7a756f;
-    font-size: 14px;
+    font-size: 15px;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto 35px;
+    line-height: 1.6;
 }
 
-
 /* =========================================
-   TABELA PRINCIPAL
+   FORMULÁRIO E LAYOUT DE CARDS
    ========================================= */
+.cadastro-grid-card {
+    background: linear-gradient(145deg, #18181c, #121215);
+    border: 1px solid var(--gold-border);
+    border-radius: 18px;
+    padding: 35px;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 45px;
+    box-sizing: border-box;
+}
 
 .TabelaCadastro {
     width: 100%;
-    table-layout: fixed;
     border-collapse: separate;
-    border-spacing: 12px;
-    margin-top: 20px;
+    border-spacing: 0;
+    margin-bottom: 25px;
 }
 
 .TabelaCadastro tr {
-    vertical-align: top;
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
 }
 
-.TabelaCadastro th {
-    text-align: left;
-    padding-bottom: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #6f6860;
-}
-
-.TabelaCadastro td {
+.TabelaCadastro td.cards {
+    flex: 1.1;
+    background: transparent;
+    border: none;
     padding: 0;
+    height: auto;
 }
 
+.TabelaCadastro td.coluna-direita {
+    flex: 0.9;
+    background: transparent;
+    border: none;
+    padding: 0;
+    max-width: none;
+    width: auto;
+}
 
 /* =========================================
-   INPUTS E SELECTS GERAIS
+   CALENDÁRIO CUSTOMIZADO
    ========================================= */
-
-.TabelaCadastro input,
-.TabelaCadastro select {
-    width: 100%;
-    height: 46px;
-    padding: 0 12px;
-    border: 1px solid #ddd4c8;
-    border-radius: 10px;
-    background-color: #fff;
-    color: #4a4540;
-    font-size: 14px;
-    outline: none;
-}
-
-.TabelaCadastro input:focus,
-.TabelaCadastro select:focus {
-    border-color: #c58a3a;
-    box-shadow: 0 0 0 3px rgba(197, 138, 58, 0.12);
-}
-
-
-/* =========================================
-   CALENDÁRIO
-   ========================================= */
-
 .campo-calendario {
     width: 100%;
 }
 
-.TabelaCadastro > tbody > tr > td:first-child {
-    width: 55%;
-}
-
 #calendario-customizado {
     width: 100%;
-    padding: 16px;
-    background: #fff;
-    border: 1px solid #e5ddd3;
+    background: #1e1e23;
+    border: 1px solid var(--gold-border);
     border-radius: 14px;
+    padding: 22px;
+    box-sizing: border-box;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
 }
 
 .calendario-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding-bottom: 12px;
 }
 
 .calendario-mes {
-    font-size: 16px;
+    font-family: var(--font-heading);
+    font-size: 18px;
     font-weight: 600;
-    color: #4a4540;
+    color: var(--gold-light);
+    letter-spacing: 0.5px;
 }
 
 .calendario-btn {
-    width: 32px;
-    height: 32px;
-    border: none;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--gold-border);
     border-radius: 8px;
-    background: #f5eee6;
-    color: #a66f2c;
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--gold-light);
     font-size: 20px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-smooth);
 }
 
 .calendario-btn:hover {
-    background: #ead9c5;
+    background: var(--gold-primary);
+    color: #000000;
+    transform: scale(1.08);
 }
 
 .calendario-semana,
 .calendario-dias {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
+    gap: 8px;
+    text-align: center;
 }
 
 .calendario-semana {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
 .calendario-semana span {
-    text-align: center;
-    font-size: 11px;
-    font-weight: 600;
-    color: #8a8178;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gold-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .calendario-dias button {
     width: 100%;
-    height: 34px;
-    border: none;
+    height: 38px;
+    border: 1px solid transparent;
     border-radius: 8px;
-    background: transparent;
-    color: #4a4540;
+    background: rgba(255, 255, 255, 0.03);
+    color: #e0e0e0;
+    font-size: 13.5px;
+    font-weight: 500;
     cursor: pointer;
+    transition: var(--transition-smooth);
 }
 
-.calendario-dias button:hover {
-    background: #f5eee6;
+.calendario-dias button:hover:not(:disabled) {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: var(--gold-primary);
+    color: var(--gold-light);
+    transform: translateY(-2px);
 }
 
 .calendario-dias button:disabled {
-    color: #c9c2ba;
+    color: #55555e;
+    background: transparent;
     cursor: not-allowed;
+    opacity: 0.4;
 }
 
 .calendario-dias button.dia-selecionado {
-    background: #d6a110;
-    color: #fff;
-    font-weight: 600;
+    background: linear-gradient(135deg, #d4af37, #b8860b) !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
 }
-
-.calendario-dias button.dia-selecionado:hover {
-    background: #d6a110;
-}
-
 
 /* =========================================
-   CARDS
+   COLUNA DIREITA (SERVIÇOS E HORÁRIOS)
    ========================================= */
-
-.cards {
-    height: 120px;
-    padding: 20px;
-    background: #fff;
-    border: 1px solid #e5ddd3;
-    border-radius: 14px;
-    vertical-align: top;
-}
-
-.cards label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #6f6860;
-}
-
-.cards input,
-.cards select {
-    width: 100%;
-    height: 42px;
-    margin-top: 2px;
-    padding: 0 12px;
-    border: 1px solid #ddd4c8;
-    border-radius: 8px;
-    background-color: #fff;
-    color: #4a4540;
-    font-size: 14px;
-    outline: none;
-}
-
-.cards input:focus,
-.cards select:focus {
-    border-color: #c58a3a;
-    box-shadow: 0 0 0 3px rgba(197, 138, 58, 0.12);
-}
-
-
-/* =========================================
-   ÁREA DIREITA
-   ========================================= */
-
-.coluna-direita {
-    width: 45%;
-    max-width: 45%;
-    padding: 0;
-    vertical-align: top;
-    overflow: hidden;
-}
-
-
-/* =========================================
-   SELECT DE SERVIÇO
-   ========================================= */
-
 .area-servico {
-    width: 70%;
-    max-width: 380px;
-    margin: 35px 0 0 80px;
-    text-align: center;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 0 25px 0;
+    text-align: left;
 }
 
-.titulo-servicos {
-    margin: 0 0 12px 0;
-    font-size: 20px;
+.titulo-servicos,
+.titulo-horarios {
+    font-family: var(--font-heading);
+    font-size: 18px;
     font-weight: 600;
-    color: #2c2c2c;
+    color: var(--gold-light);
+    margin: 0 0 12px 0;
+    letter-spacing: 0.5px;
 }
 
+.area-servico select,
 #Dis_ser {
     width: 100%;
-    height: 46px;
+    height: 48px;
     padding: 0 40px 0 14px;
-    border: 1px solid #ddd4c8;
+    border: 1px solid var(--gold-border);
     border-radius: 10px;
-    background-color: #fff;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a66f2c' d='M2 4l4 4 4-4z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    color: #4a4540;
+    background-color: #1e1e23;
+    color: #ffffff;
     font-size: 14px;
+    font-family: var(--font-body);
     cursor: pointer;
     outline: none;
     appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23d4af37' d='M2 4l4 4 4-4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    transition: var(--transition-smooth);
 }
 
 #Dis_ser:focus {
-    border-color: #c58a3a;
-    box-shadow: 0 0 0 3px rgba(197, 138, 58, 0.12);
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
 }
 
-
-/* =========================================
-   TÍTULO "HORÁRIOS"
-   ========================================= */
-
-.titulo-horarios {
-    margin-top: 60px;
-    margin-bottom: 20px;
-    margin-left: 230px;
-    font-size: 20px;
-    font-weight: 600;
-    color: #2c2c2c;
+#Dis_ser option {
+    background: #18181c;
+    color: #ffffff;
 }
-
-.titulo-horarios2 {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    margin-left: 100px;
-    font-size: 14px;
-    font-weight: 300;
-    color: #2c2c2c;
-}
-
-
-/* =========================================
-   ÁREA DE HORÁRIOS
-   ========================================= */
 
 .area-horarios {
     display: flex;
-    gap: 0;
-    margin-top: 20px;
-    margin-left: 30px;
+    gap: 20px;
+    margin: 0 0 25px 0;
 }
 
 .campo-horario {
@@ -327,590 +348,354 @@ body {
 .campo-horario label {
     display: block;
     margin-bottom: 8px;
-    margin-left: 100px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #c58a3a;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 0;
 }
 
 .campo-horario input {
-    width: 80%;
-    height: 46px;
-    padding: 0 12px;
-    border: 1px solid #ddd4c8;
-    border-radius: 10px;
-    background: #fff;
-    color: #4a4540;
-    font-size: 14px;
-    outline: none;
-}
-
-
-/* =========================================
-   HORÁRIOS DE ATENDIMENTO
-   ========================================= */
-
-label[for="Dis_scheduled-times"] {
-    display: block;
-    margin-top: 25px;
-    margin-bottom: 12px;
-    margin-left: 550px;
-    font-size: 20px;
-    color: #2c2c2c;
-}
-
-label[for="Dis_scheduled-times"] strong {
-    font-weight: 600;
-}
-
-
-/* =========================================
-   BOTÃO SALVAR DISPONIBILIDADE
-   ========================================= */
-
-#btnSalvar {
-    display: block;
-    width: 280px;
+    width: 100%;
     height: 48px;
-    margin: 70px auto 80px auto;
-    border: 2px solid #d6a110;
+    padding: 0 14px;
+    border: 1px solid var(--gold-border);
+    border-radius: 10px;
+    background: #1e1e23;
+    color: #ffffff;
+    font-size: 14px;
+    font-family: var(--font-body);
+    outline: none;
+    transition: var(--transition-smooth);
+}
+
+.campo-horario input:focus {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+}
+
+/* =========================================
+   HORÁRIOS DE ATENDIMENTO GERADOS
+   ========================================= */
+.secao-horarios-gerados {
+    margin-top: 30px;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    padding-top: 25px;
+}
+
+.label-horarios-titulo {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    color: var(--gold-light);
+    margin-bottom: 15px;
+}
+
+#Dis_scheduled-times {
+    background: #19191d;
+    border: 1px solid var(--gold-border);
+    border-radius: 12px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#lista-horarios-vazia {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: center;
+    padding: 15px 0;
+}
+
+#lista-horarios {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+#lista-horarios li {
+    background: #202026;
+    border: 1px solid rgba(212, 175, 55, 0.25);
     border-radius: 8px;
-    background-color: #d6a110;
-    color: white;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 15px;
-    font-weight: 600;
+    padding: 12px 16px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: none !important;
+    transition: var(--transition-smooth);
+}
+
+#lista-horarios li:hover {
+    border-color: var(--gold-primary);
+    background: #25252d;
+}
+
+#lista-horarios li strong {
+    color: var(--gold-light);
+    font-size: 14px;
+}
+
+.status-select {
+    background: #141417;
+    color: #ffffff;
+    border: 1px solid var(--gold-border);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    outline: none;
     cursor: pointer;
-    box-shadow: 0 2px 0 black;
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease,
-        transform 0.1s ease,
-        box-shadow 0.1s ease;
+}
+
+/* =========================================
+   BOTÃO DE SALVAR DISPONIBILIDADE
+   ========================================= */
+#btnSalvar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #d4af37 0%, #a67c00 50%, #8a6508 100%);
+    color: #0b0b0c;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 16px 36px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+    transition: var(--transition-smooth);
+    cursor: pointer;
+    margin-top: 25px;
 }
 
 #btnSalvar:hover:not(:disabled) {
-    background-color: #111;
-    color: #d6a110;
-}
-
-#btnSalvar:active:not(:disabled) {
-    transform: translateY(4px);
-    box-shadow: 0 0 0 black;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(212, 175, 55, 0.5);
+    background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 60%, #a67c00 100%);
+    color: #000;
 }
 
 #btnSalvar:disabled {
-    background-color: #d8d4ce;
-    color: #f5f5f5;
+    opacity: 0.45;
     cursor: not-allowed;
+    box-shadow: none;
+    filter: grayscale(0.5);
 }
 
-
 /* =========================================
-   LISTA DE HORÁRIOS
+   LISTAGEM DAS DISPONIBILIDADES (TABELA)
    ========================================= */
-
-/*
-   IMPORTANTE:
-   O GRID controla os 3 cards por linha.
-   Não usamos width: 30%, inline-block ou
-   margens individuais nos cards.
-*/
-
-#lista-horarios {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
-    width: 100%;
-    margin: 20px 0;
-    padding: 0;
-    list-style: none;
+.secao-cadastradas {
+    margin-top: 50px;
 }
 
+.secao-cadastradas h2 {
+    font-family: var(--font-heading);
+    font-size: 26px;
+    color: #ffffff;
+    margin-bottom: 20px;
+}
 
-/* =========================================
-   CARD DE HORÁRIO
-   ========================================= */
-
-#lista-horarios .card-horario {
-    width: 100%;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-
-    background: #fff;
-    border: 1px solid #e5ddd3;
+.filtro-cadastradas-bar {
+    background: linear-gradient(145deg, #18181c, #121214);
+    border: 1px solid var(--gold-border);
     border-radius: 12px;
-    overflow: hidden;
-
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-#lista-horarios .card-horario:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.10);
-}
-
-
-/* =========================================
-   PARTE AMARELA DO CARD
-   ========================================= */
-
-.card-horario-topo {
-    padding: 14px 10px;
-    background: #d6a110;
-    color: #fff;
-    text-align: center;
-    font-size: 15px;
-}
-
-.card-horario-topo strong {
-    display: block;
-}
-
-
-/* =========================================
-   PARTE DO STATUS
-   ========================================= */
-
-.card-horario-status {
+    padding: 18px 24px;
+    margin-bottom: 25px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px;
-    background: #fff;
-}
-
-.card-horario-status label {
-    flex-shrink: 0;
-    font-size: 12px;
-    font-weight: 600;
-    color: #2c2c2c;
-}
-
-
-/* =========================================
-   SELECT DE STATUS
-   ========================================= */
-
-.status-select {
-    flex: 1;
-    min-width: 0;
-    height: 32px;
-    padding: 0 6px;
-    border: 1px solid #ddd4c8;
-    border-radius: 7px;
-    background: #fff;
-    color: #2c2c2c;
-    font-size: 12px;
-    cursor: pointer;
-    outline: none;
-}
-
-.status-select:focus {
-    border-color: #d6a110;
-    box-shadow: 0 0 0 2px rgba(214, 161, 16, 0.12);
-}
-
-
-/* =========================================
-   MENSAGEM DE ERRO DOS HORÁRIOS
-   ========================================= */
-
-#msg-erro-horario {
-    display: none;
-    margin-top: -10px;
-    margin-bottom: 15px;
-    margin-left: 100px;
-    color: #c0392b;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-
-/* =========================================
-   TÍTULO DOS HORÁRIOS GERADOS
-   ========================================= */
-
-#titulo-horarios-atendimento {
-    display: none;
-}
-
-
-/* =========================================
-   TÍTULO DISPONIBILIDADES CADASTRADAS
-   ========================================= */
-
-#titulo-disponibilidades {
-    margin-left: 500px;
-    color: #2c2c2c;
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-
-/* =========================================
-   CARD FILTRO DE DATA
-   ========================================= */
-
-.card-filtro-data {
-    width: 340px;
-    margin: 0 auto 30px auto;
-    background: #fff;
-    border: 1px solid #e5ddd3;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-}
-
-.card-filtro-titulo {
-    display: block;
-    width: 100%;
-    padding: 13px 16px;
-    background: #d6a110;
-    color: #fff;
-    text-align: center;
-    font-size: 15px;
-    font-weight: 600;
-}
-
-.card-filtro-conteudo {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     gap: 15px;
-    padding: 16px;
+    flex-wrap: wrap;
 }
 
-.card-filtro-conteudo span {
-    margin-top: 10px;
-    margin-left: 30px;
-    color: black;
+.filtro-cadastradas-bar label {
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
+    color: var(--gold-light);
+    text-transform: uppercase;
 }
 
-#filtroData {
-    width: 150px;
-    height: 40px;
-    padding: 0 10px;
-    border: 1px solid #ddd4c8;
+.filtro-cadastradas-bar select {
+    background: #202026;
+    color: #ffffff;
+    border: 1px solid var(--gold-border);
     border-radius: 8px;
-    background: #fff;
-    color: #2c2c2c;
-    font-size: 13px;
+    height: 40px;
+    padding: 0 14px;
+    font-size: 13.5px;
     outline: none;
     cursor: pointer;
 }
-
-#filtroData:hover {
-    border-color: #c58a3a;
-}
-
-#filtroData:focus {
-    border-color: #d6a110;
-    box-shadow: 0 0 0 3px rgba(214, 161, 16, 0.12);
-}
-
-
-/* =========================================
-   AÇÕES EM LOTE
-   ========================================= */
 
 #acoes-lote-data {
-    width: 600px;
-    margin: 0 auto 35px auto;
-    background: #fff;
-    border: 1px solid #e5ddd3;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid var(--gold-border);
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 25px;
 }
 
-#acoes-lote-data > label {
-    display: block;
-    width: 100%;
-    padding: 14px 16px;
-    background: #d6a110;
-    color: #fff;
-    text-align: center;
-    font-size: 15px;
-    font-weight: 600;
-}
-
-#acoes-lote-data > div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    padding: 18px;
+#acoes-lote-data label {
+    font-size: 13px;
+    color: var(--gold-light);
 }
 
 #acoes-lote-data button {
-    min-width: 115px;
-    height: 40px;
-    padding: 0 16px;
-    border: 2px solid #d6a110;
-    border-radius: 8px;
-    background: #d6a110;
-    color: white;
-    font-size: 13px;
+    background: #202026;
+    color: var(--gold-light);
+    border: 1px solid var(--gold-border);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 12px;
     font-weight: 600;
-    font-family: Arial, Helvetica, sans-serif;
     cursor: pointer;
-    box-shadow: 0 2px 0 #111;
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease,
-        transform 0.1s ease,
-        box-shadow 0.1s ease;
+    margin-right: 8px;
+    margin-top: 6px;
+    transition: var(--transition-smooth);
 }
 
 #acoes-lote-data button:hover {
-    background: #111;
-    color: #d6a110;
+    background: var(--gold-primary);
+    color: #000000;
+    transform: translateY(-2px);
 }
 
-#acoes-lote-data button:active {
-    transform: translateY(3px);
-    box-shadow: 0 0 0 #111;
+/* Tabela de Disponibilidades */
+.table-disp-wrapper {
+    background: linear-gradient(145deg, #18181c, #121215);
+    border: 1px solid var(--gold-border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
 }
-
-
-/* =========================================
-   REGISTROS DE DISPONIBILIDADE
-   ========================================= */
 
 #tabelaDisponibilidades {
     width: 100%;
-    border: none;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13.5px;
 }
 
 #tabelaDisponibilidades thead {
-    display: none;
+    background: rgba(212, 175, 55, 0.08);
+    border-bottom: 2px solid var(--gold-border);
 }
 
-#tabelaDisponibilidades tbody {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 25px;
-    width: 100%;
-    padding: 0 50px;
+#tabelaDisponibilidades th {
+    padding: 16px 14px;
+    color: var(--gold-light);
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    white-space: nowrap;
 }
-
-
-/* =========================================
-   CARD
-   ========================================= */
 
 #tabelaDisponibilidades tbody tr {
-    display: block;
-    flex: 0 0 calc((100% - 50px) / 3);
-    width: calc((100% - 50px) / 3);
-    margin: 0;
-    background: #111;
-    border: 1px solid #d6a110;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    transition: var(--transition-smooth);
 }
 
 #tabelaDisponibilidades tbody tr:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.20);
+    background-color: rgba(212, 175, 55, 0.04);
 }
-
-
-/* =========================================
-   CÉLULAS
-   ========================================= */
 
 #tabelaDisponibilidades td {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 15px;
-    border: none;
-    background: #111;
-    color: #d6a110;
-    font-size: 13px;
+    padding: 16px 14px;
+    color: #e0e0e0;
+    vertical-align: middle;
 }
 
-
-/* =========================================
-   DATA
-   ========================================= */
-
-#tabelaDisponibilidades td:first-child {
-    display: block;
-    padding: 13px 10px;
-    background: #d6a110;
-    color: #fff;
-    text-align: center;
-    font-size: 15px;
-    font-weight: 600;
-}
-
-
-/* =========================================
-   INÍCIO / FIM / STATUS
-   ========================================= */
-
-#tabelaDisponibilidades td:nth-child(2)::before,
-#tabelaDisponibilidades td:nth-child(3)::before,
-#tabelaDisponibilidades td:nth-child(4)::before {
-    font-weight: 600;
-    color: #d6a110;
-}
-
-#tabelaDisponibilidades td:nth-child(2)::before {
-    content: "Início";
-}
-
-#tabelaDisponibilidades td:nth-child(3)::before {
-    content: "Fim";
-}
-
-#tabelaDisponibilidades td:nth-child(4)::before {
-    content: "Status";
-}
-
-#tabelaDisponibilidades td:nth-child(2),
-#tabelaDisponibilidades td:nth-child(3),
-#tabelaDisponibilidades td:nth-child(4) {
-    color: #d6a110;
-}
-
-
-/* =========================================
-   EDITAR
-   ========================================= */
-
-#tabelaDisponibilidades td:nth-child(5) {
-    justify-content: center;
-    padding: 12px 15px 6px;
-    background: #111;
-    border-top: 1px solid #3a321f;
-}
-
-#tabelaDisponibilidades td:nth-child(5) form {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-#tabelaDisponibilidades td:nth-child(5) select {
-    width: 105px;
-    height: 34px;
-    border: 1px solid #ddd4c8;
-    border-radius: 7px;
-    background: #fff;
-    color: #2c2c2c;
-    font-size: 12px;
+#tabelaDisponibilidades select {
+    background: #202026;
+    color: #ffffff;
+    border: 1px solid var(--gold-border);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12.5px;
     outline: none;
+    cursor: pointer;
 }
 
-#tabelaDisponibilidades td:nth-child(5) button {
-    height: 34px;
-    padding: 0 14px;
-    border: 2px solid #d6a110;
-    border-radius: 7px;
-    background: #d6a110;
-    color: #111;
+#tabelaDisponibilidades button[type="submit"] {
+    background: rgba(212, 175, 55, 0.15);
+    color: var(--gold-light);
+    border: 1px solid var(--gold-border);
+    padding: 6px 14px;
+    border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease;
+    margin-left: 6px;
+    transition: var(--transition-smooth);
 }
 
-#tabelaDisponibilidades td:nth-child(5) button:hover {
-    background: #111;
-    color: #d6a110;
+#tabelaDisponibilidades button[type="submit"]:hover {
+    background: var(--gold-primary);
+    color: #000000;
 }
 
-
-/* =========================================
-   EXCLUIR
-   ========================================= */
-
-#tabelaDisponibilidades td:nth-child(6) {
-    justify-content: center;
-    padding: 6px 15px 15px;
-    background: #111;
+#tabelaDisponibilidades form[action*="Excluir"] button {
+    background: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    border-color: rgba(231, 76, 60, 0.4);
 }
 
-#tabelaDisponibilidades td:nth-child(6) button {
-    width: 120px;
-    height: 34px;
-    border: 2px solid #c0392b;
-    border-radius: 7px;
-    background: #111;
-    color: #c0392b;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease;
+#tabelaDisponibilidades form[action*="Excluir"] button:hover {
+    background: #e74c3c;
+    color: #ffffff;
 }
-
-#tabelaDisponibilidades td:nth-child(6) button:hover {
-    background: #c0392b;
-    color: #fff;
-}
-
 
 /* =========================================
    RESPONSIVIDADE
    ========================================= */
-
-@media (max-width: 1000px) {
-
-    #lista-horarios {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+@media (max-width: 950px) {
+    .TabelaCadastro tr {
+        flex-direction: column;
+        gap: 25px;
     }
 
-    #tabelaDisponibilidades tbody tr {
-        flex: 0 0 calc((100% - 25px) / 2);
-        width: calc((100% - 25px) / 2);
+    .TabelaCadastro td.cards,
+    .TabelaCadastro td.coluna-direita {
+        width: 100%;
+        flex: none;
+    }
+
+    .table-disp-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #tabelaDisponibilidades {
+        min-width: 750px;
     }
 }
 
-
-@media (max-width: 700px) {
-
+@media (max-width: 600px) {
     .pagina-disponibilidade {
         width: 95%;
-        padding: 25px 0;
+        padding: 25px 0 60px;
     }
 
-    #lista-horarios {
-        grid-template-columns: 1fr;
+    .cadastro-grid-card {
+        padding: 22px 16px;
+    }
+
+    .area-horarios {
+        flex-direction: column;
         gap: 15px;
     }
 
-    #tabelaDisponibilidades tbody {
-        padding: 0;
-    }
-
-    #tabelaDisponibilidades tbody tr {
-        flex: 0 0 100%;
+    .btn-back-link {
         width: 100%;
-    }
-
-    #acoes-lote-data {
-        width: 100%;
-    }
-
-    .card-horario-status {
-        gap: 10px;
+        justify-content: center;
     }
 }

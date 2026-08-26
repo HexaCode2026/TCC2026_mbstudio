@@ -263,17 +263,6 @@ class User
         return $stmt->execute([$id]);
     }
 
-    // =====================================
-    // BUSCAR NOME DO USUÁRIO
-    // =====================================
-    public function buscarNome($id)
-    {
-        $sql = "SELECT User_name FROM users WHERE User_id = ?";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$id]);
-        return $stmt->fetchColumn();
-    }
-
 }
 
 ?>

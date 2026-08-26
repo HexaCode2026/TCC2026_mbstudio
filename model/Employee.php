@@ -417,44 +417,5 @@ class Employee{
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // =====================================
-    // OBTER OU CRIAR EMP_ID PELO USER_ID
-    // =====================================
-    public function getEmpIdByUserId($userId) {
-        $stmtEmp = $this->pdo->prepare("SELECT Emp_id FROM employees WHERE User_id = ?");
-        $stmtEmp->execute([$userId]);
-        $empId = $stmtEmp->fetchColumn();
-        return $empId;
-    }
-
-    public function inserirEmpregado($userId) {
-        $insertEmp = $this->pdo->prepare("INSERT INTO employees (User_id) VALUES (?)");
-        $insertEmp->execute([$userId]);
-        return $this->pdo->lastInsertId();
-    }
-    // =====================================
-    // LISTAR FUNCIONÁRIOS ATIVOS (PARA O CLIENTE)
-    // =====================================
-    public function listarFuncionariosAtivos() {
-        $sql = "SELECT e.Emp_id, u.User_name, e.Emp_photo, e.Emp_specialty, e.Emp_bio 
-                FROM employees e
-                JOIN users u ON e.User_id = u.User_id
-                WHERE u.User_active = 1 AND u.User_perm = 'F'
-                ORDER BY u.User_name ASC";
-        $stmt = $this->pdo->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    // =====================================
-    // BUSCAR NOME DO USUARIO POR EMP_ID
-    // =====================================
-    public function buscarNomePorEmpId($empId) {
-        $sql = "SELECT u.User_name 
-                FROM employees e 
-                JOIN users u ON e.User_id = u.User_id 
-                WHERE e.Emp_id = ?";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$empId]);
-        return $stmt->fetchColumn();
-    }
 }
 ?>

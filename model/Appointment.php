@@ -24,6 +24,7 @@ class Appointment {
                     a.Appo_cancel_reason,
                     a.Appo_observation,
                     a.Appo_created,
+                    a.Appo_updated,
                     c_user.User_name AS client_name,
                     c_user.User_email AS client_email,
                     c.Cli_phone AS client_phone,
@@ -149,4 +150,85 @@ class Appointment {
             'cancelados' => (int)($stats['cancelados'] ?? 0)
         ];
     }
+
+    // =====================================
+    // LISTAR AGENDAMENTOS DO CLIENTE
+    // =====================================
+    public function listarMeusAgendamentos($cliId) {
+        $query = "SELECT a.*, 
+                         e_user.User_name AS employee_name, 
+                         e.Emp_photo AS employee_photo,
+                         s.Ser_name, 
+                         s.Ser_price, 
+                         s.Ser_duration
+                  FROM appointments a
+                  JOIN employees e ON a.Emp_id = e.Emp_id
+                  JOIN users e_user ON e.User_id = e_user.User_id
+                  JOIN services s ON a.Ser_id = s.Ser_id
+                  WHERE a.Cli_id = ?
+                  ORDER BY a.Appo_date DESC, a.Appo_start DESC";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([$cliId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // =====================================
+    // VERIFICAR SE O HORÁRIO ESTÁ LIVRE
+    // =====================================
+    public function verificarConflitoHorario($empId, $date, $start, $end) {
+        $sqlCheck = "SELECT Appo_id FROM appointments 
+                     WHERE Emp_id = ? AND Appo_date = ? 
+                       AND Appo_status NOT IN ('Cancelado pelo Cliente', 'Cancelado pelo Funcionario', 'Cancelado pelo Administrador', 'Nao Compareceu')
+                       AND (
+                           (Appo_start <= ? AND Appo_end > ?) OR
+                           (Appo_start < ? AND Appo_end >= ?) OR
+                           (? <= Appo_start AND ? >= Appo_end)
+                       )";
+        $stmtCheck = $this->pdo->prepare($sqlCheck);
+        $stmtCheck->execute([
+            $empId, $date, 
+            $start, $start, 
+            $end, $end, 
+            $start, $end
+        ]);
+        return $stmtCheck->rowCount() > 0;
+    }
+
+    // =====================================
+    // CRIAR AGENDAMENTO
+    // =====================================
+    public function criarAgendamento($cliId, $empId, $serId, $date, $start, $end) {
+        $sqlInsert = "INSERT INTO appointments (Cli_id, Emp_id, Ser_id, Appo_date, Appo_start, Appo_end, Appo_status) 
+                      VALUES (?, ?, ?, ?, ?, ?, 'Pendente')";
+        $stmtInsert = $this->pdo->prepare($sqlInsert);
+        return $stmtInsert->execute([$cliId, $empId, $serId, $date, $start, $end]);
+    }
+
+    // =====================================
+    // BUSCAR AGENDAMENTO POR ID E CLIENTE (Para cancelamento)
+    // =====================================
+    public function verificarDonoAgendamento($appoId, $userId) {
+        $check = $this->pdo->prepare("SELECT a.Appo_id FROM appointments a JOIN clients c ON a.Cli_id = c.Cli_id WHERE a.Appo_id = ? AND c.User_id = ?");
+        $check->execute([$appoId, $userId]);
+        return $check->fetchColumn();
+    }
+
+    public function buscarParaHorarios($empId, $date) {
+        $sqlAppo = "SELECT Appo_start, Appo_end FROM appointments 
+                    WHERE Emp_id = ? AND Appo_date = ? 
+                    AND Appo_status NOT IN ('Cancelado pelo Cliente', 'Cancelado pelo Funcionario', 'Cancelado pelo Administrador', 'Nao Compareceu')";
+        $stmtAppo = $this->pdo->prepare($sqlAppo);
+        $stmtAppo->execute([$empId, $date]);
+        return $stmtAppo->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function buscarTodosAgendamentosAtivosDoDia($date) {
+        $sqlAppo = "SELECT Emp_id, Appo_start, Appo_end FROM appointments 
+                    WHERE Appo_date = ? 
+                    AND Appo_status NOT IN ('Cancelado pelo Cliente', 'Cancelado pelo Funcionario', 'Cancelado pelo Administrador', 'Nao Compareceu')";
+        $stmtAppo = $this->pdo->prepare($sqlAppo);
+        $stmtAppo->execute([$date]);
+        return $stmtAppo->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
+?>

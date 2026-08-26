@@ -170,5 +170,21 @@ class Availability {
         $stmt->execute([$empId, $date]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Busca horários disponíveis de todos os funcionários aptos a um serviço em uma data
+     */
+    public function listarHorariosDisponiveis($date, $serId) {
+        $sql = "SELECT a.Ava_start, a.Ava_end, e.Emp_id, u.User_name, e.Emp_photo
+                FROM availabilities a
+                JOIN employees e ON a.Emp_id = e.Emp_id
+                JOIN employee_services es ON e.Emp_id = es.Emp_id
+                JOIN users u ON e.User_id = u.User_id
+                WHERE a.Ava_date = ? AND es.Ser_id = ? AND a.Ava_status = 'Disponivel'
+                ORDER BY u.User_name ASC, a.Ava_start ASC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$date, $serId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

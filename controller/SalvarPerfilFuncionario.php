@@ -418,6 +418,214 @@ if(!empty($novaSenha)){
 
 
 // =====================================
+// VALIDAÇÃO: FOTO DE PERFIL (OPCIONAL)
+// =====================================
+
+$caminhoNovaFoto = null;
+
+
+if (
+
+    isset($_FILES['foto'])
+
+    &&
+
+    $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE
+
+) {
+
+
+    // 1. Verificar erro de upload
+
+    if ($_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
+
+
+        echo "
+
+        <script>
+
+        alert('Erro no envio da foto. Tente novamente.');
+
+        window.location='../View/funcionario/Perfil.php';
+
+        </script>
+
+        ";
+
+        exit;
+
+
+    }
+
+
+    // 2. Verificar tamanho (máximo 2MB)
+
+    if ($_FILES['foto']['size'] > 2 * 1024 * 1024) {
+
+
+        echo "
+
+        <script>
+
+        alert('A foto deve ter no máximo 2MB.');
+
+        window.location='../View/funcionario/Perfil.php';
+
+        </script>
+
+        ";
+
+        exit;
+
+
+    }
+
+
+    // 3. Verificar extensão
+
+    $extensao = strtolower(
+        pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION)
+    );
+
+    $extensoesPermitidas = ['jpg', 'jpeg', 'png', 'webp'];
+
+    if (!in_array($extensao, $extensoesPermitidas, true)) {
+
+
+        echo "
+
+        <script>
+
+        alert('Formato de imagem não permitido. Use JPG, PNG ou WebP.');
+
+        window.location='../View/funcionario/Perfil.php';
+
+        </script>
+
+        ";
+
+        exit;
+
+
+    }
+
+
+    // 4. Verificar MIME real via finfo (não confiar na extensão)
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+
+    $mimeReal = $finfo->file($_FILES['foto']['tmp_name']);
+
+    $mimesPermitidos = ['image/jpeg', 'image/png', 'image/webp'];
+
+    if (!in_array($mimeReal, $mimesPermitidos, true)) {
+
+
+        echo "
+
+        <script>
+
+        alert('O arquivo enviado não é uma imagem válida.');
+
+        window.location='../View/funcionario/Perfil.php';
+
+        </script>
+
+        ";
+
+        exit;
+
+
+    }
+
+
+    // 5. Verificar conteúdo de imagem real
+
+    if (!getimagesize($_FILES['foto']['tmp_name'])) {
+
+
+        echo "
+
+        <script>
+
+        alert('O arquivo enviado não é uma imagem válida.');
+
+        window.location='../View/funcionario/Perfil.php';
+
+        </script>
+
+        ";
+
+        exit;
+
+
+    }
+
+
+    // 6. Determinar extensão segura baseada no MIME real
+
+    $mapaExtensoes = [
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/webp' => 'webp',
+    ];
+
+    $extensaoSegura = $mapaExtensoes[$mimeReal];
+
+
+    // 7. Gerar nome único e mover arquivo
+
+    $nomeArquivo = 'func_' . $userId . '_' . uniqid() . '.' . $extensaoSegura;
+
+    $pastaDestino = __DIR__ . '/../uploads/funcionarios/';
+
+
+    if (!is_dir($pastaDestino)) {
+
+        mkdir($pastaDestino, 0755, true);
+
+    }
+
+
+    if (!move_uploaded_file($_FILES['foto']['tmp_name'], $pastaDestino . $nomeArquivo)) {
+
+
+        echo "
+
+        <script>
+
+        alert('Erro ao salvar a foto no servidor. Tente novamente.');
+
+        window.location='../View/funcionario/Perfil.php';
+
+        </script>
+
+        ";
+
+        exit;
+
+
+    }
+
+
+    $caminhoNovaFoto = 'uploads/funcionarios/' . $nomeArquivo;
+
+
+}
+
+
+
+
+// =====================================
+// GUARDAR FOTO ANTIGA ANTES DA ATUALIZAÇÃO
+// =====================================
+
+$fotoAntiga = $dadosAtuais['Emp_photo'] ?? '';
+
+
+
+
+// =====================================
 // ATUALIZAR PERFIL (TRANSAÇÃO ÚNICA)
 // =====================================
 
@@ -433,7 +641,9 @@ $atualizou = $employeeModel->atualizarPerfil(
 
     $bio,
 
-    $novaSenhaHash
+    $novaSenhaHash,
+
+    $caminhoNovaFoto
 
 );
 
@@ -441,6 +651,21 @@ $atualizou = $employeeModel->atualizarPerfil(
 
 
 if(!$atualizou){
+
+
+    // Se nova foto foi movida, remover para evitar arquivo órfão
+
+    if ($caminhoNovaFoto !== null) {
+
+        $caminhoAbsolutoNovo = __DIR__ . '/../' . $caminhoNovaFoto;
+
+        if (is_file($caminhoAbsolutoNovo)) {
+
+            unlink($caminhoAbsolutoNovo);
+
+        }
+
+    }
 
 
     echo "
@@ -457,6 +682,51 @@ if(!$atualizou){
 
     exit;
 
+
+}
+
+
+
+
+// =====================================
+// SUCESSO: REMOVER FOTO ANTIGA COM SEGURANÇA
+// =====================================
+
+if ($caminhoNovaFoto !== null && !empty($fotoAntiga)) {
+
+    $caminhoAbsolutoAntigo = __DIR__ . '/../' . $fotoAntiga;
+
+    $pastaPermitida = realpath(__DIR__ . '/../uploads/funcionarios/');
+
+
+    if ($pastaPermitida !== false) {
+
+        $caminhoRealAntigo = realpath($caminhoAbsolutoAntigo);
+
+
+        if (
+
+            $caminhoRealAntigo !== false
+
+            &&
+
+            strpos($caminhoRealAntigo, $pastaPermitida) === 0
+
+            &&
+
+            dirname($caminhoRealAntigo) === $pastaPermitida
+
+            &&
+
+            is_file($caminhoRealAntigo)
+
+        ) {
+
+            unlink($caminhoRealAntigo);
+
+        }
+
+    }
 
 }
 

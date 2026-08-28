@@ -91,6 +91,7 @@ $dadosFuncionario = $employeeModel->buscarPorUserId($userId);
                     method="POST" 
                     action="../../controller/SalvarPerfilFuncionario.php" 
                     class="employee-profile-form"
+                    enctype="multipart/form-data"
                 >
 
 
@@ -107,6 +108,67 @@ $dadosFuncionario = $employeeModel->buscarPorUserId($userId);
                             <p class="profile-section-description">
                                 Mantenha seus dados atualizados para que seus clientes encontrem as informações corretas.
                             </p>
+
+                        </div>
+
+
+                        <!-- FOTO DE PERFIL -->
+
+                        <div class="profile-photo-area">
+
+                            <div class="profile-photo-wrapper">
+
+                                <?php if (!empty($dadosFuncionario['Emp_photo'])): ?>
+
+                                    <img
+                                        id="fotoPreview"
+                                        src="../../<?= htmlspecialchars($dadosFuncionario['Emp_photo'], ENT_QUOTES, 'UTF-8'); ?>"
+                                        alt="Foto de perfil"
+                                        class="profile-photo-img"
+                                    >
+
+                                <?php else: ?>
+
+                                    <div id="fotoPlaceholder" class="profile-photo-placeholder">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </div>
+
+                                    <img
+                                        id="fotoPreview"
+                                        src=""
+                                        alt="Foto de perfil"
+                                        class="profile-photo-img"
+                                        style="display:none;"
+                                    >
+
+                                <?php endif; ?>
+
+                            </div>
+
+                            <div class="profile-photo-info">
+
+                                <h3 class="profile-photo-title">Foto de Perfil</h3>
+
+                                <p class="profile-photo-hint">
+                                    Formatos aceitos: JPG, PNG ou WebP. Tamanho máximo: 2MB.
+                                </p>
+
+                                <label for="foto" class="btn-upload-photo">Escolher Nova Foto</label>
+
+                                <input
+                                    type="file"
+                                    id="foto"
+                                    name="foto"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    hidden
+                                >
+
+                                <span id="fotoNome" class="foto-nome-selecionada"></span>
+
+                            </div>
 
                         </div>
 
@@ -316,6 +378,38 @@ $dadosFuncionario = $employeeModel->buscarPorUserId($userId);
 
     </main>
 
+
+    <!-- Preview da Foto de Perfil -->
+    <script>
+    var inputFoto = document.getElementById('foto');
+
+    if (inputFoto) {
+        inputFoto.addEventListener('change', function(e) {
+
+            var file = e.target.files[0];
+            if (!file) return;
+
+            // Mostrar nome do arquivo selecionado
+            document.getElementById('fotoNome').textContent = file.name;
+
+            // Preview visual (apenas UX — validação real é no PHP)
+            var reader = new FileReader();
+
+            reader.onload = function(event) {
+                var img = document.getElementById('fotoPreview');
+                img.src = event.target.result;
+                img.style.display = 'block';
+
+                // Ocultar placeholder se existir
+                var placeholder = document.getElementById('fotoPlaceholder');
+                if (placeholder) placeholder.style.display = 'none';
+            };
+
+            reader.readAsDataURL(file);
+
+        });
+    }
+    </script>
 
 </body>
 

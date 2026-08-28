@@ -42,7 +42,9 @@ class Employee
 
             e.Emp_specialty,
 
-            e.Emp_bio
+            e.Emp_bio,
+
+            e.Emp_photo
 
         FROM employees e
 
@@ -193,7 +195,9 @@ class Employee
 
         $bio,
 
-        $senhaHash = null
+        $senhaHash = null,
+
+        $foto = null
 
     ) {
 
@@ -232,34 +236,71 @@ class Employee
             ]);
 
 
-            // 2. Atualizar dados do funcionário (especialidade e bio)
+            // 2. Atualizar dados do funcionário (especialidade, bio e opcionalmente foto)
 
-            $sqlEmp = "
+            if ($foto !== null) {
 
-            UPDATE employees
+                $sqlEmp = "
 
-            SET
+                UPDATE employees
 
-                Emp_specialty = ?,
+                SET
 
-                Emp_bio = ?
+                    Emp_specialty = ?,
 
-            WHERE User_id = ?
+                    Emp_bio = ?,
 
-            ";
+                    Emp_photo = ?
+
+                WHERE User_id = ?
+
+                ";
 
 
-            $updateEmp = $this->pdo->prepare($sqlEmp);
+                $updateEmp = $this->pdo->prepare($sqlEmp);
 
-            $updateEmp->execute([
+                $updateEmp->execute([
 
-                $especialidade,
+                    $especialidade,
 
-                $bio,
+                    $bio,
 
-                $userId
+                    $foto,
 
-            ]);
+                    $userId
+
+                ]);
+
+            } else {
+
+                $sqlEmp = "
+
+                UPDATE employees
+
+                SET
+
+                    Emp_specialty = ?,
+
+                    Emp_bio = ?
+
+                WHERE User_id = ?
+
+                ";
+
+
+                $updateEmp = $this->pdo->prepare($sqlEmp);
+
+                $updateEmp->execute([
+
+                    $especialidade,
+
+                    $bio,
+
+                    $userId
+
+                ]);
+
+            }
 
 
             // 3. Se houver nova senha, atualizar na mesma transação

@@ -1,5 +1,5 @@
 <?php
-date_default_timezone_set('America/Sao_Paulo');
+date_default_timezone_set('Etc/GMT+3');
 require_once "../../config/conexao.php";
 require_once "../../core/Session.php";
 

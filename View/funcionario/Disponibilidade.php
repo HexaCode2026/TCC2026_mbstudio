@@ -1,5 +1,5 @@
 <?php
-date_default_timezone_set('America/Sao_Paulo');
+date_default_timezone_set('Etc/GMT+3');
 require_once "../../config/conexao.php";
 require_once "../../core/Session.php";
 
@@ -878,13 +878,23 @@ if (!empty($minhasDisponibilidades)) {
 
             <?php if (!empty($minhasDisponibilidades)): ?>
                 <div class="filtro-cadastradas-bar">
-                    <label for="filtroData"><strong>Filtrar por Data:</strong></label>
-                    <select id="filtroData" onchange="filtrarTabelaPorData()">
-                        <option value="nenhuma">Selecione uma data...</option>
-                        <option value="todas">Exibir todas as datas</option>
-                        <?php foreach ($datasCadastradas as $data): ?>
-                            <option value="<?= htmlspecialchars($data) ?>"><?= date('d/m/Y', strtotime($data)) ?></option>
+                    <label><strong>Filtrar por Data:</strong></label>
+                    <select id="filtroAno" onchange="atualizarMeses()">
+                        <option value="nenhuma">Ano...</option>
+                        <option value="todas">Todos</option>
+                        <?php 
+                        $anosUnicos = array_unique(array_map(function($d) { return explode('-', $d)[0]; }, $datasCadastradas));
+                        foreach ($anosUnicos as $ano): ?>
+                            <option value="<?= htmlspecialchars($ano) ?>"><?= htmlspecialchars($ano) ?></option>
                         <?php endforeach; ?>
+                    </select>
+                    
+                    <select id="filtroMes" onchange="atualizarDias()" disabled>
+                        <option value="nenhuma">Mês...</option>
+                    </select>
+
+                    <select id="filtroDia" onchange="aplicarFiltroData()" disabled>
+                        <option value="nenhuma">Dia...</option>
                     </select>
                 </div>
 
@@ -972,33 +982,140 @@ if (!empty($minhasDisponibilidades)) {
     </main>
 
     <script>
-        function filtrarTabelaPorData() {
-            const filtroData = document.getElementById('filtroData');
-            if (!filtroData) return;
+        const datasCadastradasJs = [
+            <?php foreach ($datasCadastradas as $data): ?>
+                "<?= htmlspecialchars($data) ?>",
+            <?php endforeach; ?>
+        ];
 
-            const filtro = filtroData.value;
+        const datasHierarchy = {};
+        datasCadastradasJs.forEach(data => {
+            const parts = data.split('-');
+            const ano = parts[0];
+            const mes = parts[1];
+            const dia = parts[2];
+            
+            if (!datasHierarchy[ano]) datasHierarchy[ano] = {};
+            if (!datasHierarchy[ano][mes]) datasHierarchy[ano][mes] = new Set();
+            datasHierarchy[ano][mes].add(dia);
+        });
+
+        function getMesesDisponiveis(ano) {
+            if (ano === 'todas') {
+                const meses = new Set();
+                for (let a in datasHierarchy) {
+                    for (let m in datasHierarchy[a]) {
+                        meses.add(m);
+                    }
+                }
+                return Array.from(meses).sort();
+            } else {
+                return Object.keys(datasHierarchy[ano] || {}).sort();
+            }
+        }
+
+        function getDiasDisponiveis(ano, mes) {
+            const dias = new Set();
+            const anosAvaliar = (ano === 'todas') ? Object.keys(datasHierarchy) : [ano];
+            
+            for (let a of anosAvaliar) {
+                if (datasHierarchy[a]) {
+                    const mesesAvaliar = (mes === 'todas') ? Object.keys(datasHierarchy[a]) : [mes];
+                    for (let m of mesesAvaliar) {
+                        if (datasHierarchy[a][m]) {
+                            datasHierarchy[a][m].forEach(d => dias.add(d));
+                        }
+                    }
+                }
+            }
+            return Array.from(dias).sort();
+        }
+
+        function atualizarMeses() {
+            const selectAno = document.getElementById('filtroAno');
+            const selectMes = document.getElementById('filtroMes');
+            const selectDia = document.getElementById('filtroDia');
+            
+            const ano = selectAno.value;
+            
+            selectMes.innerHTML = '<option value="nenhuma">Mês...</option>';
+            selectDia.innerHTML = '<option value="nenhuma">Dia...</option>';
+            selectDia.disabled = true;
+
+            if (ano !== 'nenhuma') {
+                selectMes.disabled = false;
+                selectMes.innerHTML += '<option value="todas">Todos</option>';
+                const meses = getMesesDisponiveis(ano);
+                meses.forEach(mes => {
+                    selectMes.innerHTML += `<option value="${mes}">${mes}</option>`;
+                });
+            } else {
+                selectMes.disabled = true;
+            }
+            filtrarTabelaPorData();
+        }
+
+        function atualizarDias() {
+            const selectAno = document.getElementById('filtroAno');
+            const selectMes = document.getElementById('filtroMes');
+            const selectDia = document.getElementById('filtroDia');
+            
+            const ano = selectAno.value;
+            const mes = selectMes.value;
+            
+            selectDia.innerHTML = '<option value="nenhuma">Dia...</option>';
+
+            if (mes !== 'nenhuma') {
+                selectDia.disabled = false;
+                selectDia.innerHTML += '<option value="todas">Todos</option>';
+                const dias = getDiasDisponiveis(ano, mes);
+                dias.forEach(dia => {
+                    selectDia.innerHTML += `<option value="${dia}">${dia}</option>`;
+                });
+            } else {
+                selectDia.disabled = true;
+            }
+            filtrarTabelaPorData();
+        }
+
+        function aplicarFiltroData() {
+            filtrarTabelaPorData();
+        }
+
+        function filtrarTabelaPorData() {
+            const ano = document.getElementById('filtroAno').value;
+            const mes = document.getElementById('filtroMes').value;
+            const dia = document.getElementById('filtroDia').value;
+            
             const tabela = document.getElementById('tabelaDisponibilidades');
             const linhas = document.querySelectorAll('#tabelaDisponibilidades tbody tr');
             const divLote = document.getElementById('acoes-lote-data');
+            
+            const isSpecificDate = (ano !== 'nenhuma' && ano !== 'todas') && 
+                                   (mes !== 'nenhuma' && mes !== 'todas') && 
+                                   (dia !== 'nenhuma' && dia !== 'todas');
 
-            if (filtro === 'nenhuma') {
+            if (ano === 'nenhuma' || mes === 'nenhuma' || dia === 'nenhuma') {
                 tabela.style.display = 'none';
                 if (divLote) divLote.style.display = 'none';
             } else {
                 tabela.style.display = '';
                 linhas.forEach(linha => {
-                    if (filtro === 'todas' || linha.getAttribute('data-data') === filtro) {
+                    const dataLine = linha.getAttribute('data-data');
+                    const parts = dataLine.split('-');
+                    const matchAno = (ano === 'todas' || parts[0] === ano);
+                    const matchMes = (mes === 'todas' || parts[1] === mes);
+                    const matchDia = (dia === 'todas' || parts[2] === dia);
+                    
+                    if (matchAno && matchMes && matchDia) {
                         linha.style.display = '';
                     } else {
                         linha.style.display = 'none';
                     }
                 });
 
-                // Mostrar os botões de ação em lote apenas se uma data específica estiver selecionada
-                if (filtro === 'todas' || filtro === 'nenhuma') {
-                    if (divLote) divLote.style.display = 'none';
-                } else {
-                    if (divLote) divLote.style.display = 'block';
+                if (divLote) {
+                    divLote.style.display = isSpecificDate ? 'block' : 'none';
                 }
             }
         }

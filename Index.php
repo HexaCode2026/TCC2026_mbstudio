@@ -1,4 +1,7 @@
 <?php
+// ============================================================================
+// CONTROLLER: Inicialização da Sessão e Controle de Acesso
+// ============================================================================
 require_once 'core/Session.php';
 Session::iniciar();
 
@@ -12,7 +15,10 @@ if (isset($_SESSION['User_perm'])) {
     }
 }
 
-// Conexão segura para buscar equipe e novidades cadastradas no banco (com fallback)
+// ============================================================================
+// MODEL / CONTROLLER: Consulta e Preparação de Dados para a View
+// ============================================================================
+$servicos = [];
 $funcionarios = [];
 $novidades = [];
 
@@ -21,6 +27,13 @@ try {
         require_once 'config/conexao.php';
 
         if (isset($pdo)) {
+            // Buscar serviços ativos
+            $stmtServicos = $pdo->query("SELECT * FROM services 
+                                         WHERE Ser_active = 1 
+                                         ORDER BY Ser_id ASC 
+                                         LIMIT 6");
+            $servicos = $stmtServicos ? $stmtServicos->fetchAll(PDO::FETCH_ASSOC) : [];
+
             // Buscar funcionários cadastrados
             $stmtEmp = $pdo->query("SELECT e.Emp_id, u.User_name, e.Emp_photo, e.Emp_specialty, e.Emp_bio 
                                     FROM employees e
@@ -28,22 +41,25 @@ try {
                                     WHERE u.User_perm = 'F'
                                     ORDER BY u.User_name ASC
                                     LIMIT 4");
-            $funcionarios = $stmtEmp->fetchAll(PDO::FETCH_ASSOC);
+            $funcionarios = $stmtEmp ? $stmtEmp->fetchAll(PDO::FETCH_ASSOC) : [];
 
             // Buscar serviços recentes ativos como novidades
             $stmtServ = $pdo->query("SELECT * FROM services 
                                      WHERE Ser_active = 1 
                                      ORDER BY Ser_id DESC 
                                      LIMIT 3");
-            $novidades = $stmtServ->fetchAll(PDO::FETCH_ASSOC);
+            $novidades = $stmtServ ? $stmtServ->fetchAll(PDO::FETCH_ASSOC) : [];
         }
     }
 } catch (Exception $e) {
-    // Caso o banco ainda não esteja conectado ou tabelas vazias, fallback visual será exibido
+    $servicos = [];
     $funcionarios = [];
     $novidades = [];
 }
 ?>
+<!-- =========================================================================
+     VIEW: Interface do Usuário (MB Studio Home)
+     ========================================================================= -->
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -54,6 +70,122 @@ try {
 
     <link rel="stylesheet" href="assets/css/global.css">
     <link rel="stylesheet" href="assets/css/home.css">
+    <style>
+        /* Ajuste do layout editorial da seção Sobre */
+        .about-salon-wrapper {
+            display: block !important;
+            max-width: 900px !important;
+            margin: 0 auto !important;
+            text-align: center !important;
+        }
+
+        /* Formato e dimensionamento dos cards baseado em funcionarios.php mantendo as cores originais */
+        .cuts-grid,
+        .team-home-grid,
+        .news-grid {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 25px !important;
+            justify-content: center !important;
+            margin-top: 35px !important;
+            margin-bottom: 40px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        .cut-item-card,
+        .specialist-card,
+        .news-card {
+            width: 340px !important;
+            max-width: 100% !important;
+            flex: 0 0 340px !important;
+            box-sizing: border-box !important;
+        }
+
+        @media (max-width: 400px) {
+
+            .cut-item-card,
+            .specialist-card,
+            .news-card {
+                width: 100% !important;
+                flex: 0 0 100% !important;
+            }
+        }
+
+        .single-card {
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+
+        /* Moldura de Foto do Serviço idêntica a servicos.php */
+        .servico-icone {
+            width: 140px !important;
+            height: 140px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #b98527 !important;
+            margin: 0 auto 16px auto !important;
+            border-radius: 50% !important;
+            overflow: hidden !important;
+            border: 2px solid rgba(214, 181, 110, 0.4) !important;
+            box-shadow: 0 6px 18px rgba(185, 133, 39, 0.15) !important;
+            background: linear-gradient(135deg, #fdfcf9, #f7f1e6) !important;
+            flex-shrink: 0 !important;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+        }
+
+        .cut-item-card:hover .servico-icone,
+        .news-card:hover .servico-icone {
+            transform: scale(1.05) !important;
+            border-color: #d4af37 !important;
+            box-shadow: 0 8px 24px rgba(185, 133, 39, 0.25) !important;
+        }
+
+        .servico-icone img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            object-position: center !important;
+            border-radius: 50% !important;
+            display: block !important;
+        }
+
+        .icone-tesoura {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 65px;
+            line-height: 1;
+            transform: rotate(-10deg);
+            display: inline-block;
+            color: #b98527;
+        }
+
+        .news-card {
+            position: relative !important;
+            padding-top: 28px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+            box-sizing: border-box !important;
+        }
+
+        .news-card .news-badge {
+            position: absolute !important;
+            top: 14px !important;
+            right: 14px !important;
+            background: linear-gradient(135deg, #d4af37, #b8860b) !important;
+            color: #111 !important;
+            font-size: 11px !important;
+            font-weight: 800 !important;
+            letter-spacing: 1px !important;
+            text-transform: uppercase !important;
+            padding: 5px 12px !important;
+            border-radius: 20px !important;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35) !important;
+            z-index: 10 !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -136,7 +268,7 @@ try {
     </section>
 
     <!-- =================================================================
-         2. SOBRE O SALÃO & O ESPAÇO (TEXTO GENÉRICO EDITÁVEL)
+         2. SOBRE O SALÃO & O ESPAÇO (TEXTO EDITÁVEL)
          ================================================================= -->
     <section class="about-salon-section">
         <div class="about-salon-wrapper">
@@ -165,68 +297,6 @@ try {
                     precisão das cores e um atendimento acolhedor para que o seu momento de autocuidado seja
                     inesquecível.
                 </p>
-
-                <div class="about-highlights-grid">
-                    <div class="highlight-box">
-                        <div class="highlight-box-icon">✦</div>
-                        <h4>Atendimento Consultivo</h4>
-                        <p>Análise de perfil, visagismo e harmonia para o corte e cor ideais.</p>
-                    </div>
-                    <div class="highlight-box">
-                        <div class="highlight-box-icon">✦</div>
-                        <h4>Cosméticos de Qualidade</h4>
-                        <p>Utilizamos apenas marcas de alta qualidade para o melhor resultado.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="about-space-visual">
-                <div class="about-space-card">
-                    <div class="space-card-header">
-                        <h3>O Nosso <span class="gold">Espaço</span></h3>
-                        <span>Ambiente planejado para o seu conforto</span>
-                    </div>
-
-                    <ul class="space-features-list">
-                        <li>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            Lavatórios ergonômicos com massagem e relaxamento
-                        </li>
-                        <li>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            Estações exclusivas para mechas, colorimetria e tratamentos
-                        </li>
-                        <li>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            Espaço café gourmet e drinks selecionados
-                        </li>
-                        <li>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            Ambiente climatizado com trilha sonora relaxante
-                        </li>
-                    </ul>
-
-                    <a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Servicos.php')" class="btn-gold"
-                        style="width: 100%; text-align: center;">
-                        Viva Esta Experiência
-                    </a>
-                </div>
             </div>
 
         </div>
@@ -247,79 +317,38 @@ try {
                 salão.
             </p>
 
-            <div class="cuts-grid">
-                <!-- Card 1 -->
-                <div class="cut-item-card">
-                    <div class="cut-photo-box">
-                        <span class="tag-cat">Cortes</span>
-                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.5">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                            <polyline points="21 15 16 10 5 21"></polyline>
-                        </svg>
-                        <p>Foto do Corte Feminino</p>
-                    </div>
-                    <h4>Corte & <span class="cursiva-gold">Visagismo</span></h4>
-                    <p class="cut-desc">Cortes modernos personalizados para valorizar os traços do seu rosto.</p>
-                    <a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Servicos.php')"
-                        class="btn-outline-gold">Agendar</a>
+            <?php if (!empty($servicos)): ?>
+                <div class="cuts-grid">
+                    <?php foreach ($servicos as $s): ?>
+                        <div class="cut-item-card <?= count($servicos) === 1 ? 'single-card' : '' ?>">
+                            <div class="servico-icone">
+                                <?php
+                                $sPhoto = $s['Ser_image'] ?? '';
+                                $hasSPhoto = !empty($sPhoto) && (file_exists($sPhoto) || file_exists(__DIR__ . '/' . $sPhoto));
+                                ?>
+                                <?php if ($hasSPhoto): ?>
+                                    <img src="<?= htmlspecialchars($sPhoto) ?>" alt="<?= htmlspecialchars($s['Ser_name']) ?>">
+                                <?php else: ?>
+                                    <span class="icone-tesoura">✂</span>
+                                <?php endif; ?>
+                            </div>
+                            <h4><?= htmlspecialchars($s['Ser_name']) ?></h4>
+                            <p class="cut-desc">
+                                <?= htmlspecialchars($s['Ser_description'] ?: 'Serviço exclusivo MB Studio com produtos de alta performance.') ?>
+                            </p>
+                            <div style="margin-bottom: 12px; font-weight: 700; color: var(--gold-dark); font-size: 14px;">
+                                R$ <?= number_format($s['Ser_price'], 2, ',', '.') ?>
+                                <?= !empty($s['Ser_duration']) ? ' <span style="font-weight: normal; color: #888; font-size: 12px;">(' . $s['Ser_duration'] . ' min)</span>' : '' ?>
+                            </div>
+                            <a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Data.php?Ser_id=<?= $s['Ser_id'] ?>')"
+                                class="btn-outline-gold">Agendar</a>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-
-                <!-- Card 2 -->
-                <div class="cut-item-card">
-                    <div class="cut-photo-box">
-                        <span class="tag-cat">Coloração</span>
-                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.5">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                            <polyline points="21 15 16 10 5 21"></polyline>
-                        </svg>
-                        <p>Foto Iluminação / Blond</p>
-                    </div>
-                    <h4>Loiros & <span class="cursiva-gold">Iluminação</span></h4>
-                    <p class="cut-desc">Técnicas sutis de mechas preservando a saúde e brilho dos fios.</p>
-                    <a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Servicos.php')"
-                        class="btn-outline-gold">Agendar</a>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="cut-item-card">
-                    <div class="cut-photo-box">
-                        <span class="tag-cat">Tratamentos</span>
-                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.5">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                            <polyline points="21 15 16 10 5 21"></polyline>
-                        </svg>
-                        <p>Foto Terapia Capilar</p>
-                    </div>
-                    <h4>Terapia & <span class="cursiva-gold">Spa Capilar</span></h4>
-                    <p class="cut-desc">Recuperação profunda, hidratação molecular e nutrição intensiva.</p>
-                    <a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Servicos.php')"
-                        class="btn-outline-gold">Agendar</a>
-                </div>
-
-                <!-- Card 4 -->
-                <div class="cut-item-card">
-                    <div class="cut-photo-box">
-                        <span class="tag-cat">Produção</span>
-                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.5">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                            <polyline points="21 15 16 10 5 21"></polyline>
-                        </svg>
-                        <p>Foto Penteados / Noivas</p>
-                    </div>
-                    <h4>Penteados & <span class="cursiva-gold">Eventos</span></h4>
-                    <p class="cut-desc">Produções elegantes e marcantes para ocasiões inesquecíveis.</p>
-                    <a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Servicos.php')"
-                        class="btn-outline-gold">Agendar</a>
-                </div>
-            </div>
+            <?php else: ?>
+                <p style="color:#888; width: 100%; text-align: center; margin: 30px 0; font-style: italic;">No momento, não
+                    temos serviços cadastrados.</p>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -337,14 +366,17 @@ try {
                 Conheça os profissionais apaixonados que tornam cada visita ao MB Studio uma experiência singular.
             </p>
 
-            <div class="team-home-grid">
-                <?php if (!empty($funcionarios)): ?>
+            <?php if (!empty($funcionarios)): ?>
+                <div class="team-home-grid">
                     <?php foreach ($funcionarios as $f): ?>
-                        <div class="specialist-card">
+                        <div class="specialist-card <?= count($funcionarios) === 1 ? 'single-card' : '' ?>">
                             <div class="specialist-avatar">
-                                <?php if (!empty($f['Emp_photo']) && file_exists($f['Emp_photo'])): ?>
-                                    <img src="<?= htmlspecialchars($f['Emp_photo']) ?>"
-                                        alt="<?= htmlspecialchars($f['User_name']) ?>">
+                                <?php
+                                $fPhoto = $f['Emp_photo'] ?? '';
+                                $hasFPhoto = !empty($fPhoto) && (file_exists($fPhoto) || file_exists(__DIR__ . '/' . $fPhoto));
+                                ?>
+                                <?php if ($hasFPhoto): ?>
+                                    <img src="<?= htmlspecialchars($fPhoto) ?>" alt="<?= htmlspecialchars($f['User_name']) ?>">
                                 <?php else: ?>
                                     <div class="specialist-avatar-placeholder">
                                         <?= strtoupper(substr($f['User_name'], 0, 1)) ?>
@@ -361,39 +393,11 @@ try {
                             <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
-                <?php else: ?>
-                    <!-- Fallback de alto padrão caso não haja equipe cadastrada no banco -->
-                    <div class="specialist-card">
-                        <div class="specialist-avatar">
-                            <div class="specialist-avatar-placeholder">M</div>
-                        </div>
-                        <h3 class="specialist-name">Mariana Bastos</h3>
-                        <p class="specialist-role">Master Hair Stylist & Visagista</p>
-                        <p class="specialist-bio">"Especialista em cortes contemporâneos e consultoria de imagem
-                            personalizada."</p>
-                    </div>
-
-                    <div class="specialist-card">
-                        <div class="specialist-avatar">
-                            <div class="specialist-avatar-placeholder">C</div>
-                        </div>
-                        <h3 class="specialist-name">Carlos Eduardo</h3>
-                        <p class="specialist-role">Colorista & Blonde Expert</p>
-                        <p class="specialist-bio">"Referência em mechas iluminadas, transições suaves e preservação da fibra
-                            capilar."</p>
-                    </div>
-
-                    <div class="specialist-card">
-                        <div class="specialist-avatar">
-                            <div class="specialist-avatar-placeholder">L</div>
-                        </div>
-                        <h3 class="specialist-name">Letícia Andrade</h3>
-                        <p class="specialist-role">Terapeuta Capilar & Make</p>
-                        <p class="specialist-bio">"Foco na saúde do couro cabeludo, rituais de spa e produções refinadas
-                            para eventos."</p>
-                    </div>
-                <?php endif; ?>
-            </div>
+                </div>
+            <?php else: ?>
+                <p style="color:#aaa; width: 100%; text-align: center; margin: 30px 0; font-style: italic;">No momento, não
+                    temos profissionais cadastrados.</p>
+            <?php endif; ?>
 
             <a href="View/cliente/Funcionarios.php" class="btn-gold">
                 Conhecer Toda a Equipe
@@ -416,22 +420,22 @@ try {
                 nosso estúdio.
             </p>
 
-            <div class="news-grid">
-                <?php if (!empty($novidades)): ?>
+            <?php if (!empty($novidades)): ?>
+                <div class="news-grid">
                     <?php foreach ($novidades as $n): ?>
-                        <div class="news-card">
-                            <div class="news-image-wrap">
-                                <?php if (!empty($n['Ser_image']) && file_exists($n['Ser_image'])): ?>
-                                    <img src="<?= htmlspecialchars($n['Ser_image']) ?>"
-                                        alt="<?= htmlspecialchars($n['Ser_name']) ?>">
+                        <div class="news-card <?= count($novidades) === 1 ? 'single-card' : '' ?>">
+                            <span class="news-badge">Novidade</span>
+
+                            <div class="servico-icone">
+                                <?php
+                                $nPhoto = $n['Ser_image'] ?? '';
+                                $hasNPhoto = !empty($nPhoto) && (file_exists($nPhoto) || file_exists(__DIR__ . '/' . $nPhoto));
+                                ?>
+                                <?php if ($hasNPhoto): ?>
+                                    <img src="<?= htmlspecialchars($nPhoto) ?>" alt="<?= htmlspecialchars($n['Ser_name']) ?>">
                                 <?php else: ?>
-                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="1.5">
-                                        <polygon
-                                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-                                        </polygon>
-                                    </svg>
+                                    <span class="icone-tesoura">✂</span>
                                 <?php endif; ?>
-                                <span class="news-badge">Novidade</span>
                             </div>
                             <div class="news-body">
                                 <h3 class="news-title"><?= htmlspecialchars($n['Ser_name']) ?></h3>
@@ -452,89 +456,11 @@ try {
                             </div>
                         </div>
                     <?php endforeach; ?>
-                <?php else: ?>
-                    <!-- Fallback de cards de novidades -->
-                    <div class="news-card">
-                        <div class="news-image-wrap">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="1.5">
-                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                            </svg>
-                            <span class="news-badge">Lançamento</span>
-                        </div>
-                        <div class="news-body">
-                            <h3 class="news-title">Spa Capilar & Ozonioterapia</h3>
-                            <p class="news-description">Protocolo avançado de desintoxicação do couro cabeludo, estimulação
-                                de crescimento e hidratação profunda com vapor de ozônio.</p>
-                            <div class="news-footer">
-                                <div class="news-price-wrap">
-                                    <span>A partir de</span>
-                                    <strong>R$ 180,00</strong>
-                                </div>
-                                <a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Servicos.php')"
-                                    class="btn-gold" style="padding: 8px 18px; font-size: 12px;">
-                                    Agendar
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="news-card">
-                        <div class="news-image-wrap">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="1.5">
-                                <circle cx="12" cy="12" r="5"></circle>
-                                <line x1="12" y1="1" x2="12" y2="3"></line>
-                                <line x1="12" y1="21" x2="12" y2="23"></line>
-                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                                <line x1="1" y1="12" x2="3" y2="12"></line>
-                                <line x1="21" y1="12" x2="23" y2="12"></line>
-                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                            </svg>
-                            <span class="news-badge">Tendência</span>
-                        </div>
-                        <div class="news-body">
-                            <h3 class="news-title">Iluminação Express SunKiss</h3>
-                            <p class="news-description">Pontos de luz estratégicos com efeito queimado de sol,
-                                proporcionando luminosidade natural com baixa manutenção.</p>
-                            <div class="news-footer">
-                                <div class="news-price-wrap">
-                                    <span>A partir de</span>
-                                    <strong>R$ 290,00</strong>
-                                </div>
-                                <a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Servicos.php')"
-                                    class="btn-gold" style="padding: 8px 18px; font-size: 12px;">
-                                    Agendar
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="news-card">
-                        <div class="news-image-wrap">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="1.5">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                            </svg>
-                            <span class="news-badge">Exclusivo</span>
-                        </div>
-                        <div class="news-body">
-                            <h3 class="news-title">Blindagem Molecular de Fios</h3>
-                            <p class="news-description">Tratamento anti-frizz e anti-porosidade de alta fixação que sela as
-                                cutículas conferindo brilho espelhado prolongado.</p>
-                            <div class="news-footer">
-                                <div class="news-price-wrap">
-                                    <span>A partir de</span>
-                                    <strong>R$ 220,00</strong>
-                                </div>
-                                <a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Servicos.php')"
-                                    class="btn-gold" style="padding: 8px 18px; font-size: 12px;">
-                                    Agendar
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                <?php endif; ?>
-            </div>
+                </div>
+            <?php else: ?>
+                <p style="color:#666; width: 100%; text-align: center; margin: 30px 0; font-style: italic;">No momento, não
+                    há novidades cadastradas.</p>
+            <?php endif; ?>
         </div>
     </section>
 

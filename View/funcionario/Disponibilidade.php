@@ -1083,7 +1083,10 @@ if (!empty($minhasDisponibilidades)) {
         }
 
         function filtrarTabelaPorData() {
-            const ano = document.getElementById('filtroAno').value;
+            const elAno = document.getElementById('filtroAno');
+            if (!elAno) return; // Se não houver disponibilidades, os filtros não existem
+
+            const ano = elAno.value;
             const mes = document.getElementById('filtroMes').value;
             const dia = document.getElementById('filtroDia').value;
             

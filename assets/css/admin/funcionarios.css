@@ -1,0 +1,628 @@
+:root {
+            --gold-primary: #b8860b;
+            --gold-accent: #d4af37;
+            --gold-light: #f5eccf;
+            --gold-dark: #8a6508;
+            --gold-darker: #6e5005;
+            --gold-border: rgba(184, 134, 11, 0.22);
+            --gold-border-hover: rgba(184, 134, 11, 0.5);
+            
+            --bg-body: #fbf9f5;
+            --bg-card: #ffffff;
+            --bg-card-alt: #f8f5ee;
+            
+            --text-title: #1a1917;
+            --text-body: #3c3933;
+            --text-muted: #736d62;
+            
+            --font-heading: 'Playfair Display', Georgia, serif;
+            --font-cursive: 'Alex Brush', cursive;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            
+            --card-shadow: 0 10px 30px rgba(184, 134, 11, 0.07), 0 2px 6px rgba(0, 0, 0, 0.03);
+            --card-shadow-hover: 0 16px 40px rgba(184, 134, 11, 0.14), 0 4px 10px rgba(0, 0, 0, 0.04);
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-body);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            padding-top: 75px;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .admin-team-wrapper {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 35px 25px 80px;
+            box-sizing: border-box;
+        }
+
+        /* Barra Superior */
+        .top-nav-bar {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn-back-dashboard {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold-dark);
+            background: #ffffff;
+            border: 1px solid var(--gold-border);
+            padding: 10px 22px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+            box-shadow: 0 2px 8px rgba(184, 134, 11, 0.08);
+        }
+
+        .btn-back-dashboard:hover {
+            background: rgba(184, 134, 11, 0.1);
+            border-color: var(--gold-primary);
+            color: var(--gold-darker);
+            transform: translateX(-3px);
+            box-shadow: 0 4px 14px rgba(184, 134, 11, 0.18);
+        }
+
+        .btn-manage-services-top {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #b8860b, #8a6508);
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+            box-shadow: 0 3px 10px rgba(138, 101, 8, 0.25);
+        }
+
+        .btn-manage-services-top:hover {
+            background: linear-gradient(135deg, #d4af37, #b8860b);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(138, 101, 8, 0.35);
+        }
+
+        /* Banner de Boas-Vindas e Título */
+        .team-header-card {
+            background: linear-gradient(135deg, #ffffff 0%, #faf6ec 100%);
+            border: 1px solid var(--gold-border);
+            border-radius: 20px;
+            padding: 30px 35px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 35px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .team-header-card::after {
+            content: '✂️';
+            position: absolute;
+            right: 25px;
+            bottom: -15px;
+            font-size: 100px;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+
+        .header-tag-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            background: rgba(184, 134, 11, 0.1);
+            border: 1px solid var(--gold-border);
+            border-radius: 30px;
+            color: var(--gold-dark);
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .team-main-title {
+            font-family: var(--font-heading);
+            font-size: clamp(24px, 3.2vw, 34px);
+            font-weight: 700;
+            color: var(--text-title);
+            margin: 0 0 6px 0;
+            line-height: 1.2;
+        }
+
+        .team-subtitle {
+            font-size: 14.5px;
+            color: var(--text-muted);
+            max-width: 680px;
+            line-height: 1.55;
+            margin: 0;
+        }
+
+        /* Grid de Resumo / KPIs */
+        .kpi-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 18px;
+            margin-bottom: 35px;
+        }
+
+        .kpi-card {
+            background: #ffffff;
+            border: 1px solid var(--gold-border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: var(--transition-smooth);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-shadow-hover);
+            border-color: var(--gold-primary);
+        }
+
+        .kpi-icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(184, 134, 11, 0.08);
+            border: 1px solid rgba(184, 134, 11, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-dark);
+            flex-shrink: 0;
+        }
+
+        .kpi-info-val {
+            font-family: var(--font-heading);
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-title);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .kpi-info-lbl {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Barra de Busca e Filtros */
+        .controls-filter-bar {
+            background: #ffffff;
+            border: 1px solid var(--gold-border);
+            border-radius: 16px;
+            padding: 18px 24px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .search-box-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 260px;
+        }
+
+        .search-icon-svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8c867a;
+            pointer-events: none;
+        }
+
+        .search-input-field {
+            width: 100%;
+            padding: 11px 16px 11px 42px;
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-body);
+            background: #faf8f3;
+            transition: var(--transition-smooth);
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .search-input-field:focus {
+            background: #ffffff;
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.15);
+        }
+
+        .filters-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 14px;
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            border-radius: 10px;
+            background: #faf8f3;
+            color: var(--text-body);
+            font-size: 13px;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .filter-select:focus, .filter-select:hover {
+            border-color: var(--gold-primary);
+            background: #ffffff;
+        }
+
+        .team-count-tag {
+            font-size: 13px;
+            color: var(--gold-dark);
+            background: rgba(184, 134, 11, 0.1);
+            border: 1px solid var(--gold-border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Grid de Cards dos Funcionários */
+        .team-luxury-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .team-card-luxury {
+            background: #ffffff;
+            border: 1px solid var(--gold-border);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-card-luxury:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow-hover);
+            border-color: var(--gold-primary);
+        }
+
+        /* Topo do Card */
+        .team-card-top {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(184, 134, 11, 0.15);
+        }
+
+        .team-avatar-frame {
+            width: 74px;
+            height: 74px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--gold-accent);
+            box-shadow: 0 4px 12px rgba(184, 134, 11, 0.2);
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #faf7ef, #f4ede0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .team-avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .team-avatar-initials {
+            font-family: var(--font-heading);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gold-dark);
+            letter-spacing: 1px;
+        }
+
+        .team-info-header {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .team-name-title {
+            font-family: var(--font-heading);
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--text-title);
+            margin: 0 0 4px 0;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .team-specialty-badge {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gold-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            background: rgba(184, 134, 11, 0.08);
+            border: 1px solid var(--gold-border);
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-top: 2px;
+        }
+
+        /* Corpo do Card */
+        .team-card-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .card-info-item {
+            font-size: 13.5px;
+            color: var(--text-body);
+            line-height: 1.5;
+        }
+
+        .card-info-label {
+            font-weight: 700;
+            color: var(--text-muted);
+            font-size: 11.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Badges */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+
+        .status-pill.active {
+            background: rgba(46, 204, 113, 0.12);
+            color: #1b8a47;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .status-pill.active .status-dot {
+            background-color: #2ecc71;
+            box-shadow: 0 0 6px #2ecc71;
+        }
+
+        .status-pill.inactive {
+            background: rgba(231, 76, 60, 0.1);
+            color: #b03a2e;
+            border: 1px solid rgba(231, 76, 60, 0.25);
+        }
+
+        .status-pill.inactive .status-dot {
+            background-color: #e74c3c;
+        }
+
+        .badge-agenda {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(184, 134, 11, 0.08);
+            border: 1px solid var(--gold-border);
+            color: var(--gold-dark);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+
+        .services-tag-list {
+            font-size: 13px;
+            color: var(--text-title);
+            background: #faf8f3;
+            border: 1px solid rgba(184, 134, 11, 0.15);
+            padding: 8px 12px;
+            border-radius: 8px;
+            line-height: 1.4;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .bio-quote-box {
+            background: #faf7ee;
+            border-left: 3px solid var(--gold-primary);
+            padding: 8px 12px;
+            border-radius: 0 8px 8px 0;
+            font-size: 12.5px;
+            color: var(--text-muted);
+            font-style: italic;
+            line-height: 1.45;
+        }
+
+        /* Rodapé de Ações */
+        .team-card-actions {
+            margin-top: 22px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(184, 134, 11, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-card-manage {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #b8860b, #8a6508);
+            color: #ffffff;
+            border: none;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            text-decoration: none;
+            text-align: center;
+            transition: var(--transition-smooth);
+            box-shadow: 0 2px 6px rgba(138, 101, 8, 0.2);
+            cursor: pointer;
+        }
+
+        .btn-card-manage:hover {
+            background: linear-gradient(135deg, #d4af37, #b8860b);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(138, 101, 8, 0.3);
+        }
+
+        .btn-card-remove {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #ffffff;
+            color: #c0392b;
+            border: 1px solid rgba(192, 57, 43, 0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-align: center;
+        }
+
+        .btn-card-remove:hover {
+            background: #c0392b;
+            color: #ffffff;
+            border-color: #c0392b;
+            box-shadow: 0 3px 8px rgba(192, 57, 43, 0.25);
+            transform: translateY(-1px);
+        }
+
+        /* Estado Vazio */
+        .empty-state-wrap {
+            text-align: center;
+            padding: 60px 20px;
+            background: #ffffff;
+            border: 1px solid var(--gold-border);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            color: var(--text-muted);
+            grid-column: 1 / -1;
+        }
+
+        .empty-icon-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(184, 134, 11, 0.08);
+            border: 1px solid var(--gold-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            color: var(--gold-dark);
+            font-size: 28px;
+        }
+
+        .empty-title {
+            font-family: var(--font-heading);
+            font-size: 20px;
+            color: var(--text-title);
+            margin-bottom: 6px;
+        }
+
+        /* Rodapé Informativo */
+        .team-page-footer {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(184, 134, 11, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .admin-team-wrapper {
+                padding: 20px 15px 60px;
+            }
+
+            .team-header-card {
+                padding: 22px 20px;
+            }
+
+            .team-luxury-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-filter-bar {
+                padding: 15px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filters-group {
+                justify-content: space-between;
+            }
+
+            .filter-select {
+                flex: 1;
+            }
+        }

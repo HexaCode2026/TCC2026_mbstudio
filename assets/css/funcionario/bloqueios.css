@@ -1,0 +1,88 @@
+.page-container {
+            max-width: 900px;
+            margin: 100px auto 40px;
+            padding: 30px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            font-family: sans-serif;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .form-section {
+            flex: 1;
+            min-width: 300px;
+            background: #faf8f3;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #eee8df;
+        }
+        .list-section {
+            flex: 2;
+            min-width: 400px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+            font-size: 14px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .btn-gold {
+            background: #b98527;
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+        .btn-gold:hover {
+            background: #d4af37;
+        }
+        .table-mini {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .table-mini th {
+            background: #f4f0e6;
+            color: #b98527;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #e2d7c1;
+        }
+        .table-mini td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
+        .btn-danger {
+            color: #dc3545;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .btn-danger:hover {
+            text-decoration: underline;
+        }
+        .alert {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }

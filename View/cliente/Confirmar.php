@@ -36,37 +36,7 @@ $funcionario = $stmtFunc->fetch(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <title>Confirmar Agendamento</title>
     <link rel="stylesheet" href="../../assets/css/global.css">
-    <style>
-        .mini-card {
-            border: 1px solid #d4af37;
-            padding: 20px;
-            max-width: 500px;
-            margin: 40px auto;
-            border-radius: 12px;
-            background: #fff;
-            box-shadow: 0 4px 12px rgba(185,133,39,0.1);
-            text-align: left;
-            font-family: sans-serif;
-        }
-        .mini-card p {
-            margin: 8px 0;
-            color: #333;
-        }
-        .btn-gold {
-            background: #b98527;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 15px;
-        }
-        .btn-gold:hover {
-            background: #d4af37;
-        }
-    </style>
+    <link rel="stylesheet" href="../../assets/css/cliente/confirmar.css">
 </head>
 <body style="background: #fdfcf9; text-align: center;">
 

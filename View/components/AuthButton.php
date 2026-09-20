@@ -3,109 +3,12 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 $userName = isset($_SESSION['User_name']) ? $_SESSION['User_name'] : null;
-$basePath = '/TCC2026_mbstudio';
+$docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/');
+$projectRoot = str_replace('\\', '/', realpath(__DIR__ . '/../../'));
+$basePath = str_ireplace($docRoot, '', $projectRoot);
 ?>
 
-<style>
-/* CSS para o botão flutuante de autenticação */
-.auth-floating-container {
-    position: relative;
-    z-index: 1000;
-    font-family: 'Inter', sans-serif;
-    display: flex;
-    align-items: center;
-}
-
-.auth-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(26, 26, 26, 0.8);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(212, 175, 55, 0.5);
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-.auth-btn:hover {
-    background: rgba(212, 175, 55, 0.1);
-    border-color: #d4af37;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(212, 175, 55, 0.3);
-}
-
-.auth-icon {
-    width: 24px;
-    height: 24px;
-    background: linear-gradient(135deg, #d4af37, #f3e5ab);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #000;
-    font-weight: bold;
-    font-size: 12px;
-}
-
-/* Dropdown para usuário logado */
-.auth-dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.auth-dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 100%;
-    padding-top: 10px; /* Cria uma área invisível para o hover não falhar */
-    z-index: 1001;
-}
-
-.auth-dropdown-menu {
-    background-color: #1a1a1a;
-    min-width: 150px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.auth-dropdown:hover .auth-dropdown-content {
-    display: block;
-}
-
-.auth-dropdown-item {
-    color: white;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    font-size: 14px;
-    transition: background 0.2s;
-}
-
-.auth-dropdown-item:hover {
-    background-color: rgba(212, 175, 55, 0.2);
-    color: #f3e5ab;
-}
-
-.auth-dropdown-item.logout {
-    color: #ff6b6b;
-    border-top: 1px solid rgba(255,255,255,0.05);
-}
-
-.auth-dropdown-item.logout:hover {
-    background-color: rgba(255, 107, 107, 0.1);
-    color: #ff6b6b;
-}
-</style>
+<link rel="stylesheet" href="<?= $basePath ?>/assets/css/components/authbutton.css">
 
 <div class="auth-floating-container">
     <?php if ($userName): ?>

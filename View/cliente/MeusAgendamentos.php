@@ -38,44 +38,7 @@ if ($cli_id) {
     <meta charset="UTF-8">
     <title>Meus Agendamentos</title>
     <link rel="stylesheet" href="../../assets/css/global.css">
-    <style>
-        .page-container {
-            max-width: 900px;
-            margin: 100px auto 40px;
-            padding: 20px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            font-family: sans-serif;
-        }
-        .table-mini {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .table-mini th {
-            background: #f4f0e6;
-            color: #b98527;
-            padding: 12px;
-            text-align: left;
-            border-bottom: 2px solid #e2d7c1;
-        }
-        .table-mini td {
-            padding: 12px;
-            border-bottom: 1px solid #f0f0f0;
-            color: #333;
-        }
-        .status-badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .status-Pendente { background: #fff3cd; color: #856404; }
-        .status-Confirmado { background: #d4edda; color: #155724; }
-        .status-Cancelado { background: #f8d7da; color: #721c24; }
-        .status-Concluido { background: #cce5ff; color: #004085; }
-    </style>
+    <link rel="stylesheet" href="../../assets/css/cliente/meusagendamentos.css">
 </head>
 <body style="background: #fdfcf9;">
 

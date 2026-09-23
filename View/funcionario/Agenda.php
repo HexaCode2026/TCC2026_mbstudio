@@ -264,6 +264,7 @@ if (!empty($appointments)) {
                                                     data-cliente="<?= htmlspecialchars($app['client_name'], ENT_QUOTES, 'UTF-8') ?>" 
                                                     data-servico="<?= htmlspecialchars($app['Ser_name'], ENT_QUOTES, 'UTF-8') ?>" 
                                                     data-valor="<?= $app['Ser_price'] ?>" 
+                                                    data-cli-obs="<?= htmlspecialchars($app['Cli_observation'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                                                     onclick="abrirModalFinalizacao(this)">
                                                 ★ Finalizar Atendimento
                                             </button>
@@ -319,6 +320,11 @@ if (!empty($appointments)) {
                 <form action="../../controller/FinalizarAgendamento.php" method="POST" id="formFinalizacao">
                     <input type="hidden" name="appo_id" id="modalAppoId" value="">
                     
+                    <div style="margin-top: 15px; margin-bottom: 15px;">
+                        <p class="payment-title" style="margin-bottom: 10px;">Observações do Cliente</p>
+                        <textarea name="cli_observation" id="modalClientObs" rows="3" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid var(--border-color); background: #1a1a1a; color: var(--text-light); resize: vertical; font-family: inherit;" placeholder="Adicione observações sobre o cliente (opcional)..."></textarea>
+                    </div>
+
                     <div class="payment-section">
                         <p class="payment-title">Forma de Pagamento</p>
                         <div class="payment-options">
@@ -390,9 +396,10 @@ if (!empty($appointments)) {
             document.getElementById('modalServicoNome').textContent = btn.dataset.servico;
             document.getElementById('modalServicoValor').textContent = parseFloat(btn.dataset.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             
-            // reset radio
+            // reset radio and textarea
             const radios = document.querySelectorAll('input[name="payment_method"]');
             radios.forEach(r => r.checked = false);
+            document.getElementById('modalClientObs').value = btn.dataset.cliObs || '';
 
             document.getElementById('modalFinalizacao').style.display = 'flex';
         }

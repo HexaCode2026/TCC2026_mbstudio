@@ -54,6 +54,17 @@ if ($userPerm === 'F') {
 $success = $appointmentModel->finalizarComPagamento($appoId, $paymentMethod, $empId);
 
 if ($success) {
+    if (isset($_POST['cli_observation'])) {
+        $cliObservation = $_POST['cli_observation'];
+        $stmtClient = $pdo->prepare("SELECT Cli_id FROM appointments WHERE Appo_id = ?");
+        $stmtClient->execute([$appoId]);
+        $cliId = $stmtClient->fetchColumn();
+        
+        if ($cliId) {
+            $stmtUpdateObs = $pdo->prepare("UPDATE clients SET Cli_observation = ? WHERE Cli_id = ?");
+            $stmtUpdateObs->execute([$cliObservation, $cliId]);
+        }
+    }
     header("Location: $redirect?sucesso=atendimento_concluido");
 } else {
     header("Location: $redirect?erro=falha_permissao_ou_status");

@@ -25,11 +25,23 @@ if (!$empId && $_SESSION['User_perm'] == 'F') {
     $empId = $pdo->lastInsertId();
 }
 
-
+// POST: Salvar Observações do Cliente
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_client_obs') {
+    $cliId = $_POST['cli_id'] ?? 0;
+    $observation = $_POST['cli_observation'] ?? '';
+    if ($cliId) {
+        $stmtObs = $pdo->prepare("UPDATE clients SET Cli_observation = ? WHERE Cli_id = ?");
+        $stmtObs->execute([$observation, $cliId]);
+    }
+    header("Location: Agenda.php");
+    exit;
+}
 
 // Busca os agendamentos do funcionário vinculado ao usuário logado
 // appointments (Cli_id) -> clients (User_id) -> users (User_name)
 $query = "SELECT a.*, 
+                 c.Cli_id,
+                 c.Cli_observation,
                  users.User_name as client_name, 
                  s.Ser_name, 
                  s.Ser_price, 
@@ -158,8 +170,9 @@ if (!empty($appointments)) {
                             <th>Início</th>
                             <th>Fim</th>
                             <th>Cliente</th>
+                            <th style="text-align: center;">Obs. Cliente</th>
                             <th>Serviço</th>
-                            <th>Observação</th>
+                            <th>Obs. Agendamento</th>
                             <th>Status Atual</th>
                             <th style="text-align: center;">Ações</th>
                         </tr>
@@ -178,6 +191,16 @@ if (!empty($appointments)) {
                                 </td>
                                 <td>
                                     <span class="client-name-cell"><?= htmlspecialchars($app['client_name']) ?></span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <button type="button" class="btn-acao btn-obs" 
+                                            data-cli-id="<?= $app['Cli_id'] ?>" 
+                                            data-cli-name="<?= htmlspecialchars($app['client_name'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-cli-obs="<?= htmlspecialchars($app['Cli_observation'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                                            onclick="abrirModalObs(this)"
+                                            style="font-size: 0.85em; padding: 5px 10px; background-color: transparent; border: 1px solid var(--gold-primary); color: var(--gold-light); border-radius: 4px; cursor: pointer;">
+                                        Observações
+                                    </button>
                                 </td>
                                 <td class="service-info-cell">
                                     <strong><?= htmlspecialchars($app['Ser_name']) ?></strong>
@@ -323,7 +346,44 @@ if (!empty($appointments)) {
         </div>
     </div>
 
+    <!-- Modal Observações Cliente -->
+    <div id="modalObsCliente" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Observações do Cliente</h2>
+                <button type="button" class="btn-close-modal" onclick="fecharModalObs()">×</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Cliente:</strong> <span id="modalObsClienteNome"></span></p>
+                <form action="Agenda.php" method="POST" id="formObsCliente">
+                    <input type="hidden" name="action" value="update_client_obs">
+                    <input type="hidden" name="cli_id" id="modalObsCliId" value="">
+                    
+                    <div style="margin-top: 15px;">
+                        <textarea name="cli_observation" id="modalObsTexto" rows="5" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid var(--border-color); background: #1a1a1a; color: var(--text-light); resize: vertical; font-family: inherit;"></textarea>
+                    </div>
+                    
+                    <div class="modal-actions" style="margin-top: 20px;">
+                        <button type="button" class="btn-acao btn-cancelar-modal" onclick="fecharModalObs()">Cancelar</button>
+                        <button type="submit" class="btn-acao btn-aceitar">Salvar Observações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
+        function abrirModalObs(btn) {
+            document.getElementById('modalObsCliId').value = btn.dataset.cliId;
+            document.getElementById('modalObsClienteNome').textContent = btn.dataset.cliName;
+            document.getElementById('modalObsTexto').value = btn.dataset.cliObs;
+            document.getElementById('modalObsCliente').style.display = 'flex';
+        }
+
+        function fecharModalObs() {
+            document.getElementById('modalObsCliente').style.display = 'none';
+        }
+
         function abrirModalFinalizacao(btn) {
             document.getElementById('modalAppoId').value = btn.dataset.appoId;
             document.getElementById('modalClienteNome').textContent = btn.dataset.cliente;

@@ -167,4 +167,46 @@ class Appointment
             'cancelados' => (int) ($stats['cancelados'] ?? 0)
         ];
     }
+
+    /**
+     * Finaliza um atendimento registrando a forma de pagamento de maneira estritamente atômica.
+     * Retorna true se a operação modificou exatamente 1 linha (sucesso + autorização).
+     */
+    public function finalizarComPagamento($appoId, $paymentMethod, $empId = null)
+    {
+        $metodosPermitidos = ['Pix', 'Dinheiro', 'Cartão'];
+        if (!in_array($paymentMethod, $metodosPermitidos, true)) {
+            return false;
+        }
+
+        if ($empId !== null) {
+            // Fluxo do Funcionário
+            $sql = "UPDATE appointments 
+                    SET Appo_status = 'Concluido', 
+                        Appo_payment_method = :payment_method 
+                    WHERE Appo_id = :id 
+                      AND Emp_id = :emp_id 
+                      AND Appo_status = 'Em Atendimento'";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':payment_method' => $paymentMethod,
+                ':id' => $appoId,
+                ':emp_id' => $empId
+            ]);
+        } else {
+            // Fluxo do Administrador
+            $sql = "UPDATE appointments 
+                    SET Appo_status = 'Concluido', 
+                        Appo_payment_method = :payment_method 
+                    WHERE Appo_id = :id 
+                      AND Appo_status = 'Em Atendimento'";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':payment_method' => $paymentMethod,
+                ':id' => $appoId
+            ]);
+        }
+
+        return $stmt->rowCount() === 1;
+    }
 }

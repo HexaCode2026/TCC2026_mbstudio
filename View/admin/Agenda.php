@@ -5,49 +5,31 @@ require_once "../../core/Session.php";
 
 Session::iniciar();
 
-// Proteção para Funcionário ou Administrador
-if (!isset($_SESSION['User_perm']) || ($_SESSION['User_perm'] != 'F' && $_SESSION['User_perm'] != 'A')) {
+// Proteção Admin
+if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'A') {
     header("Location: ../../Index.php");
     exit;
 }
 
-// Pega o ID do usuário logado
-$userId = $_SESSION['User_id'] ?? 0;
-
-// Busca ou garante o Emp_id do funcionário logado
-$stmtEmp = $pdo->prepare("SELECT Emp_id FROM employees WHERE User_id = ?");
-$stmtEmp->execute([$userId]);
-$empId = $stmtEmp->fetchColumn();
-
-if (!$empId && $_SESSION['User_perm'] == 'F') {
-    $insertEmp = $pdo->prepare("INSERT INTO employees (User_id) VALUES (?)");
-    $insertEmp->execute([$userId]);
-    $empId = $pdo->lastInsertId();
-}
-
-
-
-// Busca os agendamentos do funcionário vinculado ao usuário logado
-// appointments (Cli_id) -> clients (User_id) -> users (User_name)
+// Busca todos os agendamentos
 $query = "SELECT a.*, 
-                 users.User_name as client_name, 
+                 c_user.User_name as client_name, 
+                 e_user.User_name as emp_name,
                  s.Ser_name, 
                  s.Ser_price, 
                  s.Ser_duration 
           FROM appointments a
           JOIN clients c ON a.Cli_id = c.Cli_id
-          JOIN users ON c.User_id = users.User_id
-          JOIN services s ON a.Ser_id = s.Ser_id
+          JOIN users c_user ON c.User_id = c_user.User_id
           JOIN employees e ON a.Emp_id = e.Emp_id
-          WHERE e.User_id = :user_id
+          JOIN users e_user ON e.User_id = e_user.User_id
+          JOIN services s ON a.Ser_id = s.Ser_id
           ORDER BY a.Appo_date DESC, a.Appo_start ASC";
 
 $stmt = $pdo->prepare($query);
-$stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
 $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Obter datas únicas dos agendamentos para o filtro
 $datasCadastradas = [];
 if (!empty($appointments)) {
     foreach ($appointments as $app) {
@@ -67,57 +49,61 @@ if (!empty($appointments)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Agenda | MB Studio</title>
+    <title>Atendimentos | Admin | MB Studio</title>
 
     <link rel="stylesheet" href="../../assets/css/global.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="../../assets/css/funcionario/agenda.css">
+    <link rel="stylesheet" href="../../assets/css/funcionario/agenda.css"> <!-- Reutilizando o mesmo estilo base elegante -->
 </head>
 
 <body>
-    <!-- Cabeçalho Global MB Studio -->
     <?php include '../components/Header.php'; ?>
-    <?php include '../components/LoginModal.php'; ?>
 
     <main class="agenda-container">
-
-        <!-- Top Navigation -->
         <div class="agenda-top-nav">
-            <a href="Home.php" class="btn-back-link">
+            <a href="Dashboard.php" class="btn-back-link">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
                 </svg>
-                Voltar ao Início
-            </a>
-
-            <a href="Disponibilidade.php" class="btn-back-link" style="border-color: var(--gold-primary); color: var(--gold-light);">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                Gerenciar Disponibilidade
+                Voltar ao Painel
             </a>
         </div>
 
-        <!-- Header da Página -->
         <div class="agenda-header-box">
             <div class="agenda-badge">
-                <span>✦ Painel de Atendimento ✦</span>
+                <span>✦ Controle Geral ✦</span>
             </div>
             <h1 class="agenda-title">
-                Minha <span class="cursiva-gold">Agenda</span>
+                Todos os <span class="cursiva-gold">Atendimentos</span>
             </h1>
             <p class="agenda-subtitle">
-                Acompanhe em tempo real os agendamentos realizados, aceite solicitações e gerencie o fluxo de atendimento dos seus clientes.
+                Acompanhe globalmente o fluxo de todos os profissionais e finalize recebimentos que estão em atendimento.
             </p>
         </div>
 
+        <?php if (isset($_GET['sucesso']) && $_GET['sucesso'] == 'atendimento_concluido'): ?>
+            <div style="background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.4); color: #2ecc71; padding: 15px; border-radius: 8px; margin-bottom: 25px; text-align: center; font-weight: 600;">
+                Atendimento finalizado e pagamento registrado com sucesso.
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['erro'])): ?>
+            <?php 
+                $msgErro = "Ocorreu um erro ao tentar finalizar.";
+                if ($_GET['erro'] == 'dados_incompletos') $msgErro = "Dados incompletos fornecidos.";
+                elseif ($_GET['erro'] == 'pagamento_invalido') $msgErro = "Método de pagamento inválido selecionado.";
+                elseif ($_GET['erro'] == 'falha_permissao_ou_status') $msgErro = "Falha ao finalizar: verifique se o atendimento realmente se encontra 'Em Atendimento'.";
+                elseif ($_GET['erro'] == 'funcionario_nao_encontrado') $msgErro = "Funcionário não localizado no sistema.";
+            ?>
+            <div style="background: rgba(231, 76, 60, 0.1); border: 1px solid rgba(231, 76, 60, 0.4); color: #e74c3c; padding: 15px; border-radius: 8px; margin-bottom: 25px; text-align: center; font-weight: 600;">
+                <?= htmlspecialchars($msgErro, ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
+
         <?php if (!empty($appointments)): ?>
-            <!-- Barra de Filtros -->
             <div class="filter-glass-card">
                 <div class="filter-group">
                     <div class="filter-item">
@@ -143,23 +129,19 @@ if (!empty($appointments)) {
                         </select>
                     </div>
                 </div>
-
                 <div class="total-badge-count">
                     <span>Total: <?= count($appointments) ?> agendamento(s)</span>
                 </div>
             </div>
 
-            <!-- Tabela de Agendamentos -->
             <div class="table-responsive-wrapper">
                 <table class="agenda-table" id="tabelaAgenda">
                     <thead>
                         <tr>
-                            <th>Data</th>
-                            <th>Início</th>
-                            <th>Fim</th>
+                            <th>Data / Hora</th>
                             <th>Cliente</th>
+                            <th>Profissional</th>
                             <th>Serviço</th>
-                            <th>Observação</th>
                             <th>Status Atual</th>
                             <th style="text-align: center;">Ações</th>
                         </tr>
@@ -168,25 +150,14 @@ if (!empty($appointments)) {
                         <?php foreach ($appointments as $app): ?>
                             <tr data-data="<?= htmlspecialchars($app['Appo_date']) ?>" data-status="<?= htmlspecialchars($app['Appo_status']) ?>">
                                 <td>
-                                    <strong><?= date('d/m/Y', strtotime($app['Appo_date'])) ?></strong>
+                                    <strong><?= date('d/m/Y', strtotime($app['Appo_date'])) ?></strong><br>
+                                    <span style="color: var(--gold-light); font-size: 12px;"><?= htmlspecialchars(substr($app['Appo_start'], 0, 5)) ?> às <?= htmlspecialchars(substr($app['Appo_end'], 0, 5)) ?></span>
                                 </td>
-                                <td>
-                                    <span style="color: var(--gold-light); font-weight: 600;"><?= htmlspecialchars(substr($app['Appo_start'], 0, 5)) ?></span>
-                                </td>
-                                <td>
-                                    <span style="color: var(--text-muted);"><?= htmlspecialchars(substr($app['Appo_end'], 0, 5)) ?></span>
-                                </td>
-                                <td>
-                                    <span class="client-name-cell"><?= htmlspecialchars($app['client_name']) ?></span>
-                                </td>
+                                <td><span class="client-name-cell"><?= htmlspecialchars($app['client_name']) ?></span></td>
+                                <td><span style="color: #e0e0e0;"><?= htmlspecialchars($app['emp_name']) ?></span></td>
                                 <td class="service-info-cell">
                                     <strong><?= htmlspecialchars($app['Ser_name']) ?></strong>
-                                    <small>R$ <?= number_format($app['Ser_price'], 2, ',', '.') ?> (<?= $app['Ser_duration'] ?> min)</small>
-                                </td>
-                                <td>
-                                    <span class="obs-text">
-                                        <?= htmlspecialchars(!empty($app['Appo_observation']) ? $app['Appo_observation'] : 'Nenhuma') ?>
-                                    </span>
+                                    <small>R$ <?= number_format($app['Ser_price'], 2, ',', '.') ?></small>
                                 </td>
                                 <td>
                                     <?php
@@ -200,61 +171,25 @@ if (!empty($appointments)) {
                                     <span class="status-pill <?= $statusClass ?>">
                                         ● <?= htmlspecialchars($app['Appo_status']) ?>
                                     </span>
-                                    <?php if (!empty($app['Appo_cancel_reason'])): ?>
-                                        <span class="cancel-reason-note">
-                                            <strong>Motivo:</strong> <?= htmlspecialchars($app['Appo_cancel_reason']) ?>
-                                        </span>
+                                    <?php if ($app['Appo_payment_method']): ?>
+                                        <div style="margin-top: 4px; font-size: 11px; color: var(--gold-primary);">Pago via: <?= htmlspecialchars($app['Appo_payment_method']) ?></div>
                                     <?php endif; ?>
                                 </td>
                                 <td>
                                     <div class="action-buttons-wrap">
-                                        <!-- SE PENDENTE -->
-                                        <?php if ($app['Appo_status'] == 'Pendente'): ?>
-                                            <form action="../../controller/ConfirmarAgendamento.php" method="POST" style="margin: 0;">
-                                                <input type="hidden" name="id" value="<?= $app['Appo_id'] ?>">
-                                                <button type="submit" class="btn-acao btn-aceitar">
-                                                    ✓ Aceitar Agendamento
-                                                </button>
-                                            </form>
-                                        <?php endif; ?>
-
-                                        <!-- SE CONFIRMADO -->
-                                        <?php if ($app['Appo_status'] == 'Confirmado'): ?>
-                                            <form action="../../controller/IniciarAtendimento.php" method="POST" style="margin: 0;">
-                                                <input type="hidden" name="appo_id" value="<?= $app['Appo_id'] ?>">
-                                                <button type="submit" class="btn-acao btn-iniciar">
-                                                    ▶ Iniciar Atendimento
-                                                </button>
-                                            </form>
-                                            <form action="../../controller/NaoCompareceu.php" method="POST" style="margin: 0;" onsubmit="return confirm('Deseja realmente marcar que o cliente não compareceu?');">
-                                                <input type="hidden" name="appo_id" value="<?= $app['Appo_id'] ?>">
-                                                <button type="submit" class="btn-acao btn-falta">
-                                                    ∅ Não Compareceu
-                                                </button>
-                                            </form>
-                                        <?php endif; ?>
-
-                                        <!-- SE EM ATENDIMENTO -->
+                                        <!-- ADMINISTRADOR SÓ DEVE POSSUIR BOTÃO DE FINALIZAR -->
                                         <?php if ($app['Appo_status'] == 'Em Atendimento'): ?>
                                             <button type="button" class="btn-acao btn-concluir" 
                                                     data-appo-id="<?= $app['Appo_id'] ?>" 
                                                     data-cliente="<?= htmlspecialchars($app['client_name'], ENT_QUOTES, 'UTF-8') ?>" 
+                                                    data-profissional="<?= htmlspecialchars($app['emp_name'], ENT_QUOTES, 'UTF-8') ?>" 
                                                     data-servico="<?= htmlspecialchars($app['Ser_name'], ENT_QUOTES, 'UTF-8') ?>" 
                                                     data-valor="<?= $app['Ser_price'] ?>" 
                                                     onclick="abrirModalFinalizacao(this)">
-                                                ★ Finalizar Atendimento
+                                                ★ Finalizar
                                             </button>
-                                        <?php endif; ?>
-
-                                        <!-- CANCELAMENTO (SE NÃO ESTIVER CANCELADO, CONCLUIDO OU NAO COMPARECEU) -->
-                                        <?php if (strpos($app['Appo_status'], 'Cancelado') === false && $app['Appo_status'] != 'Concluido' && $app['Appo_status'] != 'Nao Compareceu'): ?>
-                                            <form action="../../controller/CancelarAgendamento.php" method="POST" class="form-cancelar-inline" onsubmit="return confirm('Deseja realmente cancelar este agendamento?');">
-                                                <input type="hidden" name="appo_id" value="<?= $app['Appo_id'] ?>">
-                                                <input type="text" name="cancel_reason" class="input-cancelar" placeholder="Motivo do cancelamento..." required oninput="this.nextElementSibling.disabled = this.value.trim() === '';">
-                                                <button type="submit" class="btn-acao btn-cancelar" disabled>
-                                                    ✕ Cancelar
-                                                </button>
-                                            </form>
+                                        <?php else: ?>
+                                            <span style="color: var(--text-muted); font-size: 12px; font-style: italic; display: block; text-align: center;">Nenhuma ação</span>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -263,32 +198,26 @@ if (!empty($appointments)) {
                     </tbody>
                 </table>
             </div>
-
         <?php else: ?>
             <div class="empty-agenda-card">
                 <div class="empty-icon">📅</div>
                 <h3>Nenhum agendamento encontrado</h3>
-                <p>Assim que os clientes realizarem agendamentos com você, eles aparecerão detalhados aqui.</p>
-                <div style="margin-top: 25px;">
-                    <a href="Disponibilidade.php" class="btn-back-link" style="border-color: var(--gold-primary); color: var(--gold-light);">
-                        Cadastrar Horários Disponíveis
-                    </a>
-                </div>
+                <p>O salão ainda não possui históricos de agendamentos para exibir.</p>
             </div>
         <?php endif; ?>
-
     </main>
 
-    <!-- Modal Finalização -->
+    <!-- Modal Finalização (idêntico ao do funcionário) -->
     <div id="modalFinalizacao" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Finalizar Atendimento</h2>
+                <h2>Finalizar Atendimento (Admin)</h2>
                 <button type="button" class="btn-close-modal" onclick="fecharModalFinalizacao()">×</button>
             </div>
             <div class="modal-body">
                 <div class="info-resumo">
                     <p><strong>Cliente:</strong> <span id="modalClienteNome"></span></p>
+                    <p><strong>Profissional:</strong> <span id="modalProfissionalNome"></span></p>
                     <p><strong>Serviço:</strong> <span id="modalServicoNome"></span></p>
                     <p><strong>Valor:</strong> R$ <span id="modalServicoValor"></span></p>
                 </div>
@@ -327,10 +256,10 @@ if (!empty($appointments)) {
         function abrirModalFinalizacao(btn) {
             document.getElementById('modalAppoId').value = btn.dataset.appoId;
             document.getElementById('modalClienteNome').textContent = btn.dataset.cliente;
+            document.getElementById('modalProfissionalNome').textContent = btn.dataset.profissional;
             document.getElementById('modalServicoNome').textContent = btn.dataset.servico;
             document.getElementById('modalServicoValor').textContent = parseFloat(btn.dataset.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             
-            // reset radio
             const radios = document.querySelectorAll('input[name="payment_method"]');
             radios.forEach(r => r.checked = false);
 
@@ -373,5 +302,4 @@ if (!empty($appointments)) {
         }
     </script>
 </body>
-
 </html>

@@ -148,3 +148,18 @@ JOIN users c_user ON c.User_id = c_user.User_id
 JOIN employees e ON a.Emp_id = e.Emp_id
 JOIN users e_user ON e.User_id = e_user.User_id
 JOIN services s ON a.Ser_id = s.Ser_id;
+
+-- ==========================================
+-- 10. CÓDIGOS DE VERIFICAÇÃO (Email/2FA)
+-- ==========================================
+CREATE TABLE verification_codes (
+    Code_id INT AUTO_INCREMENT PRIMARY KEY,
+    User_id INT NOT NULL,
+    Code_token VARCHAR(255) NOT NULL,
+    Code_type ENUM('Cadastro', 'Login2FA') DEFAULT 'Cadastro',
+    Code_expires_at DATETIME NOT NULL,
+    Code_attempts INT DEFAULT 0,
+    Code_used BOOLEAN DEFAULT FALSE,
+    Code_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(User_id) REFERENCES users(User_id) ON DELETE CASCADE
+);tcc_agendamento

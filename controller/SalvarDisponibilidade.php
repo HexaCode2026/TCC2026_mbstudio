@@ -13,12 +13,13 @@ if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'F') {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $userId = $_SESSION['User_id'];
     $date = $_POST['Dis_date'] ?? null;
+    $serId = $_POST['Dis_ser'] ?? null;
     $horarios = $_POST['horarios'] ?? [];
 
     $hoje = date('Y-m-d');
-    if (!$date || $date < $hoje || empty($horarios)) {
+    if (!$date || !$serId || $date < $hoje || empty($horarios)) {
         echo "<script>
-            alert('Por favor, preencha uma data válida (a partir de hoje) e defina os horários com status.');
+            alert('Por favor, preencha uma data válida, selecione um serviço e defina os horários com status.');
             window.location='../View/funcionario/Disponibilidade.php';
         </script>";
         exit;
@@ -94,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $availabilityModel = new Availability($pdo);
-    $sucesso = $availabilityModel->salvarDisponibilidades($empId, $date, $horarios);
+    $sucesso = $availabilityModel->salvarDisponibilidades($empId, $serId, $date, $horarios);
 
     if ($sucesso) {
         echo "<script>

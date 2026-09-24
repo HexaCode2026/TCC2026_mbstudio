@@ -3,6 +3,7 @@ header('Content-Type: application/json');
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/User.php";
 require_once __DIR__ . "/../core/Session.php";
+require_once __DIR__ . "/../helpers/EmailHelper.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $data = json_decode(file_get_contents('php://input'), true);
@@ -20,19 +21,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $usuario = new User($pdo);
+    $userExistente = $usuario->login($email);
 
-    if ($usuario->emailExiste($email)) {
-        echo json_encode(['success' => false, 'message' => 'Este email já foi cadastrado!']);
-        exit;
+    if ($userExistente) {
+        if ($userExistente['User_active'] == 1) {
+            echo json_encode(['success' => false, 'message' => 'Este email já foi cadastrado e verificado! Faça login.']);
+            exit;
+        } else {
+            // E-mail existe, mas não foi verificado. Atualizar os dados e reenviar o código.
+            $userId = $userExistente['User_id'];
+            $usuario->atualizarDadosInativos($userId, $nome, $senha);
+            
+            $codigo = $usuario->gerarCodigoVerificacao($userId, 'Cadastro');
+            EmailHelper::enviarCodigo($email, $codigo, 'Cadastro');
+
+            if(session_status() == PHP_SESSION_NONE) { session_start(); }
+            $_SESSION['verificar_user_id'] = $userId;
+            $_SESSION['verificar_tipo'] = 'Cadastro';
+
+            echo json_encode([
+                'success' => true, 
+                'action' => 'verify',
+                'message' => 'Seu cadastro estava pendente. Um novo código de verificação foi enviado para seu e-mail!'
+            ]);
+            exit;
+        }
     }
 
-    $cadastro = $usuario->cadastrar($nome, $email, $senha);
+    $userId = $usuario->cadastrar($nome, $email, $senha);
 
-    if ($cadastro) {
-        // Se desejar já logar o usuário automaticamente após o cadastro,
-        // pode-se fazer o login aqui mesmo e retornar os dados na resposta.
-        // Por simplicidade, vamos retornar sucesso e pedir pro usuário logar.
-        echo json_encode(['success' => true, 'message' => 'Cadastro realizado com sucesso! Você já pode fazer login.']);
+    if ($userId) {
+        $codigo = $usuario->gerarCodigoVerificacao($userId, 'Cadastro');
+        EmailHelper::enviarCodigo($email, $codigo, 'Cadastro');
+
+        if(session_status() == PHP_SESSION_NONE) { session_start(); }
+        $_SESSION['verificar_user_id'] = $userId;
+        $_SESSION['verificar_tipo'] = 'Cadastro';
+
+        echo json_encode([
+            'success' => true, 
+            'action' => 'verify',
+            'message' => 'Cadastro realizado! Verifique seu e-mail para ativar a conta.'
+        ]);
         exit;
     }
 

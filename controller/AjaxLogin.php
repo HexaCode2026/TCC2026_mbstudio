@@ -3,6 +3,7 @@ header('Content-Type: application/json');
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/User.php";
 require_once __DIR__ . "/../core/Session.php";
+require_once __DIR__ . "/../helpers/EmailHelper.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Tenta ler o input como JSON, caso o JS envie raw json
@@ -25,16 +26,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $dados = $usuario->login($email);
 
     if ($dados && password_verify($senha, $dados['User_pass'])) {
-        Session::login($dados);
         
-        // Define para onde o usuário poderia ser redirecionado se fosse um login comum
-        // Mas no modal, a ação é ditada pelo frontend.
-        echo json_encode([
-            'success' => true,
-            'message' => 'Login realizado com sucesso!',
-            'perm' => $dados['User_perm']
-        ]);
-        exit;
+        if(session_status() == PHP_SESSION_NONE) { session_start(); }
+
+        if ($dados['User_active'] == 0) {
+            $codigo = $usuario->gerarCodigoVerificacao($dados['User_id'], 'Cadastro');
+            EmailHelper::enviarCodigo($email, $codigo, 'Cadastro');
+            
+            $_SESSION['verificar_user_id'] = $dados['User_id'];
+            $_SESSION['verificar_tipo'] = 'Cadastro';
+
+            echo json_encode([
+                'success' => true,
+                'action' => 'verify',
+                'message' => 'Sua conta ainda não foi ativada. Verifique seu e-mail.'
+            ]);
+            exit;
+        } else {
+            $codigo = $usuario->gerarCodigoVerificacao($dados['User_id'], 'Login2FA');
+            EmailHelper::enviarCodigo($email, $codigo, 'Login2FA');
+            
+            $_SESSION['verificar_user_id'] = $dados['User_id'];
+            $_SESSION['verificar_tipo'] = 'Login2FA';
+            $_SESSION['temp_login_dados'] = $dados;
+
+            echo json_encode([
+                'success' => true,
+                'action' => 'verify',
+                'message' => 'Para sua segurança, enviamos um código 2FA para seu e-mail.'
+            ]);
+            exit;
+        }
     }
 
     echo json_encode(['success' => false, 'message' => 'Email ou senha incorretos.']);

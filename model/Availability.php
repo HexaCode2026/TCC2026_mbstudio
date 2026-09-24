@@ -12,22 +12,23 @@ class Availability {
      * Salva ou atualiza os blocos de horários de disponibilidade para um funcionário em uma data
      * 
      * @param int $empId ID do funcionário (Emp_id)
+     * @param int $serId ID do serviço (Ser_id)
      * @param string $date Data no formato YYYY-MM-DD
      * @param array $horarios Array de slots com start, end e status
      * @return bool
      */
-    public function salvarDisponibilidades($empId, $date, array $horarios) {
+    public function salvarDisponibilidades($empId, $serId, $date, array $horarios) {
         try {
             $this->pdo->beginTransaction();
 
-            // Remover disponibilidades anteriores do mesmo funcionário na mesma data
-            $deleteSql = "DELETE FROM availabilities WHERE Emp_id = ? AND Ava_date = ?";
+            // Remover disponibilidades anteriores do mesmo funcionário na mesma data para o mesmo serviço
+            $deleteSql = "DELETE FROM availabilities WHERE Emp_id = ? AND Ser_id = ? AND Ava_date = ?";
             $deleteStmt = $this->pdo->prepare($deleteSql);
-            $deleteStmt->execute([$empId, $date]);
+            $deleteStmt->execute([$empId, $serId, $date]);
 
             // Inserir cada faixa de horário com seu respectivo status
-            $insertSql = "INSERT INTO availabilities (Emp_id, Ava_date, Ava_start, Ava_end, Ava_status) 
-                          VALUES (?, ?, ?, ?, ?)";
+            $insertSql = "INSERT INTO availabilities (Emp_id, Ser_id, Ava_date, Ava_start, Ava_end, Ava_status) 
+                          VALUES (?, ?, ?, ?, ?, ?)";
             $insertStmt = $this->pdo->prepare($insertSql);
 
             foreach ($horarios as $h) {
@@ -38,6 +39,7 @@ class Availability {
                 if ($start && $end) {
                     $insertStmt->execute([
                         $empId,
+                        $serId,
                         $date,
                         $start,
                         $end,
@@ -62,8 +64,8 @@ class Availability {
      * @param array $horarios Array de slots com start, end e status
      * @return bool
      */
-    public function editarDisponibilidades($empId, $date, array $horarios) {
-        return $this->salvarDisponibilidades($empId, $date, $horarios);
+    public function editarDisponibilidades($empId, $serId, $date, array $horarios) {
+        return $this->salvarDisponibilidades($empId, $serId, $date, $horarios);
     }
 
     /**
@@ -144,15 +146,17 @@ class Availability {
      */
     public function listarPorFuncionario($empId, $dataMinima = null) {
         if ($dataMinima) {
-            $sql = "SELECT * FROM availabilities 
-                    WHERE Emp_id = ? AND Ava_date >= ? 
-                    ORDER BY Ava_date ASC, Ava_start ASC";
+            $sql = "SELECT a.*, s.Ser_name FROM availabilities a 
+                    LEFT JOIN services s ON a.Ser_id = s.Ser_id
+                    WHERE a.Emp_id = ? AND a.Ava_date >= ? 
+                    ORDER BY a.Ava_date ASC, a.Ava_start ASC";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([$empId, $dataMinima]);
         } else {
-            $sql = "SELECT * FROM availabilities 
-                    WHERE Emp_id = ? 
-                    ORDER BY Ava_date ASC, Ava_start ASC";
+            $sql = "SELECT a.*, s.Ser_name FROM availabilities a 
+                    LEFT JOIN services s ON a.Ser_id = s.Ser_id
+                    WHERE a.Emp_id = ? 
+                    ORDER BY a.Ava_date ASC, a.Ava_start ASC";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([$empId]);
         }

@@ -54,56 +54,36 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 
     // cadastrar
+    $userId = $usuario->cadastrar($nome, $email, $senha);
 
-
-    $cadastro = $usuario->cadastrar(
-
-        $nome,
-
-        $email,
-
-        $senha
-
-    );
-
-
-
-
-    if($cadastro){
-
-
+    if($userId){
+        require_once __DIR__ . "/../helpers/EmailHelper.php";
+        
+        $codigo = $usuario->gerarCodigoVerificacao($userId, 'Cadastro');
+        EmailHelper::enviarCodigo($email, $codigo, 'Cadastro');
+        
+        // Iniciar sessão se não estiver iniciada
+        if(session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['verificar_user_id'] = $userId;
+        $_SESSION['verificar_tipo'] = 'Cadastro';
 
         echo "
-
         <script>
-
-        alert('Cadastro realizado com sucesso!');
-
-        window.location='../Index.php';
-
+        alert('Cadastro realizado! Verifique seu e-mail para ativar a conta.');
+        window.location='../View/VerificarCodigo.php';
         </script>
-
         ";
-
-
 
     }else{
 
-
-
         echo "
-
         <script>
-
         alert('Erro ao realizar cadastro!');
-
         window.location='../View/Cadastro.php';
-
         </script>
-
         ";
-
-
 
     }
 

@@ -64,6 +64,25 @@ $basePath = str_ireplace($docRoot, '', $projectRoot);
             </form>
         </div>
 
+        <!-- VISÃO DE VERIFICAÇÃO (2FA / ATIVAÇÃO) -->
+        <div id="view-verificacao" class="form-view">
+            <div class="login-modal-header">
+                <h2 id="verificacao-titulo">Verificação</h2>
+                <p id="verificacao-desc">Enviamos um código para o seu e-mail.</p>
+            </div>
+            
+            <div id="verificacao-modal-msg" class="modal-msg"></div>
+
+            <form id="global-verificacao-form" onsubmit="handleAjaxVerificacao(event)">
+                <div class="login-form-group">
+                    <label>Código de 6 dígitos</label>
+                    <input type="text" id="verificacao-codigo" required placeholder="000000" maxlength="6" autocomplete="off" style="letter-spacing: 5px; font-size: 24px; text-align: center; font-weight: bold;">
+                </div>
+                <button type="submit" class="login-modal-btn">Verificar</button>
+                <button type="button" class="login-modal-register-btn" onclick="switchModalView('view-login')">Cancelar</button>
+            </form>
+        </div>
+
     </div>
 </div>
 
@@ -132,6 +151,12 @@ async function handleAjaxLogin(event) {
         const data = await response.json();
         
         if (data.success) {
+            if (data.action === 'verify') {
+                document.getElementById('verificacao-desc').textContent = data.message;
+                switchModalView('view-verificacao');
+                return;
+            }
+            
             window.isLoggedIn = true;
             if (data.perm === 'A') {
                 window.location.href = `${basePath}/View/admin/Home.php`;
@@ -177,10 +202,15 @@ async function handleAjaxCadastro(event) {
         const data = await response.json();
         
         if (data.success) {
+            if (data.action === 'verify') {
+                document.getElementById('verificacao-desc').textContent = data.message;
+                switchModalView('view-verificacao');
+                return;
+            }
+
             showModalMessage('cadastro-modal-msg', false, data.message);
-            // Muda para tela de login após 2 segundos de sucesso
+            
             setTimeout(() => {
-                // Preenche o email para facilitar
                 document.getElementById('modal-email').value = email;
                 switchModalView('view-login');
             }, 2000);
@@ -191,6 +221,52 @@ async function handleAjaxCadastro(event) {
         showModalMessage('cadastro-modal-msg', true, 'Erro de comunicação com o servidor.');
     } finally {
         btn.textContent = 'Cadastrar';
+        btn.disabled = false;
+    }
+}
+
+async function handleAjaxVerificacao(event) {
+    event.preventDefault();
+    
+    const codigo = document.getElementById('verificacao-codigo').value;
+    const btn = event.target.querySelector('button[type="submit"]');
+    
+    btn.textContent = 'Verificando...';
+    btn.disabled = true;
+    document.getElementById('verificacao-modal-msg').style.display = 'none';
+
+    try {
+        const basePath = "<?= $basePath ?>";
+        const response = await fetch(`${basePath}/controller/AjaxValidarCodigo.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ codigo })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showModalMessage('verificacao-modal-msg', false, data.message);
+            setTimeout(() => {
+                if (data.action === 'login') {
+                    window.location.href = `${basePath}/Index.php`;
+                } else if (data.perm === 'A') {
+                    window.location.href = `${basePath}/View/admin/Home.php`;
+                } else if (data.perm === 'F') {
+                    window.location.href = `${basePath}/View/funcionario/Home.php`;
+                } else if (window.pendingAuthActionUrl) {
+                    window.location.href = window.pendingAuthActionUrl;
+                } else {
+                    window.location.reload();
+                }
+            }, 1500);
+        } else {
+            showModalMessage('verificacao-modal-msg', true, data.message || 'Código incorreto.');
+        }
+    } catch (err) {
+        showModalMessage('verificacao-modal-msg', true, 'Erro de comunicação com o servidor.');
+    } finally {
+        btn.textContent = 'Verificar';
         btn.disabled = false;
     }
 }

@@ -9,6 +9,31 @@ class Availability {
     }
 
     /**
+     * Verifica e garante que a coluna Ser_id exista na tabela availabilities
+     * 
+     * @return bool
+     */
+    private function verificarColunaSerId() {
+        try {
+            $this->pdo->query("SELECT Ser_id FROM availabilities LIMIT 1");
+            return true;
+        } catch (Exception $e) {
+            try {
+                $this->pdo->exec("ALTER TABLE availabilities ADD COLUMN Ser_id INT NULL AFTER Emp_id");
+                $this->pdo->exec("ALTER TABLE availabilities ADD CONSTRAINT fk_availabilities_service FOREIGN KEY (Ser_id) REFERENCES services(Ser_id) ON DELETE SET NULL");
+                return true;
+            } catch (Exception $ex) {
+                try {
+                    $this->pdo->exec("ALTER TABLE availabilities ADD COLUMN Ser_id INT NULL");
+                    return true;
+                } catch (Exception $ex2) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    /**
      * Salva ou atualiza os blocos de horários de disponibilidade para um funcionário em uma data
      * 
      * @param int $empId ID do funcionário (Emp_id)
@@ -18,33 +43,60 @@ class Availability {
      * @return bool
      */
     public function salvarDisponibilidades($empId, $serId, $date, array $horarios) {
+        $temSerId = $this->verificarColunaSerId();
         try {
             $this->pdo->beginTransaction();
 
-            // Remover disponibilidades anteriores do mesmo funcionário na mesma data para o mesmo serviço
-            $deleteSql = "DELETE FROM availabilities WHERE Emp_id = ? AND Ser_id = ? AND Ava_date = ?";
-            $deleteStmt = $this->pdo->prepare($deleteSql);
-            $deleteStmt->execute([$empId, $serId, $date]);
+            if ($temSerId && $serId) {
+                // Remover disponibilidades anteriores do mesmo funcionário na mesma data para o mesmo serviço
+                $deleteSql = "DELETE FROM availabilities WHERE Emp_id = ? AND Ser_id = ? AND Ava_date = ?";
+                $deleteStmt = $this->pdo->prepare($deleteSql);
+                $deleteStmt->execute([$empId, $serId, $date]);
 
-            // Inserir cada faixa de horário com seu respectivo status
-            $insertSql = "INSERT INTO availabilities (Emp_id, Ser_id, Ava_date, Ava_start, Ava_end, Ava_status) 
-                          VALUES (?, ?, ?, ?, ?, ?)";
-            $insertStmt = $this->pdo->prepare($insertSql);
+                // Inserir cada faixa de horário com seu respectivo status
+                $insertSql = "INSERT INTO availabilities (Emp_id, Ser_id, Ava_date, Ava_start, Ava_end, Ava_status) 
+                              VALUES (?, ?, ?, ?, ?, ?)";
+                $insertStmt = $this->pdo->prepare($insertSql);
 
-            foreach ($horarios as $h) {
-                $start = $h['start'] ?? null;
-                $end = $h['end'] ?? null;
-                $status = $h['status'] ?? 'Disponivel';
+                foreach ($horarios as $h) {
+                    $start = $h['start'] ?? null;
+                    $end = $h['end'] ?? null;
+                    $status = $h['status'] ?? 'Disponivel';
 
-                if ($start && $end) {
-                    $insertStmt->execute([
-                        $empId,
-                        $serId,
-                        $date,
-                        $start,
-                        $end,
-                        $status
-                    ]);
+                    if ($start && $end) {
+                        $insertStmt->execute([
+                            $empId,
+                            $serId,
+                            $date,
+                            $start,
+                            $end,
+                            $status
+                        ]);
+                    }
+                }
+            } else {
+                $deleteSql = "DELETE FROM availabilities WHERE Emp_id = ? AND Ava_date = ?";
+                $deleteStmt = $this->pdo->prepare($deleteSql);
+                $deleteStmt->execute([$empId, $date]);
+
+                $insertSql = "INSERT INTO availabilities (Emp_id, Ava_date, Ava_start, Ava_end, Ava_status) 
+                              VALUES (?, ?, ?, ?, ?)";
+                $insertStmt = $this->pdo->prepare($insertSql);
+
+                foreach ($horarios as $h) {
+                    $start = $h['start'] ?? null;
+                    $end = $h['end'] ?? null;
+                    $status = $h['status'] ?? 'Disponivel';
+
+                    if ($start && $end) {
+                        $insertStmt->execute([
+                            $empId,
+                            $date,
+                            $start,
+                            $end,
+                            $status
+                        ]);
+                    }
                 }
             }
 
@@ -145,20 +197,38 @@ class Availability {
      * Busca disponibilidades cadastradas para um funcionário a partir de uma data ou futuras
      */
     public function listarPorFuncionario($empId, $dataMinima = null) {
-        if ($dataMinima) {
-            $sql = "SELECT a.*, s.Ser_name FROM availabilities a 
-                    LEFT JOIN services s ON a.Ser_id = s.Ser_id
-                    WHERE a.Emp_id = ? AND a.Ava_date >= ? 
-                    ORDER BY a.Ava_date ASC, a.Ava_start ASC";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$empId, $dataMinima]);
+        $temSerId = $this->verificarColunaSerId();
+
+        if ($temSerId) {
+            if ($dataMinima) {
+                $sql = "SELECT a.*, s.Ser_name FROM availabilities a 
+                        LEFT JOIN services s ON a.Ser_id = s.Ser_id
+                        WHERE a.Emp_id = ? AND a.Ava_date >= ? 
+                        ORDER BY a.Ava_date ASC, a.Ava_start ASC";
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute([$empId, $dataMinima]);
+            } else {
+                $sql = "SELECT a.*, s.Ser_name FROM availabilities a 
+                        LEFT JOIN services s ON a.Ser_id = s.Ser_id
+                        WHERE a.Emp_id = ? 
+                        ORDER BY a.Ava_date ASC, a.Ava_start ASC";
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute([$empId]);
+            }
         } else {
-            $sql = "SELECT a.*, s.Ser_name FROM availabilities a 
-                    LEFT JOIN services s ON a.Ser_id = s.Ser_id
-                    WHERE a.Emp_id = ? 
-                    ORDER BY a.Ava_date ASC, a.Ava_start ASC";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$empId]);
+            if ($dataMinima) {
+                $sql = "SELECT a.*, NULL AS Ser_name FROM availabilities a 
+                        WHERE a.Emp_id = ? AND a.Ava_date >= ? 
+                        ORDER BY a.Ava_date ASC, a.Ava_start ASC";
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute([$empId, $dataMinima]);
+            } else {
+                $sql = "SELECT a.*, NULL AS Ser_name FROM availabilities a 
+                        WHERE a.Emp_id = ? 
+                        ORDER BY a.Ava_date ASC, a.Ava_start ASC";
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute([$empId]);
+            }
         }
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

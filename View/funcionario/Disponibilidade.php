@@ -148,6 +148,7 @@ if (!empty($minhasDisponibilidades)) {
                                             <option value="" disabled>Nenhum serviço vinculado ao perfil</option>
                                         <?php endif; ?>
                                     </select>
+                                    <input type="hidden" name="Ser_id" id="Ser_id" value="">
                                 </div>
 
                                 <!-- HORÁRIOS INÍCIO E FIM -->
@@ -223,6 +224,16 @@ if (!empty($minhasDisponibilidades)) {
                     <select id="filtroDia" onchange="aplicarFiltroData()" disabled>
                         <option value="nenhuma">Dia...</option>
                     </select>
+
+                    <label style="margin-left: 15px;"><strong>Filtrar por Serviço:</strong></label>
+                    <select id="filtroServico" onchange="aplicarFiltroData()">
+                        <option value="todos">Todos</option>
+                        <?php if (!empty($servicos)): ?>
+                            <?php foreach ($servicos as $ser): ?>
+                                <option value="<?= htmlspecialchars($ser['Ser_id']) ?>"><?= htmlspecialchars($ser['Ser_name']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
                 </div>
 
                 <!-- AÇÕES EM LOTE -->
@@ -248,6 +259,7 @@ if (!empty($minhasDisponibilidades)) {
                                 <th>Data</th>
                                 <th>Início</th>
                                 <th>Fim</th>
+                                <th>Serviço</th>
                                 <th>Status Atual</th>
                                 <th>Editar Status</th>
                                 <th style="text-align: center;">Excluir</th>
@@ -255,7 +267,7 @@ if (!empty($minhasDisponibilidades)) {
                         </thead>
                         <tbody>
                             <?php foreach ($minhasDisponibilidades as $disp): ?>
-                                <tr data-data="<?= htmlspecialchars($disp['Ava_date']) ?>">
+                                <tr data-data="<?= htmlspecialchars($disp['Ava_date']) ?>" data-ser-id="<?= htmlspecialchars($disp['Ser_id'] ?? '') ?>">
                                     <td><strong><?= date('d/m/Y', strtotime($disp['Ava_date'])) ?></strong></td>
                                     <td><span
                                             style="color: var(--gold-light); font-weight: 600;"><?= htmlspecialchars(substr($disp['Ava_start'], 0, 5)) ?></span>
@@ -263,6 +275,7 @@ if (!empty($minhasDisponibilidades)) {
                                     <td><span
                                             style="color: var(--text-muted);"><?= htmlspecialchars(substr($disp['Ava_end'], 0, 5)) ?></span>
                                     </td>
+                                    <td><?= htmlspecialchars(!empty($disp['Ser_name']) ? $disp['Ser_name'] : '—') ?></td>
                                     <td>
                                         <strong
                                             style="color: <?= $disp['Ava_status'] === 'Disponivel' ? '#2ecc71' : ($disp['Ava_status'] === 'Folga' ? '#f1c40f' : ($disp['Ava_status'] === 'Ferias' ? '#3498db' : '#e74c3c')) ?>;">
@@ -416,6 +429,7 @@ if (!empty($minhasDisponibilidades)) {
             const ano = elAno.value;
             const mes = document.getElementById('filtroMes').value;
             const dia = document.getElementById('filtroDia').value;
+            const servico = document.getElementById('filtroServico') ? document.getElementById('filtroServico').value : 'todos';
             
             const tabela = document.getElementById('tabelaDisponibilidades');
             const linhas = document.querySelectorAll('#tabelaDisponibilidades tbody tr');
@@ -432,12 +446,14 @@ if (!empty($minhasDisponibilidades)) {
                 tabela.style.display = '';
                 linhas.forEach(linha => {
                     const dataLine = linha.getAttribute('data-data');
+                    const serId = linha.getAttribute('data-ser-id');
                     const parts = dataLine.split('-');
                     const matchAno = (ano === 'todas' || parts[0] === ano);
                     const matchMes = (mes === 'todas' || parts[1] === mes);
                     const matchDia = (dia === 'todas' || parts[2] === dia);
+                    const matchServico = (servico === 'todos' || serId === servico);
                     
-                    if (matchAno && matchMes && matchDia) {
+                    if (matchAno && matchMes && matchDia && matchServico) {
                         linha.style.display = '';
                     } else {
                         linha.style.display = 'none';
@@ -556,6 +572,10 @@ if (!empty($minhasDisponibilidades)) {
             atualizarDataMinima();
             const inputDate = document.getElementById('Dis_date');
             const selectSer = document.getElementById('Dis_ser');
+            const inputSerId = document.getElementById('Ser_id');
+            if (inputSerId && selectSer) {
+                inputSerId.value = selectSer.value;
+            }
             const inputStart = document.getElementById('Dis_start');
             const inputEnd = document.getElementById('Dis_end');
             const btnSalvar = document.getElementById('btnSalvar');
@@ -667,6 +687,8 @@ if (!empty($minhasDisponibilidades)) {
                         </select>
                         <input type="hidden" name="horarios[${count}][start]" value="${startTimeStr}">
                         <input type="hidden" name="horarios[${count}][end]" value="${endTimeStr}">
+                        <input type="hidden" name="horarios[${count}][Ser_id]" value="${selectSer.value}">
+                        <input type="hidden" name="horarios[${count}][ser_id]" value="${selectSer.value}">
                     </div>
                 `;
                 containerLista.appendChild(li);

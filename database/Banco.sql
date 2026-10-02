@@ -164,4 +164,4 @@ CREATE TABLE verification_codes (
     Code_used BOOLEAN DEFAULT FALSE,
     Code_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(User_id) REFERENCES users(User_id) ON DELETE CASCADE
-);tcc_agendamento
+);

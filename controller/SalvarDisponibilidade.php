@@ -12,9 +12,14 @@ if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'F') {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $userId = $_SESSION['User_id'];
-    $date = $_POST['Dis_date'] ?? null;
-    $serId = $_POST['Dis_ser'] ?? null;
+    $date = $_POST['Dis_date'] ?? $_POST['Ava_date'] ?? null;
+    $serId = $_POST['Dis_ser'] ?? $_POST['Ser_id'] ?? $_POST['ser_id'] ?? null;
     $horarios = $_POST['horarios'] ?? [];
+
+    if (!$serId && !empty($horarios) && is_array($horarios)) {
+        $primeiroHorario = reset($horarios);
+        $serId = $primeiroHorario['Ser_id'] ?? $primeiroHorario['ser_id'] ?? $primeiroHorario['Dis_ser'] ?? null;
+    }
 
     $hoje = date('Y-m-d');
     if (!$date || !$serId || $date < $hoje || empty($horarios)) {

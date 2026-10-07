@@ -70,11 +70,13 @@ CREATE TABLE employee_services(
 CREATE TABLE availabilities(
     Ava_id INT AUTO_INCREMENT PRIMARY KEY,
     Emp_id INT NOT NULL,
+    Ser_id INT NULL,
     Ava_date DATE NOT NULL,
     Ava_start TIME NOT NULL,
     Ava_end TIME NOT NULL,
     Ava_status ENUM('Disponivel','Folga','Ferias','Bloqueado') DEFAULT 'Disponivel',
-    FOREIGN KEY(Emp_id) REFERENCES employees(Emp_id) ON DELETE CASCADE
+    FOREIGN KEY(Emp_id) REFERENCES employees(Emp_id) ON DELETE CASCADE,
+    FOREIGN KEY(Ser_id) REFERENCES services(Ser_id) ON DELETE SET NULL
 );
 
 -- ==========================================
@@ -162,4 +164,4 @@ CREATE TABLE verification_codes (
     Code_used BOOLEAN DEFAULT FALSE,
     Code_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(User_id) REFERENCES users(User_id) ON DELETE CASCADE
-);tcc_agendamento
+);

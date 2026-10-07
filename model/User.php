@@ -144,6 +144,17 @@ class User
 
 
     // =====================================
+    // ATUALIZAR SENHA
+    // =====================================
+    public function atualizarSenha($id, $novaSenha)
+    {
+        $senhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
+        $sql = "UPDATE users SET User_pass = ? WHERE User_id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$senhaHash, $id]);
+    }
+
+    // =====================================
     // LOGIN
     // =====================================
 

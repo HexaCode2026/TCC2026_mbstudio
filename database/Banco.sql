@@ -158,7 +158,7 @@ CREATE TABLE verification_codes (
     Code_id INT AUTO_INCREMENT PRIMARY KEY,
     User_id INT NOT NULL,
     Code_token VARCHAR(255) NOT NULL,
-    Code_type ENUM('Cadastro', 'Login2FA') DEFAULT 'Cadastro',
+    Code_type ENUM('Cadastro', 'Login2FA', 'RecuperarSenha') DEFAULT 'Cadastro',
     Code_expires_at DATETIME NOT NULL,
     Code_attempts INT DEFAULT 0,
     Code_used BOOLEAN DEFAULT FALSE,

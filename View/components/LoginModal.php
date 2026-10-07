@@ -31,6 +31,9 @@ $basePath = str_ireplace($docRoot, '', $projectRoot);
                 <div class="login-form-group">
                     <label>Senha</label>
                     <input type="password" id="modal-senha" required placeholder="••••••••">
+                    <div style="text-align: right; margin-top: 5px;">
+                        <a href="#" onclick="switchModalView('view-esqueci-senha')" style="font-size: 12px; color: var(--gold-primary); text-decoration: none;">Esqueceu a senha?</a>
+                    </div>
                 </div>
                 <button type="submit" class="login-modal-btn">Entrar</button>
                 <button type="button" class="login-modal-register-btn" onclick="switchModalView('view-cadastro')">Não tem conta? Cadastre-se</button>
@@ -83,6 +86,49 @@ $basePath = str_ireplace($docRoot, '', $projectRoot);
             </form>
         </div>
 
+        <!-- VISÃO ESQUECI A SENHA -->
+        <div id="view-esqueci-senha" class="form-view">
+            <div class="login-modal-header">
+                <h2>Recuperar Senha</h2>
+                <p>Informe seu e-mail para receber o código.</p>
+            </div>
+            
+            <div id="esqueci-modal-msg" class="modal-msg"></div>
+
+            <form id="global-esqueci-form" onsubmit="handleAjaxEsqueciSenha(event)">
+                <div class="login-form-group">
+                    <label>Email</label>
+                    <input type="email" id="esqueci-email" required placeholder="seu@email.com">
+                </div>
+                <button type="submit" class="login-modal-btn">Enviar Código</button>
+                <button type="button" class="login-modal-register-btn" onclick="switchModalView('view-login')">Voltar para o Login</button>
+            </form>
+        </div>
+
+        <!-- VISÃO REDEFINIR SENHA -->
+        <div id="view-redefinir-senha" class="form-view">
+            <div class="login-modal-header">
+                <h2>Nova Senha</h2>
+                <p>Digite o código recebido e a nova senha.</p>
+            </div>
+            
+            <div id="redefinir-modal-msg" class="modal-msg"></div>
+
+            <form id="global-redefinir-form" onsubmit="handleAjaxRedefinirSenha(event)">
+                <input type="hidden" id="redefinir-email">
+                <div class="login-form-group">
+                    <label>Código de 6 dígitos</label>
+                    <input type="text" id="redefinir-codigo" required placeholder="000000" maxlength="6" autocomplete="off" style="letter-spacing: 5px; font-size: 24px; text-align: center; font-weight: bold;">
+                </div>
+                <div class="login-form-group">
+                    <label>Nova Senha</label>
+                    <input type="password" id="redefinir-senha" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="login-modal-btn">Redefinir Senha</button>
+                <button type="button" class="login-modal-register-btn" onclick="switchModalView('view-login')">Cancelar</button>
+            </form>
+        </div>
+
     </div>
 </div>
 
@@ -118,8 +164,14 @@ function switchModalView(viewId) {
     // Limpar mensagens e formulários ao trocar de aba
     document.getElementById('login-modal-msg').style.display = 'none';
     document.getElementById('cadastro-modal-msg').style.display = 'none';
+    document.getElementById('verificacao-modal-msg').style.display = 'none';
+    document.getElementById('esqueci-modal-msg').style.display = 'none';
+    document.getElementById('redefinir-modal-msg').style.display = 'none';
     document.getElementById('global-login-form').reset();
     document.getElementById('global-cadastro-form').reset();
+    document.getElementById('global-verificacao-form').reset();
+    document.getElementById('global-esqueci-form').reset();
+    document.getElementById('global-redefinir-form').reset();
 }
 
 function showModalMessage(containerId, isError, text) {
@@ -267,6 +319,82 @@ async function handleAjaxVerificacao(event) {
         showModalMessage('verificacao-modal-msg', true, 'Erro de comunicação com o servidor.');
     } finally {
         btn.textContent = 'Verificar';
+        btn.disabled = false;
+    }
+}
+
+async function handleAjaxEsqueciSenha(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('esqueci-email').value;
+    const btn = event.target.querySelector('button[type="submit"]');
+    
+    btn.textContent = 'Enviando...';
+    btn.disabled = true;
+    document.getElementById('esqueci-modal-msg').style.display = 'none';
+
+    try {
+        const basePath = "<?= $basePath ?>";
+        const response = await fetch(`${basePath}/controller/AjaxEsqueciSenha.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showModalMessage('esqueci-modal-msg', false, data.message);
+            setTimeout(() => {
+                document.getElementById('redefinir-email').value = email;
+                switchModalView('view-redefinir-senha');
+            }, 2000);
+        } else {
+            showModalMessage('esqueci-modal-msg', true, data.message || 'Erro ao solicitar recuperação.');
+        }
+    } catch (err) {
+        showModalMessage('esqueci-modal-msg', true, 'Erro de comunicação com o servidor.');
+    } finally {
+        btn.textContent = 'Enviar Código';
+        btn.disabled = false;
+    }
+}
+
+async function handleAjaxRedefinirSenha(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('redefinir-email').value;
+    const codigo = document.getElementById('redefinir-codigo').value;
+    const senha = document.getElementById('redefinir-senha').value;
+    const btn = event.target.querySelector('button[type="submit"]');
+    
+    btn.textContent = 'Redefinindo...';
+    btn.disabled = true;
+    document.getElementById('redefinir-modal-msg').style.display = 'none';
+
+    try {
+        const basePath = "<?= $basePath ?>";
+        const response = await fetch(`${basePath}/controller/AjaxRedefinirSenha.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, codigo, senha })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showModalMessage('redefinir-modal-msg', false, data.message);
+            setTimeout(() => {
+                document.getElementById('modal-email').value = email;
+                switchModalView('view-login');
+            }, 2000);
+        } else {
+            showModalMessage('redefinir-modal-msg', true, data.message || 'Erro ao redefinir a senha.');
+        }
+    } catch (err) {
+        showModalMessage('redefinir-modal-msg', true, 'Erro de comunicação com o servidor.');
+    } finally {
+        btn.textContent = 'Redefinir Senha';
         btn.disabled = false;
     }
 }

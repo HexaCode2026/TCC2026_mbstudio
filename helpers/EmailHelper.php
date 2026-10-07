@@ -9,12 +9,18 @@ require_once __DIR__ . '/../libs/PHPMailer/src/SMTP.php';
 
 class EmailHelper {
     public static function enviarCodigo($email, $codigo, $tipo = 'Cadastro') {
-        $assunto = $tipo == 'Cadastro' ? 'Confirme seu e-mail - MB Studio' : 'Seu código de acesso (2FA) - MB Studio';
+        if ($tipo == 'RecuperarSenha') {
+            $assunto = 'Recuperação de Senha - MB Studio';
+            $textoIntro = 'Você solicitou a recuperação da sua senha. Seu código de segurança é:';
+        } else {
+            $assunto = $tipo == 'Cadastro' ? 'Confirme seu e-mail - MB Studio' : 'Seu código de acesso (2FA) - MB Studio';
+            $textoIntro = 'Seu código de verificação é:';
+        }
         
         $mensagem = "
         <div style='font-family: Arial, sans-serif; text-align: center; color: #333;'>
             <h2>MB Studio</h2>
-            <p>Seu código de verificação é:</p>
+            <p>$textoIntro</p>
             <h1 style='letter-spacing: 5px; color: #b98527; font-size: 32px;'>$codigo</h1>
             <p>Este código expira em 15 minutos.</p>
             <hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;'>

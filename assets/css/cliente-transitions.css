@@ -1,0 +1,83 @@
+/* ==========================================================================
+   MB STUDIO - TRANSIÇÃO CROSSFADE REAL (SOMENTE CLIENTES)
+   - Efeito Dissolve direto entre telas (SEM tela preta intermediária)
+   - O conteúdo antigo dissolve diretamente enquanto o novo conteúdo surge
+   - O cabeçalho (.main-header) permanece 100% INTACTO e estático todo o tempo
+   - Descida de tela suave exclusiva para #contato na Index
+   ========================================================================== */
+
+/* Suporte à rolagem suave global */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Compensação da altura do cabeçalho fixo ao rolar para a seção de contato */
+#contato {
+    scroll-margin-top: 80px;
+}
+
+/* O Cabeçalho Global permanece fixo, visível e NUNCA desaparece ou pisca */
+.main-header {
+    view-transition-name: site-header;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 9999 !important;
+}
+
+/* O Conteúdo da Página abaixo do cabeçalho mapeado para cada tela */
+#page-content,
+.page-content-wrapper,
+main.servicos-page,
+.team-container {
+    view-transition-name: page-content;
+}
+
+/* O cabeçalho nunca sofre animação ou crossfade */
+::view-transition-old(site-header),
+::view-transition-new(site-header) {
+    animation: none !important;
+}
+
+/* ==========================================================================
+   CROSSFADE DIRETO (DISSOLVE SIMULTÂNEO)
+   Enquanto o conteúdo antigo desvanece, o novo surge NO MESMO INSTANTE.
+   Não há intervalo escuro ou tela preta entre as telas.
+   ========================================================================== */
+::view-transition-old(page-content) {
+    animation: direct-crossfade-out 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+::view-transition-new(page-content) {
+    animation: direct-crossfade-in 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+@keyframes direct-crossfade-out {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes direct-crossfade-in {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Suporte para Fallback em Grid (Crossfade simultâneo sem View Transitions) */
+.crossfade-stage-container {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    position: relative !important;
+    width: 100% !important;
+}
+
+.crossfade-stage-container > * {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+}

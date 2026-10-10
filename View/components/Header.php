@@ -4,6 +4,15 @@ $projectRoot = str_replace('\\', '/', realpath(__DIR__ . '/../../'));
 $basePath = str_ireplace($docRoot, '', $projectRoot);
 ?>
 <link rel="stylesheet" href="<?= $basePath ?>/assets/css/components/header.css">
+<?php
+$userPermHeader = $_SESSION['User_perm'] ?? null;
+if ($userPermHeader !== 'A' && $userPermHeader !== 'F'): ?>
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/cliente-transitions.css">
+    <link rel="prefetch" href="<?= $basePath ?>/assets/css/cliente/servicos.css">
+    <link rel="prefetch" href="<?= $basePath ?>/assets/css/cliente/funcionarios.css">
+    <link rel="prefetch" href="<?= $basePath ?>/assets/css/home.css">
+    <script src="<?= $basePath ?>/assets/js/cliente-transitions.js" defer></script>
+<?php endif; ?>
 
 <header class="main-header">
     <a href="<?= $basePath ?>/Index.php" class="header-logo-link">

@@ -61,16 +61,18 @@ try {
      VIEW: Interface do Usuário (MB Studio Home)
      ========================================================================= -->
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" class="page-index">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MB Studio | Beleza, Confiança & Elegância</title>
 
+    <script>document.documentElement.classList.add('cliente-transitions-enabled');</script>
     <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/home.css">
-    <style>
+    <link rel="stylesheet" href="assets/css/home.css" id="theme-home-css">
+    <link rel="stylesheet" href="assets/css/cliente-transitions.css">
+    <style id="home-inline-styles">
         /* Ajuste do layout editorial da seção Sobre */
         .about-salon-wrapper {
             display: block !important;
@@ -188,9 +190,12 @@ try {
     </style>
 </head>
 
-<body>
+<body class="cliente-page page-index-body">
     <!-- Cabeçalho Principal Global -->
     <?php include 'View/components/Header.php'; ?>
+
+    <!-- Conteúdo da Página abaixo do Cabeçalho -->
+    <div class="page-content-wrapper" id="page-content">
 
     <!-- =================================================================
          1. HERO SECTION (APRESENTAÇÃO PRINCIPAL & QUADRADO DE DESTAQUE)
@@ -556,9 +561,11 @@ try {
             <p>Elegância e Beleza em Cada Detalhe.</p>
         </div>
     </footer>
+    </div><!-- /.page-content-wrapper -->
 
     <!-- Modal Global de Login / Cadastro -->
     <?php include 'View/components/LoginModal.php'; ?>
+    <script src="assets/js/cliente-transitions.js"></script>
 </body>
 
 </html>

@@ -245,24 +245,76 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
 
             <!-- Lista de Profissionais Disponíveis -->
             <?php if (count($disponibilidades) > 0): ?>
+                <?php
+                // Agrupar disponibilidades por funcionário (Emp_id)
+                $funcionarios_agrupados = [];
+                foreach ($disponibilidades as $disp) {
+                    $emp_id_key = $disp['Emp_id'];
+                    if (!isset($funcionarios_agrupados[$emp_id_key])) {
+                        $funcionarios_agrupados[$emp_id_key] = [
+                            'Emp_id'         => $disp['Emp_id'],
+                            'User_name'      => $disp['User_name'],
+                            'Emp_photo'      => $disp['Emp_photo'],
+                            'Emp_specialty'  => $disp['Emp_specialty'],
+                            'janelas'        => [],
+                        ];
+                    }
+                    $funcionarios_agrupados[$emp_id_key]['janelas'][] = [
+                        'Ava_start' => $disp['Ava_start'],
+                        'Ava_end'   => $disp['Ava_end'],
+                    ];
+                }
+                ?>
                 <div class="professionals-grid">
-                    <?php foreach ($disponibilidades as $disp): ?>
+                    <?php foreach ($funcionarios_agrupados as $func): ?>
+                        <?php
+                        // Gerar todos os horários livres de todas as janelas deste funcionário
+                        $todos_horarios = [];
+                        $expediente_inicio = null;
+                        $expediente_fim = null;
+
+                        foreach ($func['janelas'] as $janela) {
+                            $horarios_janela = gerarHorarios(
+                                $janela['Ava_start'],
+                                $janela['Ava_end'],
+                                $servico['Ser_duration'],
+                                $func['Emp_id'],
+                                $agendamentosDoDia,
+                                $bloqueiosDoDia
+                            );
+                            $todos_horarios = array_merge($todos_horarios, $horarios_janela);
+
+                            // Calcular o expediente geral (menor início, maior fim)
+                            $ini = strtotime($janela['Ava_start']);
+                            $end = strtotime($janela['Ava_end']);
+                            if ($expediente_inicio === null || $ini < $expediente_inicio) {
+                                $expediente_inicio = $ini;
+                            }
+                            if ($expediente_fim === null || $end > $expediente_fim) {
+                                $expediente_fim = $end;
+                            }
+                        }
+
+                        // Remover duplicatas e ordenar
+                        $todos_horarios = array_unique($todos_horarios);
+                        sort($todos_horarios);
+                        ?>
                         <div class="professional-card">
                             
                             <!-- Cabeçalho do Especialista -->
                             <div class="professional-header">
                                 <div class="prof-info-left">
                                     <div class="prof-photo-frame">
-                                        <?php if (!empty($disp['Emp_photo'])): ?>
-                                            <img src="../../<?= htmlspecialchars($disp['Emp_photo']) ?>" class="prof-photo-img" alt="<?= htmlspecialchars($disp['User_name']) ?>">
+                                        <?php if (!empty($func['Emp_photo'])): ?>
+                                            <img src="../../<?= htmlspecialchars($func['Emp_photo']) ?>" class="prof-photo-img" alt="<?= htmlspecialchars($func['User_name']) ?>">
                                         <?php else: ?>
-                                            <span><?= getIniciais($disp['User_name']) ?></span>
+                                            <span><?= getIniciais($func['User_name']) ?></span>
                                         <?php endif; ?>
                                     </div>
                                     <div>
-                                        <h2 class="prof-name-text"><?= htmlspecialchars($disp['User_name']) ?></h2>
-                                        <?php if (!empty($disp['Emp_specialty'])): ?>
-                                            <span class="prof-specialty-badge"><?= htmlspecialchars($disp['Emp_specialty']) ?></span>
+                                        <h2 class="prof-name-text"><?= htmlspecialchars($func['User_name']) ?></h2>
+                                        <?php if (!empty($func['Emp_specialty'])): ?>
+                                            <span class="prof-specialty-badge"><?= htmlspecialchars($func['Emp_specialty']) ?></span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -272,7 +324,7 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <polyline points="12 6 12 12 16 14"></polyline>
                                     </svg>
-                                    <span>Expediente: <?= date('H:i', strtotime($disp['Ava_start'])) ?> às <?= date('H:i', strtotime($disp['Ava_end'])) ?></span>
+                                    <span>Expediente: <?= date('H:i', $expediente_inicio) ?> às <?= date('H:i', $expediente_fim) ?></span>
                                 </div>
                             </div>
 
@@ -286,25 +338,14 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
                                     Horários Livres para Atendimento:
                                 </div>
 
-                                <?php
-                                $horarios_gerados = gerarHorarios(
-                                    $disp['Ava_start'], 
-                                    $disp['Ava_end'], 
-                                    $servico['Ser_duration'], 
-                                    $disp['Emp_id'], 
-                                    $agendamentosDoDia, 
-                                    $bloqueiosDoDia
-                                );
-                                
-                                if (count($horarios_gerados) > 0):
-                                ?>
+                                <?php if (count($todos_horarios) > 0): ?>
                                     <div class="time-slots-grid">
-                                        <?php foreach ($horarios_gerados as $h): ?>
+                                        <?php foreach ($todos_horarios as $h): ?>
                                             <!-- Link que envia os dados para Confirmar.php -->
                                             <a 
-                                                href="Confirmar.php?Ser_id=<?= $ser_id ?>&data=<?= $data ?>&Emp_id=<?= $disp['Emp_id'] ?>&hora=<?= $h ?>" 
+                                                href="Confirmar.php?Ser_id=<?= $ser_id ?>&data=<?= $data ?>&Emp_id=<?= $func['Emp_id'] ?>&hora=<?= $h ?>" 
                                                 class="time-slot-btn"
-                                                title="Agendar com <?= htmlspecialchars($disp['User_name']) ?> às <?= $h ?>"
+                                                title="Agendar com <?= htmlspecialchars($func['User_name']) ?> às <?= $h ?>"
                                             >
                                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                                     <circle cx="12" cy="12" r="10"></circle>

@@ -22,23 +22,28 @@ if ($userPermHeader !== 'A' && $userPermHeader !== 'F'): ?>
     <nav class="header-nav">
         <?php
         $perm = $_SESSION['User_perm'] ?? null;
+        // Detectar a página atual para destacar o link ativo
+        $currentScript = $_SERVER['SCRIPT_NAME'] ?? '';
+        $currentPage = basename($currentScript, '.php');
+        $currentFull = $currentScript . ($_SERVER['QUERY_STRING'] ?? '');
+
         if ($perm === 'F'): ?>
             <!-- Menu do Funcionário -->
-            <a href="<?= $basePath ?>/View/funcionario/Agenda.php">MINHA AGENDA</a>
-            <a href="<?= $basePath ?>/View/funcionario/Disponibilidade.php">MEUS HORÁRIOS</a>
-            <a href="<?= $basePath ?>/View/funcionario/Bloqueios.php">PAUSAS/BLOQUEIOS</a>
-            <a href="<?= $basePath ?>/View/funcionario/Perfil.php">MEU PERFIL</a>
+            <a href="<?= $basePath ?>/View/funcionario/Agenda.php" class="<?= $currentPage === 'Agenda' ? 'ativo' : '' ?>">MINHA AGENDA</a>
+            <a href="<?= $basePath ?>/View/funcionario/Disponibilidade.php" class="<?= $currentPage === 'Disponibilidade' ? 'ativo' : '' ?>">MEUS HORÁRIOS</a>
+            <a href="<?= $basePath ?>/View/funcionario/Bloqueios.php" class="<?= $currentPage === 'Bloqueios' ? 'ativo' : '' ?>">PAUSAS/BLOQUEIOS</a>
+            <a href="<?= $basePath ?>/View/funcionario/Perfil.php" class="<?= $currentPage === 'Perfil' ? 'ativo' : '' ?>">MEU PERFIL</a>
         <?php elseif ($perm === 'A'): ?>
             <!-- Menu do Admin -->
-            <a href="<?= $basePath ?>/View/admin/Dashboard.php">PAINEL</a>
-            <a href="<?= $basePath ?>/View/admin/Servicos.php">GERENCIAR SERVIÇOS</a>
-            <a href="<?= $basePath ?>/View/admin/Funcionarios.php">EQUIPE</a>
+            <a href="<?= $basePath ?>/View/admin/Dashboard.php" class="<?= ($currentPage === 'Dashboard' || $currentPage === 'Home') ? 'ativo' : '' ?>">PAINEL</a>
+            <a href="<?= $basePath ?>/View/admin/Servicos.php" class="<?= $currentPage === 'Servicos' ? 'ativo' : '' ?>">GERENCIAR SERVIÇOS</a>
+            <a href="<?= $basePath ?>/View/admin/Funcionarios.php" class="<?= $currentPage === 'Funcionarios' ? 'ativo' : '' ?>">EQUIPE</a>
         <?php else: ?>
             <!-- Menu do Cliente / Visitante -->
-            <a href="<?= $basePath ?>/Index.php">INÍCIO</a>
-            <a href="<?= $basePath ?>/View/cliente/Servicos.php">SERVIÇOS</a>
-            <a href="<?= $basePath ?>/View/cliente/Funcionarios.php">EQUIPE</a>
-            <a href="<?= $basePath ?>/Index.php#contato">CONTATO</a>
+            <a href="<?= $basePath ?>/Index.php" class="<?= $currentPage === 'Index' ? 'ativo' : '' ?>">INÍCIO</a>
+            <a href="<?= $basePath ?>/View/cliente/Servicos.php" class="<?= $currentPage === 'Servicos' ? 'ativo' : '' ?>">SERVIÇOS</a>
+            <a href="<?= $basePath ?>/View/cliente/Funcionarios.php" class="<?= $currentPage === 'Funcionarios' ? 'ativo' : '' ?>">EQUIPE</a>
+            <a href="<?= $basePath ?>/Index.php#contato" class="">CONTATO</a>
         <?php endif; ?>
     </nav>
 

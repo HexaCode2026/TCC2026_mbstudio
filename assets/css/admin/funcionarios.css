@@ -1,43 +1,27 @@
 :root {
-            --gold-primary: #b8860b;
             --gold-accent: #d4af37;
-            --gold-light: #f5eccf;
-            --gold-dark: #8a6508;
-            --gold-darker: #6e5005;
-            --gold-border: rgba(184, 134, 11, 0.22);
-            --gold-border-hover: rgba(184, 134, 11, 0.5);
-            
-            --bg-body: #fbf9f5;
-            --bg-card: #ffffff;
-            --bg-card-alt: #f8f5ee;
-            
-            --text-title: #1a1917;
-            --text-body: #3c3933;
-            --text-muted: #736d62;
-            
-            --font-heading: 'Playfair Display', Georgia, serif;
-            --font-cursive: 'Alex Brush', cursive;
-            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            
-            --card-shadow: 0 10px 30px rgba(184, 134, 11, 0.07), 0 2px 6px rgba(0, 0, 0, 0.03);
-            --card-shadow-hover: 0 16px 40px rgba(184, 134, 11, 0.14), 0 4px 10px rgba(0, 0, 0, 0.04);
-            --transition-smooth: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            --gold-border-hover: rgba(184, 134, 11, 0.45);
+            --bg-card-alt: #F8FAFC;
+            --text-title: var(--text-primary, #0F172A);
+            --text-body: var(--text-secondary, #334155);
+            --font-body: var(--font-sans);
+            --card-shadow: var(--shadow-resting);
+            --card-shadow-hover: var(--shadow-hover);
         }
 
         body {
-            background-color: var(--bg-body);
-            color: var(--text-body);
-            font-family: var(--font-body);
+            background-color: var(--bg-canvas, #FAFAFA);
+            color: var(--text-secondary, #334155);
+            font-family: var(--font-sans);
             min-height: 100vh;
-            padding-top: 75px;
             margin: 0;
-            overflow-x: hidden;
+            overflow-x: clip;
         }
 
         .admin-team-wrapper {
-            max-width: 1300px;
+            max-width: 1320px;
             margin: 0 auto;
-            padding: 35px 25px 80px;
+            padding: clamp(28px, 4vw, 40px) clamp(16px, 3.5vw, 32px) 80px;
             box-sizing: border-box;
         }
 
@@ -620,9 +604,36 @@
 
             .filters-group {
                 justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 10px;
             }
 
             .filter-select {
                 flex: 1;
+                min-width: 140px;
+            }
+
+            .btn-back-dashboard,
+            .btn-manage-services-top,
+            .btn-add-employee-top {
+                min-height: 44px;
+                justify-content: center;
+            }
+
+            input, select, textarea, .form-input, .search-input-field, .filter-select {
+                font-size: 16px !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .top-nav-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-back-dashboard,
+            .btn-manage-services-top,
+            .btn-add-employee-top {
+                width: 100%;
             }
         }

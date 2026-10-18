@@ -1,105 +1,154 @@
 /**
  * ============================================================================
- * CONTROLLER: Hero Slideshow — Rotação Automática de Cortes em Destaque
+ * CONTROLLER: Hero Slideshow — Rotação Automática (4s) + Botões Laterais
  * ============================================================================
- * Gerencia o carrossel de imagens na seção hero da Index.php.
- * Troca automaticamente a cada 5 segundos com transição suave (crossfade).
- * Exibe nome do serviço, preço e indicadores de navegação (dots).
+ * Opera diretamente sobre o DOM vivo (#hero-slideshow), garantindo funcionamento
+ * imediato nos cliques dos botões laterais, dots, swipe mobile e transições AJAX.
  */
 (function () {
     'use strict';
 
-    // ── Configuração ──
-    const INTERVAL_MS = 5000;       // Intervalo de troca (5 segundos)
-    const FADE_DURATION_MS = 800;   // Duração da transição CSS (sincronizado com o CSS inline)
+    var INTERVAL_MS = 4000;
+    var activeTimer = null;
 
-    // ── Elementos DOM ──
-    const container = document.getElementById('hero-slideshow');
-    if (!container) return;
-
-    const slides = container.querySelectorAll('.hero-slide');
-    const dotsWrap = container.querySelector('.slideshow-dots');
-    const labelName = container.querySelector('.slide-label-name');
-    const labelPrice = container.querySelector('.slide-label-price');
-
-    if (!slides.length) return;
-
-    let currentIndex = 0;
-    let timer = null;
-
-    // ── Criar indicadores (dots) ──
-    if (dotsWrap) {
-        slides.forEach(function (_slide, i) {
-            var dot = document.createElement('button');
-            dot.className = 'slideshow-dot' + (i === 0 ? ' active' : '');
-            dot.setAttribute('aria-label', 'Ir para imagem ' + (i + 1));
-            dot.addEventListener('click', function () {
-                if (i !== currentIndex) {
-                    goToSlide(i);
-                    resetTimer();
-                }
-            });
-            dotsWrap.appendChild(dot);
-        });
+    function getActiveSlideIndex(slides) {
+        for (var i = 0; i < slides.length; i++) {
+            if (slides[i].classList.contains('active')) {
+                return i;
+            }
+        }
+        return 0;
     }
 
-    var dots = dotsWrap ? dotsWrap.querySelectorAll('.slideshow-dot') : [];
+    function applySlideByIndex(targetIndex) {
+        var container = document.getElementById('hero-slideshow');
+        if (!container) return;
 
-    // ── Funções de Controle ──
-    function goToSlide(index) {
-        // Desativa slide atual
-        slides[currentIndex].classList.remove('active');
-        if (dots[currentIndex]) dots[currentIndex].classList.remove('active');
+        var slides = container.querySelectorAll('.hero-slide');
+        if (!slides || slides.length <= 1) return;
 
-        // Ativa novo slide
-        currentIndex = index;
-        slides[currentIndex].classList.add('active');
-        if (dots[currentIndex]) dots[currentIndex].classList.add('active');
+        var total = slides.length;
+        var nextIdx = ((targetIndex % total) + total) % total;
 
-        // Atualiza label de texto
+        for (var i = 0; i < total; i++) {
+            if (i === nextIdx) {
+                slides[i].classList.add('active');
+            } else {
+                slides[i].classList.remove('active');
+            }
+        }
+
+        var dots = container.querySelectorAll('.slideshow-dot');
+        for (var d = 0; d < dots.length; d++) {
+            if (d === nextIdx) {
+                dots[d].classList.add('active');
+            } else {
+                dots[d].classList.remove('active');
+            }
+        }
+
+        var labelName = container.querySelector('.slide-label-name');
+        var labelPrice = container.querySelector('.slide-label-price');
         if (labelName) {
-            labelName.textContent = slides[currentIndex].getAttribute('data-name') || '';
+            labelName.textContent = slides[nextIdx].getAttribute('data-name') || '';
         }
         if (labelPrice) {
-            labelPrice.textContent = slides[currentIndex].getAttribute('data-price') || '';
+            labelPrice.textContent = slides[nextIdx].getAttribute('data-price') || '';
         }
     }
 
-    function nextSlide() {
-        var next = (currentIndex + 1) % slides.length;
-        goToSlide(next);
+    function startAutoTimer() {
+        if (activeTimer) {
+            clearInterval(activeTimer);
+            activeTimer = null;
+        }
+        activeTimer = setInterval(function () {
+            var container = document.getElementById('hero-slideshow');
+            if (!container) return;
+            if (container.matches(':hover')) return;
+            var slides = container.querySelectorAll('.hero-slide');
+            if (!slides || slides.length <= 1) return;
+            var current = getActiveSlideIndex(slides);
+            applySlideByIndex(current + 1);
+        }, INTERVAL_MS);
     }
 
-    function startTimer() {
-        timer = setInterval(nextSlide, INTERVAL_MS);
+    window.heroSlideStep = function (step, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        var container = document.getElementById('hero-slideshow');
+        if (!container) return;
+        var slides = container.querySelectorAll('.hero-slide');
+        if (!slides || slides.length <= 1) return;
+
+        var current = getActiveSlideIndex(slides);
+        applySlideByIndex(current + step);
+        startAutoTimer();
+    };
+
+    window.heroSlideGoTo = function (index, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        applySlideByIndex(index);
+        startAutoTimer();
+    };
+
+    window.initHeroSlideshow = function () {
+        var container = document.getElementById('hero-slideshow');
+        if (!container) return;
+
+        var slides = container.querySelectorAll('.hero-slide');
+        if (!slides.length) return;
+
+        // Garante que os dots existam caso não tenham vindo do servidor
+        var dotsWrap = container.querySelector('.slideshow-dots');
+        if (dotsWrap && dotsWrap.children.length !== slides.length && slides.length > 1) {
+            dotsWrap.innerHTML = '';
+            for (var i = 0; i < slides.length; i++) {
+                (function (idx) {
+                    var dot = document.createElement('button');
+                    dot.type = 'button';
+                    dot.className = 'slideshow-dot' + (idx === 0 ? ' active' : '');
+                    dot.setAttribute('aria-label', 'Ir para imagem ' + (idx + 1));
+                    dot.onclick = function (e) {
+                        window.heroSlideGoTo(idx, e);
+                    };
+                    dotsWrap.appendChild(dot);
+                })(i);
+            }
+        }
+
+        // Suporte a swipe touch no celular
+        if (!container.__swipeBound) {
+            var touchStartX = 0;
+            container.addEventListener('touchstart', function (e) {
+                if (e.changedTouches && e.changedTouches.length > 0) {
+                    touchStartX = e.changedTouches[0].screenX;
+                }
+            }, { passive: true });
+
+            container.addEventListener('touchend', function (e) {
+                if (e.changedTouches && e.changedTouches.length > 0) {
+                    var diffX = e.changedTouches[0].screenX - touchStartX;
+                    if (Math.abs(diffX) > 40) {
+                        window.heroSlideStep(diffX < 0 ? 1 : -1);
+                    }
+                }
+            }, { passive: true });
+
+            container.__swipeBound = true;
+        }
+
+        startAutoTimer();
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', window.initHeroSlideshow);
+    } else {
+        window.initHeroSlideshow();
     }
-
-    function resetTimer() {
-        clearInterval(timer);
-        startTimer();
-    }
-
-    // ── Pausar ao passar o mouse por cima ──
-    container.addEventListener('mouseenter', function () {
-        clearInterval(timer);
-    });
-
-    container.addEventListener('mouseleave', function () {
-        startTimer();
-    });
-
-    // ── Inicializar ──
-    // Garantir que o primeiro slide está ativo
-    if (!slides[0].classList.contains('active')) {
-        slides[0].classList.add('active');
-    }
-    if (labelName) {
-        labelName.textContent = slides[0].getAttribute('data-name') || '';
-    }
-    if (labelPrice) {
-        labelPrice.textContent = slides[0].getAttribute('data-price') || '';
-    }
-
-    startTimer();
-
 })();

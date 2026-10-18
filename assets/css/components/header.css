@@ -1,144 +1,537 @@
-/* Estilos do Cabeçalho Global MB Studio (Estrutura Original Totalmente Responsiva) */
-    .main-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        min-height: 70px;
-        background: rgba(18, 18, 20, 0.96);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-        z-index: 9999;
+/* ==========================================================================
+   MB STUDIO — CABEÇALHO GLOBAL (DESKTOP CENTRALIZADO & MENU 3 PONTINHOS MOBILE)
+   Padrão: Linear, Raycast & Luxury Glassmorphism | Responsivo: 320px a 1440px+
+   ========================================================================== */
+
+.main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 74px;
+    background: rgba(15, 17, 21, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+    z-index: var(--z-sticky, 100);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+/* ==========================================================================
+   ESTRUTURA DESKTOP (> 860px):
+   [Canto Esquerdo: Logo]  ---  [Centro: Links da Header]  ---  [Canto Direito: Login/Cadastrar]
+   ========================================================================== */
+.header-main-bar {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0 clamp(16px, 2.5vw, 32px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-sizing: border-box;
+}
+
+/* --- Canto Esquerdo: Logo --- */
+.header-logo-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    flex-shrink: 0;
+    margin-right: auto;
+    z-index: 2;
+}
+
+.header-logo-img {
+    height: 44px;
+    width: auto;
+    max-width: 160px;
+    object-fit: contain;
+    transition: transform 0.15s ease;
+}
+
+.header-logo-img:hover {
+    transform: scale(1.04);
+}
+
+/* --- Centro Absoluto: Navegação Principal --- */
+.header-nav {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.header-nav-links {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(12px, 1.8vw, 28px);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 6px clamp(14px, 1.8vw, 22px);
+    border-radius: 9999px;
+}
+
+/* Elementos exclusivos do modo mobile permanecem ocultos no desktop */
+.mobile-drawer-header,
+.mobile-profile-section,
+.mobile-drawer-footer,
+.mobile-section-label,
+.header-nav-backdrop {
+    display: none !important;
+}
+
+.header-nav-links a,
+.header-nav-links .nav-item-link {
+    text-decoration: none;
+    color: #e4e4e7;
+    font-size: clamp(12px, 0.95vw, 13.5px);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    position: relative;
+    padding: 6px 4px;
+    white-space: nowrap;
+    transition: color 0.18s ease;
+}
+
+.header-nav-links a:hover,
+.header-nav-links a.ativo {
+    color: var(--gold-primary, #d4af37);
+}
+
+.header-nav-links a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold-gradient, linear-gradient(135deg, #d4af37 0%, #b8860b 100%));
+    transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 9999px;
+}
+
+.header-nav-links a:hover::after,
+.header-nav-links a.ativo::after {
+    width: 100%;
+}
+
+/* --- Canto Direito: Botão Login / Cadastrar (Desktop & Mobile) + 3 Pontinhos (Mobile) --- */
+.header-right-actions {
+    margin-left: auto;
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-shrink: 0;
+    z-index: 2;
+}
+
+.header-auth {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: auto;
+}
+
+/* Botão 3 Pontinhos oculto no Desktop */
+.header-dots-btn {
+    display: none !important;
+}
+
+/* Espaço superior padrão para o conteúdo não colidir com o cabeçalho fixo */
+body {
+    padding-top: 74px !important;
+}
+
+/* ==========================================================================
+   MODO CELULAR & TABLET COMPACTO (<= 860px)
+   Canto Direito com Botão Login / Cadastrar + Botão de 3 Pontinhos (⋮)
+   ========================================================================== */
+@media (max-width: 860px) {
+    .header-main-bar {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        padding: 0 clamp(12px, 3vw, 40px);
-        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
-        font-family: 'Inter', 'Candara', -apple-system, sans-serif;
-        box-sizing: border-box;
-        transition: all 0.3s ease;
+        justify-content: space-between;
+        padding: 0 14px;
     }
 
-    .header-logo-link {
+    /* Mantém o botão de Login/Cadastrar visível no canto direito ao lado dos 3 pontinhos */
+    .header-auth {
+        display: flex !important;
+        align-items: center;
+    }
+
+    .header-auth .auth-btn {
+        padding: 6px 12px;
+        min-height: 38px;
+        font-size: 12.5px;
+    }
+
+    /* Botão de 3 Pontinhos no Canto Direito */
+    .header-dots-btn {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-width: 42px;
+        height: 42px;
+        padding: 0 10px;
+        background: rgba(26, 28, 35, 0.9);
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        border-radius: 9999px;
+        color: #f4f4f5;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        transition: all 0.18s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .header-dots-btn:hover,
+    .header-dots-btn[aria-expanded="true"] {
+        background: rgba(212, 175, 55, 0.16);
+        border-color: var(--gold-primary, #d4af37);
+        color: var(--gold-primary, #d4af37);
+        box-shadow: 0 6px 18px rgba(212, 175, 55, 0.25);
+    }
+
+    .header-dots-btn:active {
+        transform: scale(0.96);
+    }
+
+    .dots-user-avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--gold-gradient, linear-gradient(135deg, #d4af37 0%, #b8860b 100%));
+        color: #0f1115;
+        font-size: 12px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .dots-icon-svg {
+        width: 20px;
+        height: 20px;
+        color: #f4f4f5;
+        flex-shrink: 0;
+        transition: color 0.18s ease;
+    }
+
+    .header-dots-btn:hover .dots-icon-svg,
+    .header-dots-btn[aria-expanded="true"] .dots-icon-svg {
+        color: var(--gold-primary, #d4af37);
+    }
+
+    /* Backdrop Translúcido */
+    .header-nav-backdrop {
+        display: block !important;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 12, 18, 0.55);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: var(--z-modal-backdrop, 900);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.22s ease;
+    }
+
+    .header-nav-backdrop.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* Menu Popover / Gaveta no Canto Direito */
+    .header-nav {
+        position: fixed;
+        top: 76px;
+        left: auto;
+        right: 14px;
+        width: min(320px, calc(100vw - 28px));
+        max-height: calc(100dvh - 92px);
+        background: #12151e;
+        border: 1px solid rgba(212, 175, 55, 0.32);
+        border-radius: 16px;
+        box-shadow: 0 22px 48px -8px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04);
+        z-index: var(--z-modal, 1000);
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px)) 16px;
+        overflow-y: auto;
+        gap: 14px;
+        opacity: 0;
+        transform: translateY(-10px) scale(0.96);
+        transform-origin: top right;
+        pointer-events: none;
+        transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .header-nav.mobile-open {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+    }
+
+    /* Cabeçalho do Menu Mobile */
+    .mobile-drawer-header {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .drawer-title {
+        font-family: var(--font-heading, 'Playfair Display', serif);
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--gold-light, #f3e5ab);
+        letter-spacing: 0.02em;
+    }
+
+    .drawer-close-btn {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: #e4e4e7;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+        transition: background 0.18s, color 0.18s;
+    }
+
+    .drawer-close-btn:hover {
+        background: rgba(212, 175, 55, 0.2);
+        color: var(--gold-primary, #d4af37);
+    }
+
+    /* Seção de Perfil / Conta no topo do Menu 3 Pontinhos */
+    .mobile-profile-section {
+        display: flex !important;
+        flex-direction: column;
+        gap: 10px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .mobile-section-label {
+        display: block !important;
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #94a3b8;
+        padding: 0 6px;
+        margin-bottom: 2px;
+    }
+
+    .mobile-user-card {
         display: flex;
         align-items: center;
-        text-decoration: none;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(212, 175, 55, 0.22);
+        border-radius: 12px;
+    }
+
+    .mobile-user-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--gold-gradient, linear-gradient(135deg, #d4af37 0%, #b8860b 100%));
+        color: #0f1115;
+        font-weight: 700;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         flex-shrink: 0;
+    }
+
+    .mobile-user-info {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .mobile-user-greeting {
+        font-size: 14px;
+        font-weight: 600;
+        color: #ffffff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mobile-user-role {
+        font-size: 11.5px;
+        color: var(--gold-primary, #d4af37);
+        font-weight: 500;
+    }
+
+    .mobile-profile-links {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .mobile-profile-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 44px;
+        padding: 10px 12px;
+        color: #f4f4f5;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 10px;
+        transition: background 0.18s ease, color 0.18s ease;
+    }
+
+    .mobile-profile-item svg {
+        color: var(--gold-primary, #d4af37);
+        flex-shrink: 0;
+    }
+
+    .mobile-profile-item:hover,
+    .mobile-profile-item.ativo {
+        background: rgba(212, 175, 55, 0.15);
+        color: var(--gold-light, #f3e5ab);
+    }
+
+    /* Botão Login / Cadastrar dentro do menu 3 pontinhos quando deslogado */
+    .mobile-auth-cta-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        min-height: 46px;
+        padding: 12px 16px;
+        background: var(--gold-gradient, linear-gradient(135deg, #d4af37 0%, #b8860b 100%));
+        color: #0f1115;
+        font-size: 14px;
+        font-weight: 700;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .mobile-auth-cta-btn:active {
+        transform: scale(0.98);
+    }
+
+    /* Lista de Navegação no Menu 3 Pontinhos */
+    .header-nav-links {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+        background: transparent;
+        border: none;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    .header-nav-links a,
+    .header-nav-links .nav-item-link {
+        display: flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 10px 12px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #e4e4e7;
+        border-radius: 10px;
+        transition: background 0.18s ease, color 0.18s ease, transform 0.15s ease;
+    }
+
+    .header-nav-links a:hover,
+    .header-nav-links a.ativo {
+        background: rgba(212, 175, 55, 0.14);
+        color: var(--gold-primary, #d4af37);
+        transform: translateX(3px);
+    }
+
+    .header-nav-links a::after {
+        display: none;
+    }
+
+    /* Rodapé do Menu Mobile (Sair) */
+    .mobile-drawer-footer {
+        display: flex !important;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .mobile-logout-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 12px;
+        color: #f87171;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: background 0.18s ease, color 0.18s ease;
+    }
+
+    .mobile-logout-btn:hover {
+        background: rgba(239, 68, 68, 0.14);
+        color: #fca5a5;
+    }
+
+    /* Bloqueio de scroll do body quando menu está aberto */
+    body.mobile-drawer-locked {
+        overflow: hidden !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-header {
+        height: 64px;
+    }
+
+    body {
+        padding-top: 64px !important;
     }
 
     .header-logo-img {
-        height: clamp(34px, 4vw, 45px);
-        width: auto;
-        object-fit: contain;
-        transition: transform 0.3s ease;
-    }
-
-    .header-logo-img:hover {
-        transform: scale(1.05);
+        height: 36px;
     }
 
     .header-nav {
-        display: flex;
-        gap: clamp(10px, 2.2vw, 30px);
-        align-items: center;
-        flex-wrap: wrap;
-        justify-content: center;
+        top: 68px;
+        right: 10px;
+        width: calc(100vw - 20px);
+        max-height: calc(100dvh - 80px);
     }
-
-    .header-nav a {
-        text-decoration: none;
-        color: #e0e0e0;
-        font-size: clamp(12px, 1.2vw, 14.5px);
-        font-weight: 500;
-        letter-spacing: 0.8px;
-        position: relative;
-        padding: 4px 0;
-        white-space: nowrap;
-        transition: color 0.3s ease;
-    }
-
-    .header-nav a:hover,
-    .header-nav a.ativo {
-        color: #d4af37;
-    }
-
-    .header-nav a::after {
-        content: '';
-        position: absolute;
-        width: 0;
-        height: 2px;
-        bottom: 0;
-        left: 0;
-        background-color: #d4af37;
-        transition: width 0.3s ease;
-    }
-
-    .header-nav a:hover::after,
-    .header-nav a.ativo::after {
-        width: 100%;
-    }
-
-    .header-auth {
-        display: flex;
-        align-items: center;
-        flex-shrink: 0;
-    }
-
-    /* Espaço do corpo para o topo fixo */
-    body {
-        padding-top: 70px;
-    }
-
-    /* Responsividade Adaptativa Mantendo a Estrutura Original */
-    @media (max-width: 850px) {
-        .main-header {
-            padding: 8px 15px;
-            min-height: 65px;
-        }
-
-        .header-nav {
-            gap: clamp(8px, 1.8vw, 18px);
-        }
-    }
-
-    @media (max-width: 650px) {
-        .main-header {
-            padding: 6px 12px;
-            min-height: auto;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: space-between;
-        }
-
-        .header-nav {
-            order: 3;
-            width: 100%;
-            padding-top: 4px;
-            border-top: 1px solid rgba(212, 175, 55, 0.15);
-            gap: 14px;
-        }
-
-        .header-nav a {
-            font-size: 12px;
-            padding: 2px 0;
-        }
-
-        body {
-            padding-top: 88px;
-        }
-    }
-
-    @media (max-width: 400px) {
-        .header-nav {
-            gap: 10px;
-        }
-
-        .header-nav a {
-            font-size: 11px;
-        }
-
-        body {
-            padding-top: 92px;
-        }
-    }
+}

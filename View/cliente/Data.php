@@ -194,19 +194,22 @@ $depoisAmanha = date("Y-m-d", strtotime("+2 days"));
         }
 
         // Sincronizar botões rápidos caso o usuário use o calendário manual
-        document.getElementById('data').addEventListener('change', function() {
-            const val = this.value;
-            const quickButtons = document.querySelectorAll('.quick-date-btn');
-            quickButtons.forEach(btn => btn.classList.remove('active'));
+        const inputData = document.getElementById('data');
+        if (inputData) {
+            inputData.addEventListener('change', function() {
+                const val = this.value;
+                const quickButtons = document.querySelectorAll('.quick-date-btn');
+                quickButtons.forEach(btn => btn.classList.remove('active'));
 
-            if (val === '<?= $hoje ?>') {
-                quickButtons[0]?.classList.add('active');
-            } else if (val === '<?= $amanha ?>') {
-                quickButtons[1]?.classList.add('active');
-            } else if (val === '<?= $depoisAmanha ?>') {
-                quickButtons[2]?.classList.add('active');
-            }
-        });
+                if (val === '<?= $hoje ?>') {
+                    quickButtons[0]?.classList.add('active');
+                } else if (val === '<?= $amanha ?>') {
+                    quickButtons[1]?.classList.add('active');
+                } else if (val === '<?= $depoisAmanha ?>') {
+                    quickButtons[2]?.classList.add('active');
+                }
+            });
+        }
     </script>
 
 </body>

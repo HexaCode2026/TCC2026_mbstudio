@@ -106,7 +106,7 @@ if (!empty($appointments)) {
                 Voltar ao Início
             </a>
 
-            <a href="Disponibilidade.php" class="btn-back-link" style="border-color: var(--gold-primary); color: var(--gold-light);">
+            <a href="Disponibilidade.php" class="btn-back-link">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
@@ -184,7 +184,7 @@ if (!empty($appointments)) {
                                     <strong><?= date('d/m/Y', strtotime($app['Appo_date'])) ?></strong>
                                 </td>
                                 <td>
-                                    <span style="color: var(--gold-light); font-weight: 600;"><?= htmlspecialchars(substr($app['Appo_start'], 0, 5)) ?></span>
+                                    <span class="time-start-text"><?= htmlspecialchars(substr($app['Appo_start'], 0, 5)) ?></span>
                                 </td>
                                 <td>
                                     <span style="color: var(--text-muted);"><?= htmlspecialchars(substr($app['Appo_end'], 0, 5)) ?></span>
@@ -197,8 +197,7 @@ if (!empty($appointments)) {
                                             data-cli-id="<?= $app['Cli_id'] ?>" 
                                             data-cli-name="<?= htmlspecialchars($app['client_name'], ENT_QUOTES, 'UTF-8') ?>"
                                             data-cli-obs="<?= htmlspecialchars($app['Cli_observation'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
-                                            onclick="abrirModalObs(this)"
-                                            style="font-size: 0.85em; padding: 5px 10px; background-color: transparent; border: 1px solid var(--gold-primary); color: var(--gold-light); border-radius: 4px; cursor: pointer;">
+                                            onclick="abrirModalObs(this)">
                                         Observações
                                     </button>
                                 </td>
@@ -294,7 +293,7 @@ if (!empty($appointments)) {
                 <h3>Nenhum agendamento encontrado</h3>
                 <p>Assim que os clientes realizarem agendamentos com você, eles aparecerão detalhados aqui.</p>
                 <div style="margin-top: 25px;">
-                    <a href="Disponibilidade.php" class="btn-back-link" style="border-color: var(--gold-primary); color: var(--gold-light);">
+                    <a href="Disponibilidade.php" class="btn-gold">
                         Cadastrar Horários Disponíveis
                     </a>
                 </div>
@@ -321,8 +320,8 @@ if (!empty($appointments)) {
                     <input type="hidden" name="appo_id" id="modalAppoId" value="">
                     
                     <div style="margin-top: 15px; margin-bottom: 15px;">
-                        <p class="payment-title" style="margin-bottom: 10px;">Observações do Cliente</p>
-                        <textarea name="cli_observation" id="modalClientObs" rows="3" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid var(--border-color); background: #1a1a1a; color: var(--text-light); resize: vertical; font-family: inherit;" placeholder="Adicione observações sobre o cliente (opcional)..."></textarea>
+                        <p class="payment-title" style="margin-bottom: 8px;">Observações do Cliente</p>
+                        <textarea name="cli_observation" id="modalClientObs" rows="3" class="modal-textarea" placeholder="Adicione observações sobre o cliente (opcional)..."></textarea>
                     </div>
 
                     <div class="payment-section">
@@ -360,13 +359,15 @@ if (!empty($appointments)) {
                 <button type="button" class="btn-close-modal" onclick="fecharModalObs()">×</button>
             </div>
             <div class="modal-body">
-                <p><strong>Cliente:</strong> <span id="modalObsClienteNome"></span></p>
+                <div class="info-resumo">
+                    <p><strong>Cliente:</strong> <span id="modalObsClienteNome"></span></p>
+                </div>
                 <form action="Agenda.php" method="POST" id="formObsCliente">
                     <input type="hidden" name="action" value="update_client_obs">
                     <input type="hidden" name="cli_id" id="modalObsCliId" value="">
                     
-                    <div style="margin-top: 15px;">
-                        <textarea name="cli_observation" id="modalObsTexto" rows="5" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid var(--border-color); background: #1a1a1a; color: var(--text-light); resize: vertical; font-family: inherit;"></textarea>
+                    <div style="margin-top: 12px;">
+                        <textarea name="cli_observation" id="modalObsTexto" rows="5" class="modal-textarea" placeholder="Registre preferências, alergias ou notas técnicas..."></textarea>
                     </div>
                     
                     <div class="modal-actions" style="margin-top: 20px;">

@@ -6,9 +6,10 @@ $isLoggedIn = isset($_SESSION['User_id']) ? 'true' : 'false';
 $docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/');
 $projectRoot = str_replace('\\', '/', realpath(__DIR__ . '/../../'));
 $basePath = str_ireplace($docRoot, '', $projectRoot);
+$loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css') ?: '2.2';
 ?>
 
-<link rel="stylesheet" href="<?= $basePath ?>/assets/css/components/loginmodal.css">
+<link rel="stylesheet" href="<?= $basePath ?>/assets/css/components/loginmodal.css?v=<?= $loginCssVer ?>">
 
 <div id="global-login-modal">
     <div class="login-modal-content">
@@ -151,12 +152,40 @@ function checkAuthAndExecute(event, url) {
 
 function closeLoginModal() {
     const modal = document.getElementById('global-login-modal');
-    modal.classList.remove('show');
-    document.getElementById('login-modal-msg').style.display = 'none';
-    document.getElementById('cadastro-modal-msg').style.display = 'none';
-    document.getElementById('global-login-form').reset();
-    document.getElementById('global-cadastro-form').reset();
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.classList.remove('modal-open-locked');
+    }
+    const loginMsg = document.getElementById('login-modal-msg');
+    if (loginMsg) loginMsg.style.display = 'none';
+    const cadMsg = document.getElementById('cadastro-modal-msg');
+    if (cadMsg) cadMsg.style.display = 'none';
+    const formLogin = document.getElementById('global-login-form');
+    if (formLogin) formLogin.reset();
+    const formCad = document.getElementById('global-cadastro-form');
+    if (formCad) formCad.reset();
 }
+
+// Fechar ao clicar fora da caixa do modal ou pressionar ESC
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('global-login-modal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeLoginModal();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('global-login-modal');
+            if (modal && modal.classList.contains('show')) {
+                closeLoginModal();
+            }
+        }
+    });
+});
 
 function switchModalView(viewId) {
     document.querySelectorAll('.form-view').forEach(v => v.classList.remove('active'));
@@ -301,7 +330,11 @@ async function handleAjaxVerificacao(event) {
             showModalMessage('verificacao-modal-msg', false, data.message);
             setTimeout(() => {
                 if (data.action === 'login') {
-                    window.location.href = `${basePath}/Index.php`;
+                    switchModalView('view-login');
+                    if (data.email && document.getElementById('modal-email')) {
+                        document.getElementById('modal-email').value = data.email;
+                    }
+                    showModalMessage('login-modal-msg', false, data.message);
                 } else if (data.perm === 'A') {
                     window.location.href = `${basePath}/View/admin/Home.php`;
                 } else if (data.perm === 'F') {
@@ -311,7 +344,7 @@ async function handleAjaxVerificacao(event) {
                 } else {
                     window.location.reload();
                 }
-            }, 1500);
+            }, 1200);
         } else {
             showModalMessage('verificacao-modal-msg', true, data.message || 'Código incorreto.');
         }

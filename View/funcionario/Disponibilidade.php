@@ -61,6 +61,7 @@ if (!empty($minhasDisponibilidades)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disponibilidade | MB Studio</title>
 
+    <link rel="stylesheet" href="../../assets/css/global.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -88,8 +89,7 @@ if (!empty($minhasDisponibilidades)) {
                 Voltar ao Início
             </a>
 
-            <a href="Agenda.php" class="btn-back-link"
-                style="border-color: var(--gold-primary); color: var(--gold-light);">
+            <a href="Agenda.php" class="btn-back-link">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -104,71 +104,67 @@ if (!empty($minhasDisponibilidades)) {
             <div class="disp-badge">
                 <span>✦ Gestão de Atendimento ✦</span>
             </div>
-            <h1 class="tituloPagina">Meus <span class="cursiva-gold">Horários</span></h1>
-            <p class="subtitulo">Cadastre e gerencie os dias e turnos em que você estará disponível para atender no MB
+            <h1 class="tituloPagina disp-title">Meus <span class="cursiva-gold">Horários</span></h1>
+            <p class="subtitulo disp-subtitle">Cadastre e gerencie os dias e turnos em que você estará disponível para atender no MB
                 Studio.</p>
         </div>
 
         <!-- CARD PRINCIPAL DO FORMULÁRIO -->
-        <div class="cadastro-grid-card">
+        <div class="cadastro-grid-card disp-main-card">
             <form action="../../controller/SalvarDisponibilidade.php" method="POST" id="formDisponibilidade">
 
                 <input type="hidden" name="Fun_id" value="<?= htmlspecialchars($_SESSION['User_id']) ?>">
                 <input type="hidden" name="Emp_id" value="<?= htmlspecialchars($empId) ?>">
 
-                <table class="TabelaCadastro">
-                    <tbody>
-                        <tr>
-                            <!-- CALENDÁRIO INTERATIVO -->
-                            <td class="cards">
-                                <div class="campo-calendario">
-                                    <div id="calendario-customizado"></div>
-                                    <input type="hidden" name="Dis_date" id="Dis_date" min="<?= date('Y-m-d') ?>"
-                                        required>
-                                </div>
-                            </td>
+                <div class="card-grade-layout TabelaCadastro">
+                    <!-- CALENDÁRIO INTERATIVO -->
+                    <div class="cards calendario-container">
+                        <div class="campo-calendario">
+                            <div id="calendario-customizado"></div>
+                            <input type="hidden" name="Dis_date" id="Dis_date" min="<?= date('Y-m-d') ?>"
+                                required>
+                        </div>
+                    </div>
 
-                            <!-- ÁREA DIREITA (SERVIÇO & HORÁRIOS) -->
-                            <td class="coluna-direita">
-                                <!-- SERVIÇO -->
-                                <div class="area-servico">
-                                    <h2 class="titulo-servicos">Serviço a Disponibilizar</h2>
-                                    <select name="Dis_ser" id="Dis_ser" required>
-                                        <option value="">Selecione um serviço</option>
-                                        <?php if (!empty($servicos)): ?>
-                                            <?php foreach ($servicos as $ser): ?>
-                                                <option value="<?= htmlspecialchars($ser['Ser_id']) ?>"
-                                                    data-duration="<?= htmlspecialchars($ser['Ser_duration']) ?>"
-                                                    data-empser="<?= htmlspecialchars($ser['EmpSer_id']) ?>">
-                                                    <?= htmlspecialchars($ser['Ser_name']) ?>
-                                                    (<?= htmlspecialchars($ser['Ser_duration']) ?> min)
-                                                </option>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <option value="" disabled>Nenhum serviço vinculado ao perfil</option>
-                                        <?php endif; ?>
-                                    </select>
-                                    <input type="hidden" name="Ser_id" id="Ser_id" value="">
-                                </div>
+                    <!-- ÁREA DIREITA (SERVIÇO & HORÁRIOS) -->
+                    <div class="coluna-direita">
+                        <!-- SERVIÇO -->
+                        <div class="area-servico">
+                            <h2 class="titulo-servicos">Serviço a Disponibilizar</h2>
+                            <select name="Dis_ser" id="Dis_ser" required>
+                                <option value="">Selecione um serviço</option>
+                                <?php if (!empty($servicos)): ?>
+                                    <?php foreach ($servicos as $ser): ?>
+                                        <option value="<?= htmlspecialchars($ser['Ser_id']) ?>"
+                                            data-duration="<?= htmlspecialchars($ser['Ser_duration']) ?>"
+                                            data-empser="<?= htmlspecialchars($ser['EmpSer_id']) ?>">
+                                            <?= htmlspecialchars($ser['Ser_name']) ?>
+                                            (<?= htmlspecialchars($ser['Ser_duration']) ?> min)
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <option value="" disabled>Nenhum serviço vinculado ao perfil</option>
+                                <?php endif; ?>
+                            </select>
+                            <input type="hidden" name="Ser_id" id="Ser_id" value="">
+                        </div>
 
-                                <!-- HORÁRIOS INÍCIO E FIM -->
-                                <h2 class="titulo-horarios">Janela de Atendimento</h2>
-                                <div class="area-horarios">
-                                    <div class="campo-horario">
-                                        <label for="Dis_start">Horário Início</label>
-                                        <input type="time" name="Dis_start" id="Dis_start" min="08:00" max="19:00"
-                                            required>
-                                    </div>
+                        <!-- HORÁRIOS INÍCIO E FIM -->
+                        <h2 class="titulo-horarios">Janela de Atendimento</h2>
+                        <div class="area-horarios">
+                            <div class="campo-horario">
+                                <label for="Dis_start">Horário Início</label>
+                                <input type="time" name="Dis_start" id="Dis_start" min="08:00" max="19:00"
+                                    required>
+                            </div>
 
-                                    <div class="campo-horario">
-                                        <label for="Dis_end">Horário Término</label>
-                                        <input type="time" name="Dis_end" id="Dis_end" min="08:00" max="19:00" required>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            <div class="campo-horario">
+                                <label for="Dis_end">Horário Término</label>
+                                <input type="time" name="Dis_end" id="Dis_end" min="08:00" max="19:00" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- CONTAINER DINÂMICO DOS HORÁRIOS DE ATENDIMENTO GERADOS -->
                 <div class="secao-horarios-gerados">
@@ -188,7 +184,7 @@ if (!empty($minhasDisponibilidades)) {
                     </div>
                 </div>
 
-                <div style="text-align: right; margin-top: 15px;">
+                <div class="disp-submit-row">
                     <button type="submit" id="btnSalvar" disabled>
                         <span>Salvar Disponibilidade</span>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -202,48 +198,56 @@ if (!empty($minhasDisponibilidades)) {
 
         <!-- LISTAGEM DAS DISPONIBILIDADES JÁ CADASTRADAS -->
         <div class="secao-cadastradas">
-            <h2>Disponibilidades Cadastradas</h2>
+            <div class="secao-cadastradas-header">
+                <h2>Disponibilidades Cadastradas</h2>
+            </div>
 
             <?php if (!empty($minhasDisponibilidades)): ?>
                 <div class="filtro-cadastradas-bar">
-                    <label><strong>Filtrar por Data:</strong></label>
-                    <select id="filtroAno" onchange="atualizarMeses()">
-                        <option value="nenhuma">Ano...</option>
-                        <option value="todas">Todos</option>
-                        <?php 
-                        $anosUnicos = array_unique(array_map(function($d) { return explode('-', $d)[0]; }, $datasCadastradas));
-                        foreach ($anosUnicos as $ano): ?>
-                            <option value="<?= htmlspecialchars($ano) ?>"><?= htmlspecialchars($ano) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    
-                    <select id="filtroMes" onchange="atualizarDias()" disabled>
-                        <option value="nenhuma">Mês...</option>
-                    </select>
+                    <div class="filtro-group-item">
+                        <label for="filtroAno"><strong>Filtrar por Data:</strong></label>
+                        <div class="filtro-selects-inline">
+                            <select id="filtroAno" onchange="atualizarMeses()">
+                                <option value="nenhuma">Ano...</option>
+                                <option value="todas">Todos</option>
+                                <?php 
+                                $anosUnicos = array_unique(array_map(function($d) { return explode('-', $d)[0]; }, $datasCadastradas));
+                                foreach ($anosUnicos as $ano): ?>
+                                    <option value="<?= htmlspecialchars($ano) ?>"><?= htmlspecialchars($ano) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            
+                            <select id="filtroMes" onchange="atualizarDias()" disabled>
+                                <option value="nenhuma">Mês...</option>
+                            </select>
 
-                    <select id="filtroDia" onchange="aplicarFiltroData()" disabled>
-                        <option value="nenhuma">Dia...</option>
-                    </select>
+                            <select id="filtroDia" onchange="aplicarFiltroData()" disabled>
+                                <option value="nenhuma">Dia...</option>
+                            </select>
+                        </div>
+                    </div>
 
-                    <label style="margin-left: 15px;"><strong>Filtrar por Serviço:</strong></label>
-                    <select id="filtroServico" onchange="aplicarFiltroData()">
-                        <option value="todos">Todos</option>
-                        <?php if (!empty($servicos)): ?>
-                            <?php foreach ($servicos as $ser): ?>
-                                <option value="<?= htmlspecialchars($ser['Ser_id']) ?>"><?= htmlspecialchars($ser['Ser_name']) ?></option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </select>
+                    <div class="filtro-group-item">
+                        <label for="filtroServico"><strong>Filtrar por Serviço:</strong></label>
+                        <select id="filtroServico" onchange="aplicarFiltroData()">
+                            <option value="todos">Todos</option>
+                            <?php if (!empty($servicos)): ?>
+                                <?php foreach ($servicos as $ser): ?>
+                                    <option value="<?= htmlspecialchars($ser['Ser_id']) ?>"><?= htmlspecialchars($ser['Ser_name']) ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- AÇÕES EM LOTE -->
-                <div id="acoes-lote-data" style="display: none;">
-                    <label><strong>Definir todos os horários desta data selecionada como:</strong></label>
-                    <div style="margin-top: 8px;">
-                        <button type="button" onclick="salvarLote('Disponivel')">✓ Disponível</button>
-                        <button type="button" onclick="salvarLote('Folga')">☕ Folga</button>
-                        <button type="button" onclick="salvarLote('Ferias')">✈ Férias</button>
-                        <button type="button" onclick="salvarLote('Bloqueado')">⛔ Bloqueado</button>
+                <div id="acoes-lote-data" class="lote-actions-card" style="display: none;">
+                    <label class="lote-actions-title"><strong>Definir todos os horários desta data selecionada como:</strong></label>
+                    <div class="lote-buttons-row">
+                        <button type="button" class="btn-lote btn-lote-disp" onclick="salvarLote('Disponivel')">✓ Disponível</button>
+                        <button type="button" class="btn-lote btn-lote-folga" onclick="salvarLote('Folga')">☕ Folga</button>
+                        <button type="button" class="btn-lote btn-lote-ferias" onclick="salvarLote('Ferias')">✈ Férias</button>
+                        <button type="button" class="btn-lote btn-lote-bloq" onclick="salvarLote('Bloqueado')">⛔ Bloqueado</button>
                     </div>
                     <!-- Formulário oculto preenchido pelo JS -->
                     <form action="../../controller/EditarDisponibilidade.php" method="POST" id="formLoteData"
@@ -253,7 +257,7 @@ if (!empty($minhasDisponibilidades)) {
 
                 <!-- TABELA DE DISPONIBILIDADES -->
                 <div class="table-disp-wrapper">
-                    <table id="tabelaDisponibilidades">
+                    <table id="tabelaDisponibilidades" class="disp-table">
                         <thead>
                             <tr>
                                 <th>Data</th>
@@ -267,27 +271,28 @@ if (!empty($minhasDisponibilidades)) {
                         </thead>
                         <tbody>
                             <?php foreach ($minhasDisponibilidades as $disp): ?>
+                                <?php
+                                    $dispStatusClass = 'status-disp-disponivel';
+                                    if ($disp['Ava_status'] === 'Folga') $dispStatusClass = 'status-disp-folga';
+                                    elseif ($disp['Ava_status'] === 'Ferias') $dispStatusClass = 'status-disp-ferias';
+                                    elseif ($disp['Ava_status'] === 'Bloqueado') $dispStatusClass = 'status-disp-bloqueado';
+                                ?>
                                 <tr data-data="<?= htmlspecialchars($disp['Ava_date']) ?>" data-ser-id="<?= htmlspecialchars($disp['Ser_id'] ?? '') ?>">
                                     <td><strong><?= date('d/m/Y', strtotime($disp['Ava_date'])) ?></strong></td>
-                                    <td><span
-                                            style="color: var(--gold-light); font-weight: 600;"><?= htmlspecialchars(substr($disp['Ava_start'], 0, 5)) ?></span>
-                                    </td>
-                                    <td><span
-                                            style="color: var(--text-muted);"><?= htmlspecialchars(substr($disp['Ava_end'], 0, 5)) ?></span>
-                                    </td>
-                                    <td><?= htmlspecialchars(!empty($disp['Ser_name']) ? $disp['Ser_name'] : '—') ?></td>
+                                    <td><span class="disp-time-start"><?= htmlspecialchars(substr($disp['Ava_start'], 0, 5)) ?></span></td>
+                                    <td><span class="disp-time-end"><?= htmlspecialchars(substr($disp['Ava_end'], 0, 5)) ?></span></td>
+                                    <td><span class="disp-service-name"><?= htmlspecialchars(!empty($disp['Ser_name']) ? $disp['Ser_name'] : '—') ?></span></td>
                                     <td>
-                                        <strong
-                                            style="color: <?= $disp['Ava_status'] === 'Disponivel' ? '#2ecc71' : ($disp['Ava_status'] === 'Folga' ? '#f1c40f' : ($disp['Ava_status'] === 'Ferias' ? '#3498db' : '#e74c3c')) ?>;">
+                                        <span class="status-pill <?= $dispStatusClass ?>">
                                             ● <?= htmlspecialchars($disp['Ava_status']) ?>
-                                        </strong>
+                                        </span>
                                     </td>
                                     <td>
                                         <!-- FORMULÁRIO DE EDIÇÃO POR AVA_ID -->
                                         <form action="../../controller/EditarDisponibilidade.php" method="POST"
-                                            style="display: inline-flex; align-items: center;">
+                                            class="edit-disp-form">
                                             <input type="hidden" name="Ava_id" value="<?= htmlspecialchars($disp['Ava_id']) ?>">
-                                            <select name="Ava_status" required>
+                                            <select name="Ava_status" class="select-disp-status" required>
                                                 <option value="Disponivel" <?= $disp['Ava_status'] === 'Disponivel' ? 'selected' : '' ?>>Disponível</option>
                                                 <option value="Folga" <?= $disp['Ava_status'] === 'Folga' ? 'selected' : '' ?>>
                                                     Folga</option>
@@ -295,7 +300,7 @@ if (!empty($minhasDisponibilidades)) {
                                                     Férias</option>
                                                 <option value="Bloqueado" <?= $disp['Ava_status'] === 'Bloqueado' ? 'selected' : '' ?>>Bloqueado</option>
                                             </select>
-                                            <button type="submit">Salvar</button>
+                                            <button type="submit" class="btn-save-disp">Salvar</button>
                                         </form>
                                     </td>
                                     <td style="text-align: center;">
@@ -304,7 +309,7 @@ if (!empty($minhasDisponibilidades)) {
                                             onsubmit="return confirm('Tem certeza que deseja excluir esta disponibilidade?');"
                                             style="margin: 0;">
                                             <input type="hidden" name="Ava_id" value="<?= htmlspecialchars($disp['Ava_id']) ?>">
-                                            <button type="submit">✕ Excluir</button>
+                                            <button type="submit" class="btn-delete-disp">✕ Excluir</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -314,8 +319,9 @@ if (!empty($minhasDisponibilidades)) {
                 </div>
 
             <?php else: ?>
-                <p style="color: var(--text-muted); font-size: 15px; margin-top: 15px;">Nenhuma disponibilidade cadastrada
-                    no momento.</p>
+                <div class="empty-disp-state">
+                    <p>Nenhuma disponibilidade cadastrada no momento.</p>
+                </div>
             <?php endif; ?>
         </div>
 

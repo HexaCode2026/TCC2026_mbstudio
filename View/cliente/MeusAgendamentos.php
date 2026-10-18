@@ -36,77 +36,108 @@ if ($cli_id) {
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Meus Agendamentos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Agendamentos | MB Studio</title>
     <link rel="stylesheet" href="../../assets/css/global.css">
     <link rel="stylesheet" href="../../assets/css/cliente/meusagendamentos.css">
 </head>
-<body style="background: #fdfcf9;">
+<body class="cliente-page">
 
+    <!-- Cabeçalho Oficial do Projeto -->
     <?php include '../components/Header.php'; ?>
 
-    <div class="page-container">
-        <h2 style="color: #111;">Meus Agendamentos</h2>
-        <p style="color: #666; margin-bottom: 20px;">Acompanhe o status das suas solicitações. Lembre-se: o salão precisa confirmar o seu horário.</p>
+    <main class="appointments-page-wrapper">
+        <div class="appointments-container">
+            <div class="appointments-header-box">
+                <span class="tag-subtitulo" style="font-size: 12px; font-weight: 700; color: var(--gold-dark); letter-spacing: 2px; text-transform: uppercase;">✦ Minha Conta ✦</span>
+                <h1 class="appointments-title">Meus Agendamentos</h1>
+                <p class="appointments-desc">Acompanhe o status das suas solicitações de atendimento no MB Studio em tempo real.</p>
+            </div>
 
-        <?php if (isset($_GET['sucesso'])): ?>
-            <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 6px; margin-bottom: 20px;">
-                <?php
-                if ($_GET['sucesso'] == 'agendamento_cancelado') {
-                    echo "Seu agendamento foi cancelado com sucesso.";
-                } else {
-                    echo "Agendamento solicitado com sucesso! Aguarde a confirmação do profissional.";
-                }
-                ?>
-            </div>
-        <?php endif; ?>
-        <?php if (isset($_GET['erro'])): ?>
-            <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 6px; margin-bottom: 20px;">
-                Ocorreu um erro ao processar sua solicitação. Tente novamente.
-            </div>
-        <?php endif; ?>
+            <?php if (isset($_GET['sucesso'])): ?>
+                <div class="alert-feedback success">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>
+                        <?php
+                        if ($_GET['sucesso'] == 'agendamento_cancelado') {
+                            echo "Seu agendamento foi cancelado com sucesso.";
+                        } else {
+                            echo "Agendamento solicitado com sucesso! Aguarde a confirmação do profissional.";
+                        }
+                        ?>
+                    </span>
+                </div>
+            <?php endif; ?>
 
-        <?php if (count($agendamentos) > 0): ?>
-            <table class="table-mini">
-                <tr>
-                    <th>Data</th>
-                    <th>Hora</th>
-                    <th>Serviço</th>
-                    <th>Profissional</th>
-                    <th>Status</th>
-                    <th style="text-align: center;">Ações</th>
-                </tr>
-                <?php foreach ($agendamentos as $a): 
-                    $statusClass = 'status-' . explode(' ', $a['Appo_status'])[0]; 
-                ?>
-                <tr>
-                    <td><?= date('d/m/Y', strtotime($a['Appo_date'])) ?></td>
-                    <td><?= date('H:i', strtotime($a['Appo_start'])) ?></td>
-                    <td><?= htmlspecialchars($a['Ser_name']) ?></td>
-                    <td><?= htmlspecialchars($a['Funcionario']) ?></td>
-                    <td><span class="status-badge <?= $statusClass ?>"><?= htmlspecialchars($a['Appo_status']) ?></span></td>
-                    <td style="text-align: center;">
-                        <?php if ($a['Appo_status'] == 'Pendente' || $a['Appo_status'] == 'Confirmado'): ?>
-                            <form action="../../controller/CancelarAgendamento.php" method="POST" style="margin: 0; display: inline-block;" onsubmit="return confirm('Tem certeza que deseja cancelar este agendamento?');">
-                                <input type="hidden" name="appo_id" value="<?= $a['Appo_id'] ?>">
-                                <input type="hidden" name="cancel_reason" value="Cancelado pelo Cliente via painel">
-                                <button type="submit" style="background: none; border: none; color: #dc3545; font-weight: bold; cursor: pointer; text-decoration: underline;">
-                                    Cancelar
-                                </button>
-                            </form>
-                        <?php else: ?>
-                            <span style="color: #ccc;">-</span>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            </table>
-        <?php else: ?>
-            <div style="text-align: center; padding: 40px; color: #999;">
-                <p>Você não possui nenhum agendamento no momento.</p>
-                <a href="Servicos.php" style="color: #b98527; font-weight: bold; text-decoration: none;">Ver Serviços</a>
-            </div>
-        <?php endif; ?>
-    </div>
+            <?php if (isset($_GET['erro'])): ?>
+                <div class="alert-feedback error">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span>Ocorreu um erro ao processar sua solicitação. Tente novamente.</span>
+                </div>
+            <?php endif; ?>
+
+            <?php if (count($agendamentos) > 0): ?>
+                <div class="table-container">
+                    <table class="appointments-table table-mini">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Horário</th>
+                                <th>Procedimento</th>
+                                <th>Especialista</th>
+                                <th>Status</th>
+                                <th style="text-align: center;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($agendamentos as $a): 
+                                $statusClass = 'status-' . explode(' ', $a['Appo_status'])[0]; 
+                            ?>
+                            <tr>
+                                <td><strong><?= date('d/m/Y', strtotime($a['Appo_date'])) ?></strong></td>
+                                <td><?= date('H:i', strtotime($a['Appo_start'])) ?></td>
+                                <td><?= htmlspecialchars($a['Ser_name']) ?></td>
+                                <td><?= htmlspecialchars($a['Funcionario']) ?></td>
+                                <td><span class="status-badge <?= $statusClass ?>"><?= htmlspecialchars($a['Appo_status']) ?></span></td>
+                                <td style="text-align: center;">
+                                    <?php if ($a['Appo_status'] == 'Pendente' || $a['Appo_status'] == 'Confirmado'): ?>
+                                        <form action="../../controller/CancelarAgendamento.php" method="POST" style="margin: 0; display: inline-block;" onsubmit="return confirm('Tem certeza que deseja cancelar este agendamento?');">
+                                            <input type="hidden" name="appo_id" value="<?= $a['Appo_id'] ?>">
+                                            <input type="hidden" name="cancel_reason" value="Cancelado pelo Cliente via painel">
+                                            <button type="submit" class="btn-cancel-appo">
+                                                Cancelar
+                                            </button>
+                                        </form>
+                                    <?php else: ?>
+                                        <span style="color: #a1a1aa; font-size: 13px;">—</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php else: ?>
+                <div class="empty-appo-card">
+                    <div class="empty-appo-icon">📅</div>
+                    <h3 class="empty-appo-title">Nenhum agendamento encontrado</h3>
+                    <p class="empty-appo-desc">Você ainda não possui horários marcados no estúdio. Escolha um serviço e agende seu horário com nossos especialistas.</p>
+                    <a href="Servicos.php" class="btn-gold">
+                        Agendar Primeiro Horário
+                    </a>
+                </div>
+            <?php endif; ?>
+        </div>
+    </main>
+
+    <!-- Modal Global de Autenticação -->
+    <?php include '../components/LoginModal.php'; ?>
 
 </body>
 </html>

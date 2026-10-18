@@ -17,9 +17,9 @@ $servicos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Serviços | MB Studio</title>
 
-    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/global.css?v=<?= @filemtime(__DIR__ . '/../../assets/css/global.css') ?: '2.4' ?>">
 
-    <link rel="stylesheet" href="../../assets/css/cliente/servicos.css">
+    <link rel="stylesheet" href="../../assets/css/cliente/servicos.css?v=<?= @filemtime(__DIR__ . '/../../assets/css/cliente/servicos.css') ?: '2.4' ?>">
 </head>
 
 <body>

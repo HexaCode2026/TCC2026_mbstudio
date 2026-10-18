@@ -6,21 +6,28 @@ $userName = isset($_SESSION['User_name']) ? $_SESSION['User_name'] : null;
 $docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/');
 $projectRoot = str_replace('\\', '/', realpath(__DIR__ . '/../../'));
 $basePath = str_ireplace($docRoot, '', $projectRoot);
+$authCssVer = @filemtime(__DIR__ . '/../../assets/css/components/authbutton.css') ?: '2.2';
 ?>
 
-<link rel="stylesheet" href="<?= $basePath ?>/assets/css/components/authbutton.css">
+<link rel="stylesheet" href="<?= $basePath ?>/assets/css/components/authbutton.css?v=<?= $authCssVer ?>">
 
 <div class="auth-floating-container">
     <?php if ($userName): ?>
-        <div class="auth-dropdown">
-            <div class="auth-btn">
-                <div class="auth-icon"><?= strtoupper(substr($userName, 0, 1)) ?></div>
-                Olá, <?= htmlspecialchars(explode(' ', $userName)[0]) ?>
-            </div>
+        <div class="auth-dropdown" id="desktopAuthDropdown">
+            <button type="button" class="auth-btn" id="desktopAuthToggle" aria-expanded="false" aria-haspopup="true">
+                <div class="auth-icon"><?= strtoupper(substr(trim($userName), 0, 1)) ?></div>
+                <span>Olá, <?= htmlspecialchars(explode(' ', trim($userName))[0]) ?></span>
+                <svg class="auth-dots-indicator" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <circle cx="12" cy="5" r="2"></circle>
+                    <circle cx="12" cy="12" r="2"></circle>
+                    <circle cx="12" cy="19" r="2"></circle>
+                </svg>
+            </button>
             <div class="auth-dropdown-content">
                 <div class="auth-dropdown-menu">
                     <?php if (isset($_SESSION['User_perm']) && $_SESSION['User_perm'] == 'F'): ?>
                         <a href="<?= $basePath ?>/View/funcionario/Agenda.php" class="auth-dropdown-item">Minha Agenda</a>
+                        <a href="<?= $basePath ?>/View/funcionario/Perfil.php" class="auth-dropdown-item">Meu Perfil</a>
                     <?php elseif (isset($_SESSION['User_perm']) && $_SESSION['User_perm'] == 'A'): ?>
                         <a href="<?= $basePath ?>/View/admin/Dashboard.php" class="auth-dropdown-item">Painel Administrativo</a>
                     <?php else: ?>

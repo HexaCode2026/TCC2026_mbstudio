@@ -5,6 +5,10 @@ require_once __DIR__ . "/../model/User.php";
 require_once __DIR__ . "/../core/Session.php";
 require_once __DIR__ . "/../helpers/EmailHelper.php";
 
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $data = json_decode(file_get_contents('php://input'), true);
     if (!$data) {
@@ -20,53 +24,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    $usuario = new User($pdo);
-    $userExistente = $usuario->login($email);
-
-    if ($userExistente) {
-        if ($userExistente['User_active'] == 1) {
-            echo json_encode(['success' => false, 'message' => 'Este email já foi cadastrado e verificado! Faça login.']);
-            exit;
-        } else {
-            // E-mail existe, mas não foi verificado. Atualizar os dados e reenviar o código.
-            $userId = $userExistente['User_id'];
-            $usuario->atualizarDadosInativos($userId, $nome, $senha);
-            
-            $codigo = $usuario->gerarCodigoVerificacao($userId, 'Cadastro');
-            EmailHelper::enviarCodigo($email, $codigo, 'Cadastro');
-
-            if(session_status() == PHP_SESSION_NONE) { session_start(); }
-            $_SESSION['verificar_user_id'] = $userId;
-            $_SESSION['verificar_tipo'] = 'Cadastro';
-
-            echo json_encode([
-                'success' => true, 
-                'action' => 'verify',
-                'message' => 'Seu cadastro estava pendente. Um novo código de verificação foi enviado para seu e-mail!'
-            ]);
-            exit;
-        }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo json_encode(['success' => false, 'message' => 'Informe um endereço de e-mail válido.']);
+        exit;
     }
 
-    $userId = $usuario->cadastrar($nome, $email, $senha);
+    $usuario = new User($pdo);
 
-    if ($userId) {
-        $codigo = $usuario->gerarCodigoVerificacao($userId, 'Cadastro');
-        EmailHelper::enviarCodigo($email, $codigo, 'Cadastro');
+    // Verifica se o e-mail já está confirmado e cadastrado no banco de dados
+    if ($usuario->emailExiste($email)) {
+        echo json_encode(['success' => false, 'message' => 'Este e-mail já foi cadastrado e verificado! Faça login.']);
+        exit;
+    }
 
-        if(session_status() == PHP_SESSION_NONE) { session_start(); }
-        $_SESSION['verificar_user_id'] = $userId;
+    // Proteção contra sobrecarga: evita reenvio repetido em menos de 30 segundos para o mesmo e-mail
+    if (
+        isset($_SESSION['pending_registration']) &&
+        strcasecmp($_SESSION['pending_registration']['email'] ?? '', $email) === 0 &&
+        isset($_SESSION['pending_registration']['sent_at']) &&
+        (time() - $_SESSION['pending_registration']['sent_at']) < 30 &&
+        (time() < ($_SESSION['pending_registration']['expires_at'] ?? 0))
+    ) {
+        // Atualiza nome/senha na sessão caso o usuário tenha corrigido, mantendo o código já enviado recentemente
+        $_SESSION['pending_registration']['nome'] = $nome;
+        $_SESSION['pending_registration']['senha_hash'] = password_hash($senha, PASSWORD_DEFAULT);
         $_SESSION['verificar_tipo'] = 'Cadastro';
 
         echo json_encode([
-            'success' => true, 
+            'success' => true,
             'action' => 'verify',
-            'message' => 'Cadastro realizado! Verifique seu e-mail para ativar a conta.'
+            'message' => 'Um código já foi enviado recentemente para seu e-mail. Digite-o abaixo para confirmar o cadastro.'
         ]);
         exit;
     }
 
-    echo json_encode(['success' => false, 'message' => 'Erro ao realizar cadastro. Tente novamente mais tarde.']);
+    // Gera o código de 6 dígitos e guarda os dados APENAS na sessão até a confirmação
+    $codigo = (string) random_int(100000, 999999);
+
+    $_SESSION['pending_registration'] = [
+        'nome'       => $nome,
+        'email'      => $email,
+        'senha_hash' => password_hash($senha, PASSWORD_DEFAULT),
+        'token_hash' => password_hash($codigo, PASSWORD_DEFAULT),
+        'sent_at'    => time(),
+        'expires_at' => time() + (15 * 60), // Expira em 15 minutos
+        'attempts'   => 0
+    ];
+    $_SESSION['verificar_tipo'] = 'Cadastro';
+    unset($_SESSION['verificar_user_id']);
+
+    EmailHelper::enviarCodigo($email, $codigo, 'Cadastro');
+
+    echo json_encode([
+        'success' => true,
+        'action' => 'verify',
+        'message' => 'Enviamos um código de verificação para seu e-mail. Confirme-o para concluir o cadastro!'
+    ]);
     exit;
 }
 

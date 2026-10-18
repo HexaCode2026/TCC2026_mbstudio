@@ -85,8 +85,9 @@ if (!empty($appointments)) {
         </div>
 
         <?php if (isset($_GET['sucesso']) && $_GET['sucesso'] == 'atendimento_concluido'): ?>
-            <div style="background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.4); color: #2ecc71; padding: 15px; border-radius: 8px; margin-bottom: 25px; text-align: center; font-weight: 600;">
-                Atendimento finalizado e pagamento registrado com sucesso.
+            <div class="alert alert-success" style="margin-bottom: 25px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span>Atendimento finalizado e pagamento registrado com sucesso.</span>
             </div>
         <?php endif; ?>
 
@@ -98,8 +99,9 @@ if (!empty($appointments)) {
                 elseif ($_GET['erro'] == 'falha_permissao_ou_status') $msgErro = "Falha ao finalizar: verifique se o atendimento realmente se encontra 'Em Atendimento'.";
                 elseif ($_GET['erro'] == 'funcionario_nao_encontrado') $msgErro = "Funcionário não localizado no sistema.";
             ?>
-            <div style="background: rgba(231, 76, 60, 0.1); border: 1px solid rgba(231, 76, 60, 0.4); color: #e74c3c; padding: 15px; border-radius: 8px; margin-bottom: 25px; text-align: center; font-weight: 600;">
-                <?= htmlspecialchars($msgErro, ENT_QUOTES, 'UTF-8') ?>
+            <div class="alert alert-error" style="margin-bottom: 25px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span><?= htmlspecialchars($msgErro, ENT_QUOTES, 'UTF-8') ?></span>
             </div>
         <?php endif; ?>
 
@@ -151,10 +153,10 @@ if (!empty($appointments)) {
                             <tr data-data="<?= htmlspecialchars($app['Appo_date']) ?>" data-status="<?= htmlspecialchars($app['Appo_status']) ?>">
                                 <td>
                                     <strong><?= date('d/m/Y', strtotime($app['Appo_date'])) ?></strong><br>
-                                    <span style="color: var(--gold-light); font-size: 12px;"><?= htmlspecialchars(substr($app['Appo_start'], 0, 5)) ?> às <?= htmlspecialchars(substr($app['Appo_end'], 0, 5)) ?></span>
+                                    <span class="time-range-badge"><?= htmlspecialchars(substr($app['Appo_start'], 0, 5)) ?> às <?= htmlspecialchars(substr($app['Appo_end'], 0, 5)) ?></span>
                                 </td>
                                 <td><span class="client-name-cell"><?= htmlspecialchars($app['client_name']) ?></span></td>
-                                <td><span style="color: #e0e0e0;"><?= htmlspecialchars($app['emp_name']) ?></span></td>
+                                <td><span style="color: var(--text-secondary); font-weight: 500;"><?= htmlspecialchars($app['emp_name']) ?></span></td>
                                 <td class="service-info-cell">
                                     <strong><?= htmlspecialchars($app['Ser_name']) ?></strong>
                                     <small>R$ <?= number_format($app['Ser_price'], 2, ',', '.') ?></small>
@@ -172,7 +174,7 @@ if (!empty($appointments)) {
                                         ● <?= htmlspecialchars($app['Appo_status']) ?>
                                     </span>
                                     <?php if ($app['Appo_payment_method']): ?>
-                                        <div style="margin-top: 4px; font-size: 11px; color: var(--gold-primary);">Pago via: <?= htmlspecialchars($app['Appo_payment_method']) ?></div>
+                                        <div style="margin-top: 4px; font-size: 11.5px; font-weight: 600; color: var(--gold-darker);">Pago via: <?= htmlspecialchars($app['Appo_payment_method']) ?></div>
                                     <?php endif; ?>
                                 </td>
                                 <td>

@@ -1,36 +1,191 @@
-.page-container {
-            max-width: 900px;
-            margin: 100px auto 40px;
-            padding: 20px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            font-family: sans-serif;
-        }
-        .table-mini {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .table-mini th {
-            background: #f4f0e6;
-            color: #b98527;
-            padding: 12px;
-            text-align: left;
-            border-bottom: 2px solid #e2d7c1;
-        }
-        .table-mini td {
-            padding: 12px;
-            border-bottom: 1px solid #f0f0f0;
-            color: #333;
-        }
-        .status-badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .status-Pendente { background: #fff3cd; color: #856404; }
-        .status-Confirmado { background: #d4edda; color: #155724; }
-        .status-Cancelado { background: #f8d7da; color: #721c24; }
-        .status-Concluido { background: #cce5ff; color: #004085; }
+/* ==========================================================================
+   MB STUDIO — MEUS AGENDAMENTOS (HISTÓRICO DO CLIENTE)
+   Padrão: Linear, Stripe & Vercel | Surface Architecture & Data Tables
+   ========================================================================== */
+
+.appointments-page-wrapper {
+    min-height: calc(100vh - 72px);
+    padding: clamp(32px, 5vw, 56px) clamp(16px, 4vw, 40px) 80px;
+    background: radial-gradient(circle at 15% 80%, rgba(212, 175, 55, 0.04) 0%, transparent 40%), var(--bg-canvas, #FAFAFA);
+    overflow-x: clip;
+}
+
+.appointments-container {
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.appointments-header-box {
+    margin-bottom: 28px;
+    text-align: left;
+}
+
+.appointments-title {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: clamp(24px, 3.5vw, 32px);
+    font-weight: 700;
+    color: var(--text-primary, #0F172A);
+    letter-spacing: -0.025em;
+    margin-bottom: 6px;
+}
+
+.appointments-desc {
+    font-size: 14.5px;
+    color: var(--text-muted, #64748B);
+}
+
+/* Alertas de Feedback */
+.alert-feedback {
+    padding: 14px 18px;
+    border-radius: var(--radius-md, 8px);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow-resting);
+}
+
+.alert-feedback.success {
+    background: var(--color-success-bg, #ECFDF5);
+    border: 1px solid var(--color-success-border, #A7F3D0);
+    color: var(--color-success, #047857);
+}
+
+.alert-feedback.error {
+    background: var(--color-error-bg, #FEF2F2);
+    border: 1px solid var(--color-error-border, #FECACA);
+    color: var(--color-error, #B91C1C);
+}
+
+/* Tabela de Agendamentos */
+.table-mini,
+.appointments-table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.appointments-table th,
+.table-mini th {
+    background: var(--bg-subtle, #F8FAFC);
+    color: var(--text-muted, #64748B);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border, #E2E8F0);
+}
+
+.appointments-table td,
+.table-mini td {
+    padding: 15px 18px;
+    border-bottom: 1px solid var(--border-fine, rgba(0, 0, 0, 0.06));
+    font-size: 14px;
+    color: var(--text-secondary, #334155);
+    vertical-align: middle;
+    transition: background-color 150ms ease;
+}
+
+.appointments-table tbody tr:last-child td,
+.table-mini tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.appointments-table tbody tr:hover td,
+.table-mini tbody tr:hover td {
+    background-color: var(--bg-subtle, #F8FAFC);
+}
+
+/* Badges de Status do Cliente */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: var(--radius-full, 9999px);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: capitalize;
+}
+
+.status-badge.status-Pendente {
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    color: #B45309;
+}
+
+.status-badge.status-Confirmado {
+    background: #ECFDF5;
+    border: 1px solid #A7F3D0;
+    color: #047857;
+}
+
+.status-badge.status-Cancelado {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    color: #B91C1C;
+}
+
+.status-badge.status-Concluido {
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    color: #1D4ED8;
+}
+
+/* Botão de Cancelar */
+.btn-cancel-appo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    color: #B91C1C;
+    padding: 6px 14px;
+    min-height: 36px;
+    border-radius: var(--radius-full, 9999px);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast, 150ms ease);
+}
+
+.btn-cancel-appo:hover {
+    background: #DC2626;
+    border-color: #DC2626;
+    color: #FFFFFF;
+}
+
+/* Estado Vazio */
+.empty-appo-card {
+    background: var(--bg-card, #FFFFFF);
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: var(--radius-lg, 12px);
+    padding: 48px 24px;
+    text-align: center;
+    box-shadow: var(--shadow-resting);
+}
+
+.empty-appo-icon {
+    font-size: 40px;
+    margin-bottom: 14px;
+}
+
+.empty-appo-title {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: 20px;
+    color: var(--text-primary, #0F172A);
+    margin-bottom: 8px;
+}
+
+.empty-appo-desc {
+    font-size: 14.5px;
+    color: var(--text-muted, #64748B);
+    max-width: 440px;
+    margin: 0 auto 24px auto;
+}

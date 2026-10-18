@@ -1,29 +1,228 @@
-.mini-card {
-            border: 1px solid #d4af37;
-            padding: 20px;
-            max-width: 500px;
-            margin: 40px auto;
-            border-radius: 12px;
-            background: #fff;
-            box-shadow: 0 4px 12px rgba(185,133,39,0.1);
-            text-align: left;
-            font-family: sans-serif;
-        }
-        .mini-card p {
-            margin: 8px 0;
-            color: #333;
-        }
-        .btn-gold {
-            background: #b98527;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 15px;
-        }
-        .btn-gold:hover {
-            background: #d4af37;
-        }
+/* ==========================================================================
+   MB STUDIO — AGENDAMENTO (ETAPA 4: CONFIRMAÇÃO DO PEDIDO)
+   Padrão: Luxury Checkout Card | Mobile Ergonomics
+   ========================================================================== */
+
+.confirm-page-wrapper {
+    min-height: calc(100vh - 72px);
+    position: relative;
+    overflow-x: clip;
+    padding: clamp(32px, 5vw, 60px) clamp(16px, 4vw, 40px) 80px;
+    background: radial-gradient(circle at 15% 80%, rgba(212, 175, 55, 0.05) 0%, transparent 40%), var(--bg-body, #fbfaf7);
+}
+
+.confirm-container {
+    max-width: 680px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+/* Stepper de Progresso */
+.steps-progress-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border: 1px solid var(--border-subtle, #e4e4e7);
+    border-radius: var(--radius-lg, 18px);
+    padding: 16px 24px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow-card, 0 10px 25px rgba(0, 0, 0, 0.04));
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-muted, #71717a);
+}
+
+.step-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f4f4f5;
+    color: #71717a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.step-item.active {
+    color: var(--gold-dark, #b8860b);
+    font-weight: 700;
+}
+
+.step-item.active .step-badge {
+    background: var(--gold-primary, #d4af37);
+    color: #0f1115;
+}
+
+.step-item.completed {
+    color: var(--text-primary, #18181b);
+}
+
+.step-item.completed .step-badge {
+    background: var(--color-success-bg, rgba(16, 185, 129, 0.15));
+    color: var(--color-success, #10b981);
+    border: 1px solid var(--color-success-border, rgba(16, 185, 129, 0.3));
+}
+
+.step-divider {
+    flex: 1;
+    height: 1px;
+    background: var(--border-subtle, #e4e4e7);
+    margin: 0 12px;
+}
+
+/* Header */
+.confirm-header-box {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.confirm-title {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: clamp(24px, 3.5vw, 32px);
+    font-weight: 700;
+    color: var(--text-primary, #18181b);
+    margin-bottom: 8px;
+}
+
+.confirm-subtitle {
+    font-size: 14.5px;
+    color: var(--text-secondary, #52525b);
+}
+
+/* Card Principal de Confirmação */
+.mini-card,
+.confirm-card {
+    background: #ffffff;
+    border: 1px solid var(--border-subtle, #e4e4e7);
+    border-radius: var(--radius-lg, 18px);
+    padding: clamp(24px, 5vw, 36px);
+    box-shadow: var(--shadow-card, 0 10px 25px rgba(0, 0, 0, 0.04));
+    text-align: left;
+}
+
+.confirm-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border-subtle, #f4f4f5);
+    margin-bottom: 22px;
+}
+
+.confirm-card-header h3 {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: 19px;
+    color: var(--text-primary, #18181b);
+    margin: 0;
+}
+
+.order-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.order-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--border-subtle, #f4f4f5);
+}
+
+.order-item-row .label {
+    font-size: 14px;
+    color: var(--text-muted, #71717a);
+}
+
+.order-item-row .val {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--text-primary, #18181b);
+    text-align: right;
+}
+
+.order-item-row.price-highlight .val {
+    color: var(--gold-dark, #b8860b);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* Campo de Observações */
+.form-group-obs {
+    margin-top: 20px;
+    margin-bottom: 24px;
+}
+
+.form-group-obs label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-secondary, #52525b);
+}
+
+.form-group-obs textarea {
+    width: 100%;
+    min-height: 90px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-medium, #d4d4d8);
+    border-radius: var(--radius-sm, 8px);
+    font-size: 16px; /* 16px previne zoom no iOS */
+    color: var(--text-primary, #18181b);
+    outline: none;
+    resize: vertical;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-group-obs textarea:focus {
+    border-color: var(--gold-primary, #d4af37);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+/* Botão de Envio */
+.btn-confirm-submit {
+    width: 100%;
+    min-height: 48px;
+    padding: 14px 24px;
+    background: var(--gold-gradient, linear-gradient(135deg, #d4af37, #b8860b));
+    color: #0f1115;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius-full, 9999px);
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-confirm-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.45);
+    filter: brightness(1.05);
+}
+
+@media (max-width: 640px) {
+    .steps-progress-bar {
+        padding: 12px 14px;
+    }
+
+    .step-text {
+        display: none;
+    }
+}

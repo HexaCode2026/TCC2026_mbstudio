@@ -1,428 +1,303 @@
-:root {
-            --preto: #111111;
-            --dourado: #b98527;
-            --dourado-claro: #d6b56e;
-            --fundo: #fdfcf9;
-            --card: #f8f2e9;
-            --borda: #eee8df;
-        }
+/* ==========================================================================
+   MB STUDIO — CATÁLOGO DE SERVIÇOS DO CLIENTE
+   Padrão: Luxury Cards & Modern Grid | Mobile-First Ergonomics
+   ========================================================================== */
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+.servicos-page {
+    min-height: calc(100vh - 72px);
+    position: relative;
+    overflow-x: clip;
+    padding: clamp(36px, 5vw, 64px) clamp(16px, 5vw, 60px);
+    background: radial-gradient(circle at 15% 80%, rgba(212, 175, 55, 0.05) 0%, transparent 40%), var(--bg-body, #fbfaf7);
+}
 
-        html {
-            scroll-behavior: smooth;
-        }
+/* Decorações Elegantes de Fundo */
+.decoracao {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.35;
+}
 
-        body {
-            background: var(--fundo);
-            color: var(--preto);
-            font-family: Arial, Helvetica, sans-serif;
-            min-height: 100vh;
-            padding-top: 75px;
-            overflow-x: hidden;
-        }
+.decoracao-esquerda {
+    width: 210px;
+    height: 500px;
+    left: -100px;
+    top: 170px;
+    border-right: 1px solid var(--gold-border, rgba(212, 175, 55, 0.35));
+    border-radius: 50%;
+}
 
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
+.decoracao-esquerda::before,
+.decoracao-esquerda::after {
+    content: "";
+    position: absolute;
+    border-right: 1px solid var(--gold-border, rgba(212, 175, 55, 0.35));
+    border-radius: 50%;
+}
 
-        .servicos-page {
-            min-height: calc(100vh - 75px);
-            position: relative;
-            overflow: hidden;
-            padding: 42px 9% 60px;
-            background:
-                radial-gradient(
-                    circle at 15% 80%,
-                    rgba(185, 133, 39, 0.035),
-                    transparent 28%
-                ),
-                var(--fundo);
-        }
+.decoracao-esquerda::before {
+    width: 180px;
+    height: 450px;
+    top: 20px;
+    left: 25px;
+}
 
-        /* Decorações do Fundo */
-        .decoracao {
-            position: absolute;
-            pointer-events: none;
-            opacity: 0.45;
-        }
+.decoracao-esquerda::after {
+    width: 150px;
+    height: 400px;
+    top: 45px;
+    left: 50px;
+}
 
-        .decoracao-esquerda {
-            width: 210px;
-            height: 500px;
-            left: -100px;
-            top: 170px;
-            border-right: 1px solid var(--dourado-claro);
-            border-radius: 50%;
-        }
+.decoracao-direita {
+    width: 300px;
+    height: 650px;
+    right: -180px;
+    top: -50px;
+    border-left: 1px solid var(--gold-border, rgba(212, 175, 55, 0.35));
+    border-radius: 50%;
+}
 
-        .decoracao-esquerda::before,
-        .decoracao-esquerda::after {
-            content: "";
-            position: absolute;
-            border-right: 1px solid var(--dourado-claro);
-            border-radius: 50%;
-        }
+/* Seção de Introdução */
+.intro {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+    padding-bottom: 24px;
+}
 
-        .decoracao-esquerda::before {
-            width: 180px;
-            height: 450px;
-            top: 20px;
-            left: 25px;
-        }
+.intro-text {
+    max-width: 600px;
+}
 
-        .decoracao-esquerda::after {
-            width: 150px;
-            height: 400px;
-            top: 45px;
-            left: 50px;
-        }
+.subtitulo {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--gold-dark, #b8860b);
+    font-weight: 700;
+    margin-bottom: 12px;
+}
 
-        .decoracao-direita {
-            width: 300px;
-            height: 650px;
-            right: -180px;
-            top: -50px;
-            border-left: 1px solid var(--dourado-claro);
-            border-radius: 50%;
-        }
+.intro h1 {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: clamp(30px, 4vw, 48px);
+    font-weight: 700;
+    line-height: 1.18;
+    color: var(--text-primary, #18181b);
+    margin-bottom: 14px;
+}
 
-        .decoracao-direita::before,
-        .decoracao-direita::after {
-            content: "";
-            position: absolute;
-            border-left: 1px solid var(--dourado-claro);
-            border-radius: 50%;
-        }
+.intro h1 span {
+    color: var(--gold-primary, #d4af37);
+    font-family: var(--font-cursive, 'Alex Brush', cursive);
+    font-size: 1.25em;
+    font-weight: 400;
+}
 
-        .decoracao-direita::before {
-            width: 270px;
-            height: 600px;
-            right: 25px;
-            top: 25px;
-        }
+.linha-titulo {
+    width: 60px;
+    height: 2px;
+    background: var(--gold-gradient, linear-gradient(135deg, #d4af37, #b8860b));
+    margin-bottom: 16px;
+    border-radius: var(--radius-full, 9999px);
+}
 
-        .decoracao-direita::after {
-            width: 240px;
-            height: 550px;
-            right: 50px;
-            top: 50px;
-        }
+.intro p {
+    font-size: 15.5px;
+    color: var(--text-secondary, #52525b);
+    line-height: 1.6;
+}
 
-        /* Introdução */
-        .intro {
-            width: 100%;
-            min-height: 235px;
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-            z-index: 2;
-            margin-bottom: 20px;
-        }
+/* Ilustração Decorativa */
+.ilustracao {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: var(--gold-primary, #d4af37);
+    opacity: 0.75;
+}
 
-        .intro-text {
-            padding-left: 5px;
-        }
+.ilustracao .tesoura {
+    font-size: 48px;
+    transform: rotate(-15deg);
+}
 
-        .subtitulo {
-            color: var(--dourado);
-            font-size: 15px;
-            letter-spacing: 3px;
-            display: block;
-            margin-bottom: 17px;
-        }
+.ilustracao .pente {
+    font-size: 36px;
+    letter-spacing: -2px;
+}
 
-        .intro h1 {
-            font-family: Georgia, "Times New Roman", serif;
-            font-weight: 400;
-            font-size: 48px;
-            line-height: 0.98;
-            letter-spacing: -1px;
-        }
+.ilustracao .secador {
+    font-size: 40px;
+}
 
-        .intro h1 span {
-            color: var(--dourado);
-        }
+.ilustracao .brilho {
+    font-size: 24px;
+}
 
-        .linha-titulo {
-            width: 65px;
-            height: 2px;
-            background: var(--dourado);
-            margin-top: 23px;
-            margin-bottom: 16px;
-        }
+/* Grid de Serviços */
+.servicos-grid {
+    max-width: 1240px;
+    margin: 40px auto 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: clamp(20px, 3vw, 32px);
+    position: relative;
+    z-index: 2;
+}
 
-        .intro p {
-            font-size: 16px;
-            line-height: 1.7;
-            color: #151515;
-        }
+/* Cards de Serviço */
+.servico-card {
+    background: #ffffff;
+    border: 1px solid var(--border-subtle, #e4e4e7);
+    border-radius: var(--radius-lg, 18px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 24px 22px;
+    text-align: center;
+    box-shadow: var(--shadow-card, 0 10px 25px rgba(0, 0, 0, 0.04));
+    transition: transform var(--transition-base, 0.25s), box-shadow var(--transition-base, 0.25s), border-color var(--transition-base, 0.25s);
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+}
 
-        /* Ilustração */
-        .ilustracao {
-            width: 500px;
-            height: 200px;
-            margin-right: 20px;
-            position: relative;
-            color: var(--dourado-claro);
-            opacity: 0.72;
-            user-select: none;
-            pointer-events: none;
-        }
+.servico-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--gold-border-strong, rgba(212, 175, 55, 0.7));
+    box-shadow: var(--shadow-gold, 0 14px 34px rgba(212, 175, 55, 0.2));
+}
 
-        .tesoura {
-            position: absolute;
-            left: 20px;
-            top: 42px;
-            font-size: 72px;
-            transform: rotate(-28deg);
-            font-family: Georgia, serif;
-        }
+.servico-card:active {
+    transform: translateY(-2px);
+}
 
-        .pente {
-            position: absolute;
-            left: 150px;
-            top: 22px;
-            font-size: 78px;
-            transform: rotate(19deg);
-        }
+/* Moldura de Imagem do Serviço */
+.servico-icone {
+    width: 100% !important;
+    height: 220px !important;
+    max-height: 220px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold-dark, #b8860b);
+    margin-bottom: 18px;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    box-shadow: 0 4px 14px rgba(184, 134, 11, 0.10);
+    background: linear-gradient(135deg, #fdfcf9, #f7f1e6);
+    flex-shrink: 0;
+    position: relative;
+}
 
-        .secador {
-            position: absolute;
-            right: 65px;
-            top: 42px;
-            width: 160px;
-            height: 65px;
-            border: 1px solid var(--dourado-claro);
-            border-radius: 35px;
-            font-size: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: rotate(5deg);
-        }
+.servico-icone img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 220px !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+    border-radius: 11px !important;
+    display: block !important;
+    transition: transform 0.35s ease;
+}
 
-        .brilho {
-            position: absolute;
-            font-family: Georgia, serif;
-            font-size: 29px;
-        }
+.servico-card:hover .servico-icone img {
+    transform: scale(1.04);
+}
 
-        .brilho-1 {
-            left: 0;
-            top: 45px;
-        }
+.icone-tesoura {
+    font-family: Georgia, serif;
+    font-size: 56px;
+    line-height: 1;
+    transform: rotate(-10deg);
+    display: inline-block;
+}
 
-        .brilho-2 {
-            right: 190px;
-            bottom: 5px;
-        }
+.servico-card h2 {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: 21px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    line-height: 1.25;
+    color: var(--text-primary, #18181b);
+}
 
-        /* Grid de Serviços Ampliado e Mais Espaçoso */
-        .servicos-grid {
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-            gap: 28px;
-            position: relative;
-            z-index: 3;
-            margin-top: 25px;
-            margin-bottom: 20px;
-        }
+.servico-card p.desc-servico {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-muted, #71717a);
+    margin-bottom: 24px;
+    flex-grow: 1;
+}
 
-        /* Cards Maiores e Mais Nobres */
-        .servico-card {
-            min-height: 380px;
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(255, 255, 255, 0.65),
-                    rgba(248, 242, 233, 0.95)
-                );
-            border: 1px solid rgba(214, 181, 110, 0.45);
-            border-radius: 18px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            padding: 28px 22px 22px;
-            text-align: center;
-            box-shadow: 0 6px 16px rgba(185, 133, 39, 0.06), 0 2px 4px rgba(0, 0, 0, 0.02);
-            transition:
-                transform 0.3s cubic-bezier(0.25, 1, 0.5, 1),
-                box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1),
-                border-color 0.3s ease,
-                background 0.3s ease;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-            position: relative;
-            overflow: hidden;
-        }
+/* Meta: Preço & Duração */
+.servico-info-meta {
+    width: 100%;
+    border-top: 1px solid var(--border-subtle, #f4f4f5);
+    padding-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
 
-        .servico-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--dourado);
-            box-shadow: 0 16px 32px rgba(185, 133, 39, 0.18), 0 4px 10px rgba(0, 0, 0, 0.04);
-            background: #ffffff;
-        }
+.servico-info-meta .meta-preco {
+    font-size: 15px;
+    color: var(--text-primary, #18181b);
+}
 
-        .servico-card:active {
-            transform: translateY(-3px);
-        }
+.servico-info-meta .meta-preco strong {
+    color: var(--gold-dark, #b8860b);
+    font-size: 17px;
+}
 
-        /* Moldura de Foto do Serviço Maior */
-        .servico-icone {
-            width: 140px;
-            height: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--dourado);
-            margin-bottom: 16px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 2px solid rgba(214, 181, 110, 0.4);
-            box-shadow: 0 6px 18px rgba(185, 133, 39, 0.15);
-            background: linear-gradient(135deg, #fdfcf9, #f7f1e6);
-            flex-shrink: 0;
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
+.servico-info-meta .meta-duracao {
+    font-size: 13px;
+    color: var(--gold-dark, #b8860b);
+    background: var(--gold-soft, rgba(212, 175, 55, 0.12));
+    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.35));
+    padding: 4px 12px;
+    border-radius: var(--radius-full, 9999px);
+    font-weight: 600;
+    white-space: nowrap;
+}
 
-        .servico-card:hover .servico-icone {
-            transform: scale(1.05);
-            border-color: var(--dourado);
-            box-shadow: 0 8px 24px rgba(185, 133, 39, 0.25);
-        }
+/* ==========================================================================
+   BREAKPOINTS: TABLET & MOBILE
+   ========================================================================== */
+@media (max-width: 900px) {
+    .intro {
+        flex-direction: column;
+        text-align: center;
+    }
 
-        .servico-icone img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-            display: block;
-        }
+    .linha-titulo {
+        margin: 0 auto 16px auto;
+    }
 
-        .icone-tesoura {
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 65px;
-            line-height: 1;
-            transform: rotate(-10deg);
-            display: inline-block;
-        }
+    .ilustracao {
+        justify-content: center;
+    }
+}
 
-        .servico-card h2 {
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 24px;
-            font-weight: 600;
-            margin-top: 4px;
-            margin-bottom: 10px;
-            line-height: 1.25;
-            color: var(--preto);
-            letter-spacing: -0.3px;
-        }
+@media (max-width: 640px) {
+    .servicos-page {
+        padding: 30px 16px 50px;
+    }
 
-        .servico-card p.desc-servico {
-            font-size: 14.5px;
-            line-height: 1.55;
-            color: #4a4742;
-            margin-bottom: 20px;
-            flex-grow: 1;
-        }
+    .servicos-grid {
+        grid-template-columns: 1fr;
+    }
 
-        /* Informações de Preço e Duração */
-        .servico-info-meta {
-            width: 100%;
-            border-top: 1px solid rgba(214, 181, 110, 0.35);
-            padding-top: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .servico-info-meta .meta-preco {
-            font-size: 15.5px;
-            color: #222;
-        }
-
-        .servico-info-meta .meta-preco strong {
-            color: var(--dourado);
-            font-size: 17px;
-        }
-
-        .servico-info-meta .meta-duracao {
-            font-size: 13.5px;
-            color: #555;
-            background: rgba(185, 133, 39, 0.09);
-            border: 1px solid rgba(214, 181, 110, 0.3);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        /* Responsividade */
-        @media (max-width: 1200px) {
-            .servicos-page {
-                padding-left: 6%;
-                padding-right: 6%;
-            }
-        }
-
-        @media (max-width: 950px) {
-            .intro h1 {
-                font-size: 40px;
-            }
-
-            .ilustracao {
-                width: 380px;
-            }
-        }
-
-        @media (max-width: 700px) {
-            .servicos-page {
-                padding: 30px 20px 50px;
-            }
-
-            .intro {
-                min-height: auto;
-                flex-direction: column;
-            }
-
-            .intro h1 {
-                font-size: 37px;
-            }
-
-            .intro p {
-                font-size: 14px;
-            }
-
-            .ilustracao {
-                width: 100%;
-                height: 120px;
-                transform: scale(0.75);
-                transform-origin: center;
-                margin-top: 15px;
-            }
-
-            .servicos-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-        }
-
-        @media (max-width: 430px) {
-            .intro h1 {
-                font-size: 33px;
-            }
-
-            .subtitulo {
-                font-size: 12px;
-            }
-        }
+    .servico-card {
+        padding: 24px 18px 20px;
+    }
+}

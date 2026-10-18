@@ -22,8 +22,8 @@ $funcionarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nossa Equipe</title>
-    <link rel="stylesheet" href="../../assets/css/global.css">
-    <link rel="stylesheet" href="../../assets/css/cliente/funcionarios.css">
+    <link rel="stylesheet" href="../../assets/css/global.css?v=<?= @filemtime(__DIR__ . '/../../assets/css/global.css') ?: '2.4' ?>">
+    <link rel="stylesheet" href="../../assets/css/cliente/funcionarios.css?v=<?= @filemtime(__DIR__ . '/../../assets/css/cliente/funcionarios.css') ?: '2.4' ?>">
 </head>
 
 <body>

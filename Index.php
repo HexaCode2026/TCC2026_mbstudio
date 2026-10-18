@@ -5,7 +5,7 @@
 require_once 'core/Session.php';
 Session::iniciar();
 
-if (isset($_SESSION['User_perm'])) {
+if (isset($_SESSION['User_perm']) && empty($_GET['preview'])) {
     if ($_SESSION['User_perm'] === 'A') {
         header("Location: View/admin/Home.php");
         exit;
@@ -21,10 +21,12 @@ if (isset($_SESSION['User_perm'])) {
 $servicos = [];
 $funcionarios = [];
 $novidades = [];
+$destaques = [];
 
 try {
     if (file_exists('config/conexao.php')) {
         require_once 'config/conexao.php';
+        require_once 'model/Imagem.php';
 
         if (isset($pdo)) {
             // Buscar serviços ativos
@@ -50,38 +52,33 @@ try {
                                      LIMIT 3");
             $novidades = $stmtServ ? $stmtServ->fetchAll(PDO::FETCH_ASSOC) : [];
 
-            // ── Hero Slideshow: serviços mais agendados + mais caros (com imagem) ──
-            $sqlDestaques = "
-                (SELECT s.Ser_id, s.Ser_name, s.Ser_price, s.Ser_image, COUNT(a.Appo_id) AS total_agendamentos
-                 FROM services s
-                 JOIN appointments a ON a.Ser_id = s.Ser_id
-                 WHERE s.Ser_active = 1
-                   AND s.Ser_image IS NOT NULL AND s.Ser_image != ''
-                   AND a.Appo_status NOT LIKE 'Cancelado%'
-                 GROUP BY s.Ser_id
-                 ORDER BY total_agendamentos DESC
-                 LIMIT 6)
-                UNION
-                (SELECT s.Ser_id, s.Ser_name, s.Ser_price, s.Ser_image, 0 AS total_agendamentos
-                 FROM services s
-                 WHERE s.Ser_active = 1
-                   AND s.Ser_image IS NOT NULL AND s.Ser_image != ''
-                 ORDER BY s.Ser_price DESC
-                 LIMIT 4)
-            ";
-            $stmtDest = $pdo->query($sqlDestaques);
-            $destaquesRaw = $stmtDest ? $stmtDest->fetchAll(PDO::FETCH_ASSOC) : [];
+            // ── Hero Slideshow: Imagens gerenciáveis pelo Admin (tabela site_images via model/Imagem.php) ──
+            $imagemModel = new Imagem($pdo);
+            $slidesHeroDb = $imagemModel->listarAtivasHero(__DIR__);
 
-            // Desduplicar por Ser_id e validar existência do arquivo de imagem
-            $seenIds = [];
-            $destaques = [];
-            foreach ($destaquesRaw as $d) {
-                if (isset($seenIds[$d['Ser_id']]))
-                    continue;
-                $imgPath = $d['Ser_image'];
-                if (!empty($imgPath) && (file_exists($imgPath) || file_exists(__DIR__ . '/' . $imgPath))) {
-                    $seenIds[$d['Ser_id']] = true;
-                    $destaques[] = $d;
+            if (!empty($slidesHeroDb)) {
+                foreach ($slidesHeroDb as $sh) {
+                    $rawSub = trim($sh['Img_subtitle'] ?? '');
+                    if ($rawSub !== '' && is_numeric(str_replace(',', '.', $rawSub))) {
+                        $rawSub = 'R$ ' . number_format((float)str_replace(',', '.', $rawSub), 2, ',', '.');
+                    }
+                    $destaques[] = [
+                        'title'    => $sh['Img_title'],
+                        'subtitle' => $rawSub,
+                        'image'    => $sh['Img_path']
+                    ];
+                }
+            } else {
+                // Fallback automático para serviços ativos com imagem caso não haja slides ativos
+                foreach ($servicos as $s) {
+                    $imgPath = $s['Ser_image'] ?? '';
+                    if (!empty($imgPath) && (file_exists($imgPath) || file_exists(__DIR__ . '/' . $imgPath))) {
+                        $destaques[] = [
+                            'title'    => $s['Ser_name'],
+                            'subtitle' => 'R$ ' . number_format((float)$s['Ser_price'], 2, ',', '.'),
+                            'image'    => $imgPath
+                        ];
+                    }
                 }
             }
         }
@@ -90,7 +87,12 @@ try {
     $servicos = [];
     $funcionarios = [];
     $novidades = [];
+    $destaques = [];
 }
+
+$globalCssVer = @filemtime(__DIR__ . '/assets/css/global.css') ?: '2.5';
+$homeCssVer   = @filemtime(__DIR__ . '/assets/css/home.css') ?: '2.5';
+$transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '2.5';
 ?>
 <!-- =========================================================================
      VIEW: Interface do Usuário (MB Studio Home)
@@ -104,253 +106,9 @@ try {
     <title>MB Studio | Beleza, Confiança & Elegância</title>
 
     <script>document.documentElement.classList.add('cliente-transitions-enabled');</script>
-    <link rel="stylesheet" href="assets/css/global.css">
-    <link rel="stylesheet" href="assets/css/home.css" id="theme-home-css">
-    <link rel="stylesheet" href="assets/css/cliente-transitions.css">
-    <style id="home-inline-styles">
-        /* Ajuste do layout editorial da seção Sobre */
-        .about-salon-wrapper {
-            display: block !important;
-            max-width: 900px !important;
-            margin: 0 auto !important;
-            text-align: center !important;
-        }
-
-        /* Formato e dimensionamento dos cards baseado em funcionarios.php mantendo as cores originais */
-        .cuts-grid,
-        .team-home-grid,
-        .news-grid {
-            display: flex !important;
-            flex-wrap: wrap !important;
-            gap: 25px !important;
-            justify-content: center !important;
-            margin-top: 35px !important;
-            margin-bottom: 40px !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-        }
-
-        .cut-item-card,
-        .specialist-card,
-        .news-card {
-            width: 340px !important;
-            max-width: 100% !important;
-            flex: 0 0 340px !important;
-            box-sizing: border-box !important;
-        }
-
-        @media (max-width: 400px) {
-
-            .cut-item-card,
-            .specialist-card,
-            .news-card {
-                width: 100% !important;
-                flex: 0 0 100% !important;
-            }
-        }
-
-        .single-card {
-            margin-left: auto !important;
-            margin-right: auto !important;
-        }
-
-        /* Moldura de Foto do Serviço idêntica a servicos.php */
-        .servico-icone {
-            width: 140px !important;
-            height: 140px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            color: #b98527 !important;
-            margin: 0 auto 16px auto !important;
-            border-radius: 50% !important;
-            overflow: hidden !important;
-            border: 2px solid rgba(214, 181, 110, 0.4) !important;
-            box-shadow: 0 6px 18px rgba(185, 133, 39, 0.15) !important;
-            background: linear-gradient(135deg, #fdfcf9, #f7f1e6) !important;
-            flex-shrink: 0 !important;
-            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
-        }
-
-        .cut-item-card:hover .servico-icone,
-        .news-card:hover .servico-icone {
-            transform: scale(1.05) !important;
-            border-color: #d4af37 !important;
-            box-shadow: 0 8px 24px rgba(185, 133, 39, 0.25) !important;
-        }
-
-        .servico-icone img {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover !important;
-            object-position: center !important;
-            border-radius: 50% !important;
-            display: block !important;
-        }
-
-        .icone-tesoura {
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 65px;
-            line-height: 1;
-            transform: rotate(-10deg);
-            display: inline-block;
-            color: #b98527;
-        }
-
-        .news-card {
-            position: relative !important;
-            padding-top: 28px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            text-align: center !important;
-            box-sizing: border-box !important;
-        }
-
-        .news-card .news-badge {
-            position: absolute !important;
-            top: 14px !important;
-            right: 14px !important;
-            background: linear-gradient(135deg, #d4af37, #b8860b) !important;
-            color: #111 !important;
-            font-size: 11px !important;
-            font-weight: 800 !important;
-            letter-spacing: 1px !important;
-            text-transform: uppercase !important;
-            padding: 5px 12px !important;
-            border-radius: 20px !important;
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35) !important;
-            z-index: 10 !important;
-        }
-
-        /* ====================================================================
-           HERO SLIDESHOW — Carrossel de Cortes em Destaque (Crossfade)
-           ==================================================================== */
-        #hero-slideshow {
-            overflow: hidden;
-            padding: 0 !important;
-            border: none !important;
-            max-width: 370px !important;
-            min-height: 420px !important;
-        }
-
-        #hero-slideshow::after {
-            display: none !important;
-        }
-
-        .hero-slide {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            transition: opacity 0.8s ease-in-out;
-            z-index: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .hero-slide.active {
-            opacity: 1;
-            z-index: 2;
-        }
-
-        .hero-slide-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            object-position: center center;
-            display: block;
-            border-radius: 10px;
-        }
-
-        /* Overlay com nome e preço sobre a imagem */
-        .slide-info-overlay {
-            position: absolute;
-            bottom: 50px;
-            left: 0;
-            right: 0;
-            z-index: 5;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            pointer-events: none;
-            padding: 0 20px;
-        }
-
-        .slide-label-name {
-            font-family: var(--font-heading, 'Playfair Display', serif);
-            font-size: 18px;
-            font-weight: 700;
-            color: #fff;
-            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7), 0 1px 3px rgba(0, 0, 0, 0.5);
-            letter-spacing: 0.5px;
-            text-align: center;
-            transition: opacity 0.4s ease;
-        }
-
-        .slide-label-price {
-            font-family: var(--font-body, 'Inter', sans-serif);
-            font-size: 14px;
-            font-weight: 600;
-            color: #d4af37;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-            letter-spacing: 0.3px;
-            transition: opacity 0.4s ease;
-        }
-
-        /* Gradiente na parte inferior para legibilidade */
-        #hero-slideshow::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 55%;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.15) 50%, transparent 100%);
-            z-index: 3;
-            pointer-events: none;
-            border-radius: 0 0 10px 10px;
-        }
-
-        /* Indicadores de navegação (dots) */
-        .slideshow-dots {
-            position: absolute;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-            z-index: 5;
-        }
-
-        .slideshow-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            background: transparent;
-            cursor: pointer;
-            padding: 0;
-            transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
-        }
-
-        .slideshow-dot:hover {
-            border-color: #d4af37;
-            transform: scale(1.2);
-        }
-
-        .slideshow-dot.active {
-            background: #d4af37;
-            border-color: #d4af37;
-            transform: scale(1.15);
-        }
-
-        /* Manter o floating badge acima do slideshow */
-        #hero-slideshow .cuts-floating-badge {
-            z-index: 8;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/global.css?v=<?= $globalCssVer ?>">
+    <link rel="stylesheet" href="assets/css/home.css?v=<?= $homeCssVer ?>" id="theme-home-css">
+    <link rel="stylesheet" href="assets/css/cliente-transitions.css?v=<?= $transCssVer ?>">
 </head>
 
 <body class="cliente-page page-index-body">
@@ -401,22 +159,35 @@ try {
                         <?php if (!empty($destaques)): ?>
                             <?php foreach ($destaques as $idx => $dest): ?>
                                 <div class="hero-slide<?= $idx === 0 ? ' active' : '' ?>"
-                                    data-name="<?= htmlspecialchars($dest['Ser_name']) ?>"
-                                    data-price="R$ <?= number_format($dest['Ser_price'], 2, ',', '.') ?>">
-                                    <img src="<?= htmlspecialchars($dest['Ser_image']) ?>"
-                                        alt="<?= htmlspecialchars($dest['Ser_name']) ?>" class="hero-slide-img" loading="lazy">
+                                    data-name="<?= htmlspecialchars($dest['title']) ?>"
+                                    data-price="<?= htmlspecialchars($dest['subtitle']) ?>">
+                                    <img src="<?= htmlspecialchars($dest['image']) ?>"
+                                        alt="<?= htmlspecialchars($dest['title']) ?>" class="hero-slide-img" loading="eager">
                                 </div>
                             <?php endforeach; ?>
 
-                            <!-- Overlay com Nome e Preço do serviço atual -->
+                            <?php if (count($destaques) > 1): ?>
+                                <!-- Botões de passar para o lado (Anterior / Próxima) -->
+                                <button type="button" class="slideshow-arrow slideshow-prev" id="heroSlidePrev" onclick="if(window.heroSlideStep) window.heroSlideStep(-1, event);" aria-label="Imagem anterior" title="Imagem anterior">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                </button>
+                                <button type="button" class="slideshow-arrow slideshow-next" id="heroSlideNext" onclick="if(window.heroSlideStep) window.heroSlideStep(1, event);" aria-label="Próxima imagem" title="Próxima imagem">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </button>
+                            <?php endif; ?>
+
+                            <!-- Overlay com Nome e Preço do slide atual -->
                             <div class="slide-info-overlay">
-                                <span class="slide-label-name"><?= htmlspecialchars($destaques[0]['Ser_name']) ?></span>
-                                <span class="slide-label-price">R$
-                                    <?= number_format($destaques[0]['Ser_price'], 2, ',', '.') ?></span>
+                                <span class="slide-label-name"><?= htmlspecialchars($destaques[0]['title']) ?></span>
+                                <span class="slide-label-price"><?= htmlspecialchars($destaques[0]['subtitle']) ?></span>
                             </div>
 
                             <!-- Indicadores de navegação (dots) -->
-                            <div class="slideshow-dots"></div>
+                            <div class="slideshow-dots">
+                                <?php foreach ($destaques as $idx => $_d): ?>
+                                    <button type="button" class="slideshow-dot<?= $idx === 0 ? ' active' : '' ?>" onclick="if(window.heroSlideGoTo) window.heroSlideGoTo(<?= $idx ?>, event);" aria-label="Ir para imagem <?= $idx + 1 ?>"></button>
+                                <?php endforeach; ?>
+                            </div>
                         <?php else: ?>
                             <!-- Fallback quando não há imagens cadastradas -->
                             <div class="cuts-placeholder-content" style="margin: auto;">
@@ -733,8 +504,12 @@ try {
 
     <!-- Modal Global de Login / Cadastro -->
     <?php include 'View/components/LoginModal.php'; ?>
-    <script src="assets/js/cliente-transitions.js"></script>
-    <script src="assets/js/heroSlideshow.js"></script>
+    <?php
+    $heroJsVer  = @filemtime(__DIR__ . '/assets/js/heroSlideshow.js') ?: '2.4';
+    $transJsIdx = @filemtime(__DIR__ . '/assets/js/cliente-transitions.js') ?: '2.4';
+    ?>
+    <script src="assets/js/cliente-transitions.js?v=<?= $transJsIdx ?>"></script>
+    <script src="assets/js/heroSlideshow.js?v=<?= $heroJsVer ?>"></script>
 </body>
 
 </html>

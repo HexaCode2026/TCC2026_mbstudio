@@ -318,6 +318,19 @@
                     history.pushState(null, '', targetUrl.href);
                 }
 
+                // Sincroniza o estado ativo dos links do cabeçalho
+                const currentNavLinks = document.querySelectorAll('#headerNav a');
+                const targetNavLinks = targetDoc.querySelectorAll('#headerNav a');
+                if (currentNavLinks.length === targetNavLinks.length) {
+                    currentNavLinks.forEach((link, idx) => {
+                        if (targetNavLinks[idx].classList.contains('ativo')) {
+                            link.classList.add('ativo');
+                        } else {
+                            link.classList.remove('ativo');
+                        }
+                    });
+                }
+
                 if (isGoingToContato) {
                     window.scrollTo(0, 0);
                     setTimeout(smoothScrollToContato, 100);
@@ -326,6 +339,9 @@
                 }
 
                 hookAuthExecution();
+                if (typeof window.initHeroSlideshow === 'function') {
+                    window.initHeroSlideshow();
+                }
             };
 
             // 6. Executa a View Transition suave com novo estado 100% pronto e estilizado

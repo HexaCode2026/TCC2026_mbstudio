@@ -20,7 +20,9 @@ $administradores = $dashboard->totalAdministradores();
 $servicos = $dashboard->totalServicos();
 $agendamentos = $dashboard->totalAgendamentos();
 
-$adminName = $_SESSION['User_name'] ?? 'Administrador';
+$adminName    = $_SESSION['User_name'] ?? 'Administrador';
+$sucessoFlash = Session::getFlash('success');
+$erroFlash    = Session::getFlash('error');
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -45,6 +47,18 @@ $adminName = $_SESSION['User_name'] ?? 'Administrador';
 
     <main class="admin-dashboard-wrapper">
 
+        <?php if (!empty($sucessoFlash)): ?>
+            <div style="margin-bottom: 20px; padding: 14px 18px; border-radius: 12px; background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; font-size: 14px; font-weight: 600;">
+                ✅ <?= htmlspecialchars($sucessoFlash) ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($erroFlash)): ?>
+            <div style="margin-bottom: 20px; padding: 14px 18px; border-radius: 12px; background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; font-size: 14px; font-weight: 600;">
+                ⚠️ <?= htmlspecialchars($erroFlash) ?>
+            </div>
+        <?php endif; ?>
+
         <!-- Card Superior de Boas-Vindas -->
         <div class="admin-welcome-card">
             <div>
@@ -59,7 +73,14 @@ $adminName = $_SESSION['User_name'] ?? 'Administrador';
                 </p>
             </div>
 
-            <div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="Perfil.php" class="btn-logout-top" style="border-color: rgba(212, 175, 55, 0.5); color: #D4AF37;" title="Meu Perfil Administrativo">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>Meu Perfil</span>
+                </a>
                 <a href="../../controller/Logout.php" class="btn-logout-top" title="Encerrar Sessão">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>

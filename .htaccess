@@ -1,11 +1,27 @@
 # ============================================================================
-# MB STUDIO — CONFIGURAÇÃO DE SEGURANÇA DO SERVIDOR WEB (APACHE)
+# MB STUDIO — CONFIGURAÇÃO DE SEGURANÇA E ROTAS DO SERVIDOR WEB (APACHE)
 # ============================================================================
 
 # 1. Desativa listagem de diretórios
 Options -Indexes
 
-# 2. Cabeçalhos de Segurança HTTP (Mitigação de Clickjacking, MIME Sniffing e XSS)
+# 2. Mapeamento Explícito de Rotas MVC (Primeiro Acesso, Perfil Admin e Diagnóstico)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Rotas de Primeiro Acesso (Troca Obrigatória de Senha)
+    RewriteRule ^primeiro-acesso/?$ controller/PrimeiroAcessoController.php?action=index [L,QSA]
+    RewriteRule ^primeiro-acesso/salvar/?$ controller/PrimeiroAcessoController.php?action=salvar [L,QSA]
+
+    # Rotas de Perfil Administrativo (Restrito a User_perm = 'A')
+    RewriteRule ^admin/perfil/?$ controller/PerfilController.php?action=index [L,QSA]
+    RewriteRule ^admin/perfil/atualizar/?$ controller/PerfilController.php?action=atualizar [L,QSA]
+
+    # Rota amigável de diagnóstico de e-mail (/teste-email)
+    RewriteRule ^teste-email/?$ controller/TesteEmail.php [L,QSA]
+</IfModule>
+
+# 3. Cabeçalhos de Segurança HTTP (Mitigação de Clickjacking, MIME Sniffing e XSS)
 <IfModule mod_headers.c>
     Header always set X-Frame-Options "SAMEORIGIN"
     Header always set X-Content-Type-Options "nosniff"
@@ -13,7 +29,7 @@ Options -Indexes
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
-# 3. Bloqueia acesso direto a arquivos de ambiente (.env), dumps SQL e logs
+# 4. Bloqueia acesso direto a arquivos de ambiente (.env), dumps SQL e logs
 <FilesMatch "(^\.env|.*\.(sql|log|ini|sh|bak))$">
     <IfModule mod_authz_core.c>
         Require all denied
@@ -23,4 +39,3 @@ Options -Indexes
         Deny from all
     </IfModule>
 </FilesMatch>
-

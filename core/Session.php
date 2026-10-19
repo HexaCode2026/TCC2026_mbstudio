@@ -2,6 +2,12 @@
 
 class Session {
 
+    public static function getBasePath(): string {
+        $docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? ''), '/');
+        $projectRoot = str_replace('\\', '/', realpath(__DIR__ . '/../'));
+        return $docRoot ? str_ireplace($docRoot, '', $projectRoot) : '';
+    }
+
     public static function iniciar() {
         if (session_status() === PHP_SESSION_NONE) {
             $isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
@@ -28,20 +34,80 @@ class Session {
                 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             }
         }
+
+        // Interceptação Global de Primeiro Acesso (bloqueia Dashboard, Relatórios e demais rotas)
+        self::verificarPrimeiroAcesso();
     }
 
     public static function login($usuario) {
-        self::iniciar();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
 
         // Regenera o ID da sessão após autenticação para mitigar Session Fixation
         session_regenerate_id(true);
 
-        $_SESSION['User_id']    = $usuario['User_id'];
-        $_SESSION['User_name']  = $usuario['User_name'];
-        $_SESSION['User_email'] = $usuario['User_email'];
-        $_SESSION['User_perm']  = $usuario['User_perm'];
-        $_SESSION['LAST_ACTIVITY'] = time();
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        $_SESSION['User_id']               = (int)($usuario['User_id'] ?? 0);
+        $_SESSION['User_name']             = (string)($usuario['User_name'] ?? '');
+        $_SESSION['User_email']            = (string)($usuario['User_email'] ?? '');
+        $_SESSION['User_perm']             = (string)($usuario['User_perm'] ?? 'C');
+        $_SESSION['User_must_change_pass'] = !empty($usuario['User_must_change_pass']);
+        $_SESSION['LAST_ACTIVITY']         = time();
+        $_SESSION['csrf_token']            = bin2hex(random_bytes(32));
+    }
+
+    /**
+     * Filtro Global de Primeiro Acesso:
+     * Se User_must_change_pass === true, intercepta qualquer requisição autenticada
+     * e redireciona obrigatoriamente para /primeiro-acesso (exceto a própria rota e logout).
+     */
+    public static function verificarPrimeiroAcesso(): void {
+        if (php_sapi_name() === 'cli') {
+            return;
+        }
+
+        if (empty($_SESSION['User_id']) || empty($_SESSION['User_must_change_pass'])) {
+            return;
+        }
+
+        $scriptName = basename($_SERVER['SCRIPT_NAME'] ?? '');
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+
+        $rotasPermitidasScripts = [
+            'PrimeiroAcesso.php',
+            'PrimeiroAcessoController.php',
+            'Logout.php'
+        ];
+
+        if (
+            in_array($scriptName, $rotasPermitidasScripts, true) ||
+            strpos($requestUri, '/primeiro-acesso') !== false
+        ) {
+            return;
+        }
+
+        $basePath = self::getBasePath();
+        header("Location: " . $basePath . "/primeiro-acesso");
+        exit;
+    }
+
+    public static function setFlash(string $key, string $message): void {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['_flash'][$key] = $message;
+    }
+
+    public static function getFlash(string $key): ?string {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        if (isset($_SESSION['_flash'][$key])) {
+            $msg = (string)$_SESSION['_flash'][$key];
+            unset($_SESSION['_flash'][$key]);
+            return $msg;
+        }
+        return null;
     }
 
     public static function sair() {
@@ -68,11 +134,18 @@ class Session {
     }
 
     public static function gerarTokenCsrf() {
-        self::iniciar();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
         return $_SESSION['csrf_token'];
+    }
+
+    public static function csrfField(): string {
+        $token = htmlspecialchars(self::gerarTokenCsrf(), ENT_QUOTES, 'UTF-8');
+        return '<input type="hidden" name="csrf_token" value="' . $token . '">';
     }
 
     /**
@@ -81,7 +154,9 @@ class Session {
      * 2. Valida estritamente cabeçalhos Origin e Referer (Same-Origin Policy) em requisições de mutação.
      */
     public static function validarCsrf($token = null) {
-        self::iniciar();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
 
         $tokenRecebido = $token ?? $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
         if ($tokenRecebido !== null && $tokenRecebido !== '') {

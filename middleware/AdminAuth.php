@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . "/../core/Session.php";
+require_once __DIR__ . "/FirstLoginFilter.php";
+
 Session::iniciar();
 
 if (
@@ -7,11 +9,9 @@ if (
     || !isset($_SESSION['User_perm'])
     || $_SESSION['User_perm'] !== 'A'
 ) {
-    $docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? ''), '/');
-    $projectRoot = str_replace('\\', '/', realpath(__DIR__ . '/../'));
-    $basePath = $docRoot ? str_ireplace($docRoot, '', $projectRoot) : '';
-    header("Location: " . $basePath . "/Index.php");
+    header("Location: " . Session::getBasePath() . "/Index.php");
     exit;
 }
-?>
 
+FirstLoginFilter::handle();
+?>

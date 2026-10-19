@@ -3,11 +3,9 @@ header('Content-Type: application/json');
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/User.php";
 require_once __DIR__ . "/../core/Session.php";
-require_once __DIR__ . "/../helpers/EmailHelper.php";
+require_once __DIR__ . "/../helpers/BrevoEmailService.php";
 
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+Session::iniciar();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $data = json_decode(file_get_contents('php://input'), true);
@@ -23,8 +21,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    // Se o usuário iniciou um cadastro nesta sessão e ainda não confirmou o código,
-    // bloqueia o login imediatamente sem enviar novo e-mail nem sobrecarregar o banco
     if (
         isset($_SESSION['pending_registration']) &&
         strcasecmp($_SESSION['pending_registration']['email'] ?? '', $email) === 0 &&
@@ -38,13 +34,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $usuario = new User($pdo);
-    $dados = $usuario->login($email);
+    $dados = $usuario->findByEmail($email);
 
     if ($dados && password_verify($senha, $dados['User_pass'])) {
-        if ($dados['User_active'] == 0) {
+        if ((int)$dados['User_active'] === 0) {
             echo json_encode([
                 'success' => false,
                 'message' => 'Sua conta encontra-se desativada. Entre em contato com a administração.'
+            ]);
+            exit;
+        }
+
+        // Se User_must_change_pass == 1, inicia sessão restrita e redireciona diretamente para /primeiro-acesso
+        if (!empty($dados['User_must_change_pass'])) {
+            Session::login($dados);
+            $basePath = Session::getBasePath();
+            echo json_encode([
+                'success'          => true,
+                'must_change_pass' => true,
+                'redirect'         => $basePath . '/primeiro-acesso',
+                'perm'             => $dados['User_perm'],
+                'message'          => 'Primeiro acesso detectado. Redirecionando para definição de nova senha...'
             ]);
             exit;
         }
@@ -67,7 +77,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $codigo = $usuario->gerarCodigoVerificacao($dados['User_id'], 'Login2FA');
-        EmailHelper::enviarCodigo($email, $codigo, 'Login2FA');
+
+        $brevoService = new BrevoEmailService();
+        $enviado = $brevoService->enviarCodigo2FA($email, $dados['User_name'] ?? '', $codigo);
+
+        if (!$enviado) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Não foi possível enviar o código 2FA para seu e-mail no momento. Tente novamente em instantes.'
+            ]);
+            exit;
+        }
 
         $_SESSION['verificar_user_id'] = $dados['User_id'];
         $_SESSION['verificar_tipo'] = 'Login2FA';

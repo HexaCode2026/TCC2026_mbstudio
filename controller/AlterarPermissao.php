@@ -17,11 +17,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userId = filter_input(INPUT_POST, 'User_id', FILTER_VALIDATE_INT);
     $novaPermissao = $_POST['User_perm'] ?? null;
 
-    // Lista branca estrita de permissões e proteção contra auto-rebaixamento do Admin logado
+    // Lista branca estrita de permissões e bloqueio de alteração de cargo para usuários Admin (A)
     $permissoesValidas = ['A', 'F', 'C'];
     if ($userId && in_array($novaPermissao, $permissoesValidas, true) && $userId != $_SESSION['User_id']) {
         $userModel = new User($pdo);
-        $userModel->alterarPermissao($userId, $novaPermissao);
+        $alvo = $userModel->buscarPorId($userId);
+
+        if ($alvo && ($alvo['User_perm'] ?? '') !== 'A') {
+            $userModel->alterarPermissao($userId, $novaPermissao);
+        }
     }
 }
 

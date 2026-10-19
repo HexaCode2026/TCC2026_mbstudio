@@ -81,6 +81,10 @@ $currentPage = basename($currentScript, '.php');
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                                 Painel Administrativo
                             </a>
+                            <a href="<?= $basePath ?>/admin/perfil" class="mobile-profile-item <?= ($currentPage === 'Perfil' || $currentPage === 'PerfilController') ? 'ativo' : '' ?>">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                Meu Perfil
+                            </a>
                         <?php else: ?>
                             <a href="<?= $basePath ?>/View/cliente/Perfil.php" class="mobile-profile-item <?= $currentPage === 'Perfil' ? 'ativo' : '' ?>">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -123,6 +127,7 @@ $currentPage = basename($currentScript, '.php');
                     <a href="<?= $basePath ?>/View/admin/Usuarios.php" class="nav-item-link <?= $currentPage === 'Usuarios' ? 'ativo' : '' ?>">USUÁRIOS</a>
                     <a href="<?= $basePath ?>/View/admin/Agenda.php" class="nav-item-link <?= $currentPage === 'Agenda' ? 'ativo' : '' ?>">AGENDAMENTOS</a>
                     <a href="<?= $basePath ?>/View/admin/Relatorios.php" class="nav-item-link <?= $currentPage === 'Relatorios' ? 'ativo' : '' ?>">RELATÓRIOS</a>
+                    <a href="<?= $basePath ?>/admin/perfil" class="nav-item-link <?= ($currentPage === 'Perfil' || $currentPage === 'PerfilController') ? 'ativo' : '' ?>">PERFIL</a>
                 <?php else: ?>
                     <!-- Menu do Cliente / Visitante -->
                     <a href="<?= $basePath ?>/Index.php" class="nav-item-link <?= $currentPage === 'Index' ? 'ativo' : '' ?>">INÍCIO</a>

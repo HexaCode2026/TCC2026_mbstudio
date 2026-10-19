@@ -232,6 +232,11 @@ async function handleAjaxLogin(event) {
         const data = await response.json();
         
         if (data.success) {
+            if (data.must_change_pass || data.redirect) {
+                window.location.href = data.redirect || `${basePath}/primeiro-acesso`;
+                return;
+            }
+
             if (data.action === 'verify') {
                 document.getElementById('verificacao-desc').textContent = data.message;
                 switchModalView('view-verificacao');
@@ -329,7 +334,9 @@ async function handleAjaxVerificacao(event) {
         if (data.success) {
             showModalMessage('verificacao-modal-msg', false, data.message);
             setTimeout(() => {
-                if (data.action === 'login') {
+                if (data.must_change_pass || data.redirect) {
+                    window.location.href = data.redirect || `${basePath}/primeiro-acesso`;
+                } else if (data.action === 'login') {
                     switchModalView('view-login');
                     if (data.email && document.getElementById('modal-email')) {
                         document.getElementById('modal-email').value = data.email;

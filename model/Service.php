@@ -72,6 +72,28 @@ class Service {
     }
 
     // =====================================
+    // LISTAR SERVIÇOS ATIVOS (HOME)
+    // =====================================
+    public function listarAtivosHome(int $limite = 6): array {
+        $sql = "SELECT * FROM services WHERE Ser_active = 1 ORDER BY Ser_id ASC LIMIT :limite";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    // =====================================
+    // LISTAR NOVIDADES / SERVIÇOS RECENTES (HOME)
+    // =====================================
+    public function listarNovidadesHome(int $limite = 3): array {
+        $sql = "SELECT * FROM services WHERE Ser_active = 1 ORDER BY Ser_id DESC LIMIT :limite";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    // =====================================
     // ATUALIZAR SERVIÇO
     // =====================================
     public function update($id, $name, $description, $price, $duration, $image, $active, $employee_ids = []) {

@@ -4,9 +4,160 @@ class User
 {
     private $pdo;
 
+    /**
+     * Proteção contra Mass Assignment:
+     * User_id e User_perm são atributos protegidos (guarded) e nunca podem ser
+     * atribuídos em massa a partir de inputs de formulários comuns.
+     */
+    protected array $guarded = ['User_id', 'User_perm'];
+
+    protected array $fillable = [
+        'User_name',
+        'User_email',
+        'User_pass',
+        'User_active',
+        'User_must_change_pass'
+    ];
+
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
+    }
+
+    /**
+     * Filtra um array de atributos garantindo que campos protegidos (User_id, User_perm)
+     * sejam removidos antes de qualquer operação de persistência.
+     */
+    public function filtrarAtributosPermitidos(array $dados): array
+    {
+        return array_intersect_key(
+            array_diff_key($dados, array_flip($this->guarded)),
+            array_flip($this->fillable)
+        );
+    }
+
+    // =====================================
+    // BUSCAR POR E-MAIL (FLUXO DE AUTENTICAÇÃO)
+    // =====================================
+    public function findByEmail(string $email)
+    {
+        $this->limparCadastrosNaoConfirmados($email);
+
+        $sql = "
+            SELECT
+                User_id,
+                User_name,
+                User_email,
+                User_pass,
+                User_perm,
+                User_active,
+                User_must_change_pass,
+                User_created_at
+            FROM users
+            WHERE User_email = ?
+            LIMIT 1
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([trim($email)]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // =====================================
+    // BUSCAR POR ID (OMITINDO A SENHA)
+    // =====================================
+    public function findById(int $userId)
+    {
+        $sql = "
+            SELECT
+                User_id,
+                User_name,
+                User_email,
+                User_perm,
+                User_active,
+                User_must_change_pass,
+                User_created_at
+            FROM users
+            WHERE User_id = ?
+            LIMIT 1
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$userId]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // =====================================
+    // BUSCAR HASH DA SENHA ATUAL POR ID (USO INTERNO DE VALIDAÇÃO)
+    // =====================================
+    public function findPasswordHashById(int $userId): ?string
+    {
+        $sql = "SELECT User_pass FROM users WHERE User_id = ? LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$userId]);
+        $hash = $stmt->fetchColumn();
+
+        return $hash !== false ? (string)$hash : null;
+    }
+
+    // =====================================
+    // ATUALIZAR SENHA NO PRIMEIRO ACESSO
+    // =====================================
+    public function updateFirstPassword(int $userId, string $newPasswordHash): bool
+    {
+        $sql = "
+            UPDATE users
+            SET User_pass = ?,
+                User_must_change_pass = 0
+            WHERE User_id = ?
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$newPasswordHash, $userId]);
+    }
+
+    // =====================================
+    // ATUALIZAR PERFIL DO ADMIN (NUNCA ALTERA EMAIL OU PERMISSÃO)
+    // =====================================
+    public function updateProfile(int $userId, string $name, ?string $newPasswordHash = null): bool
+    {
+        if ($newPasswordHash !== null && $newPasswordHash !== '') {
+            $sql = "
+                UPDATE users
+                SET User_name = ?,
+                    User_pass = ?
+                WHERE User_id = ?
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            return $stmt->execute([trim($name), $newPasswordHash, $userId]);
+        }
+
+        $sql = "
+            UPDATE users
+            SET User_name = ?
+            WHERE User_id = ?
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([trim($name), $userId]);
+    }
+
+    // =====================================
+    // VERIFICAR SE É O ÚNICO ADMIN ATIVO (REGRA DE INTEGRIDADE)
+    // =====================================
+    public function isLastAdmin(int $userId): bool
+    {
+        $user = $this->findById($userId);
+        if (!$user || ($user['User_perm'] ?? '') !== 'A' || (int)($user['User_active'] ?? 0) !== 1) {
+            return false;
+        }
+
+        $sql = "SELECT COUNT(*) FROM users WHERE User_perm = 'A' AND User_active = 1";
+        $stmt = $this->pdo->query($sql);
+        $totalActiveAdmins = (int)$stmt->fetchColumn();
+
+        return $totalActiveAdmins <= 1;
     }
 
     // =====================================
@@ -15,8 +166,6 @@ class User
     public function limparCadastrosNaoConfirmados($email = null)
     {
         try {
-            // Remove usuários User_active = 0 que ficaram presos de cadastros não confirmados anteriormente
-            // (possuem código de tipo 'Cadastro' não utilizado e nunca tiveram código 'Cadastro' validado)
             $sql = "
                 SELECT u.User_id
                 FROM users u
@@ -64,12 +213,7 @@ class User
     {
         $this->limparCadastrosNaoConfirmados($email);
 
-        $sql = "
-        SELECT User_id
-        FROM users
-        WHERE User_email = ?
-        ";
-
+        $sql = "SELECT User_id FROM users WHERE User_email = ?";
         $consulta = $this->pdo->prepare($sql);
         $consulta->execute([$email]);
 
@@ -81,29 +225,21 @@ class User
     // =====================================
     public function cadastrar($nome, $email, $senha)
     {
-        $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+        $senhaHash = password_hash($senha, PASSWORD_BCRYPT);
         return $this->cadastrarConfirmado($nome, $email, $senhaHash);
     }
 
     public function cadastrarConfirmado($nome, $email, $senhaHash)
     {
         $sql = "
-        INSERT INTO users
-        (
-            User_name,
-            User_email,
-            User_pass,
-            User_perm,
-            User_active
-        )
-        VALUES
-        (
-            ?,
-            ?,
-            ?,
-            'C',
-            1
-        )
+            INSERT INTO users (
+                User_name,
+                User_email,
+                User_pass,
+                User_perm,
+                User_active,
+                User_must_change_pass
+            ) VALUES (?, ?, ?, 'C', 1, 0)
         ";
 
         $insert = $this->pdo->prepare($sql);
@@ -121,7 +257,7 @@ class User
 
     public function atualizarDadosInativos($id, $nome, $senha)
     {
-        $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+        $senhaHash = password_hash($senha, PASSWORD_BCRYPT);
         $sql = "UPDATE users SET User_name = ?, User_pass = ? WHERE User_id = ?";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$nome, $senhaHash, $id]);
@@ -132,29 +268,18 @@ class User
     // =====================================
     public function atualizarSenha($id, $novaSenha)
     {
-        $senhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
-        $sql = "UPDATE users SET User_pass = ? WHERE User_id = ?";
+        $senhaHash = password_hash($novaSenha, PASSWORD_BCRYPT);
+        $sql = "UPDATE users SET User_pass = ?, User_must_change_pass = 0 WHERE User_id = ?";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$senhaHash, $id]);
     }
 
     // =====================================
-    // LOGIN
+    // LOGIN (DELEGA PARA findByEmail)
     // =====================================
     public function login($email)
     {
-        $this->limparCadastrosNaoConfirmados($email);
-
-        $sql = "
-        SELECT *
-        FROM users
-        WHERE User_email = ?
-        ";
-
-        $consulta = $this->pdo->prepare($sql);
-        $consulta->execute([$email]);
-
-        return $consulta->fetch(PDO::FETCH_ASSOC);
+        return $this->findByEmail((string)$email);
     }
 
     // =====================================
@@ -164,17 +289,29 @@ class User
     {
         $this->limparCadastrosNaoConfirmados();
 
-        $sql = "SELECT User_id, User_name, User_email, User_perm, User_active FROM users ORDER BY User_name ASC";
+        $sql = "SELECT User_id, User_name, User_email, User_perm, User_active, User_must_change_pass FROM users ORDER BY User_name ASC";
         $consulta = $this->pdo->query($sql);
         return $consulta->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // =====================================
-    // ALTERAR PERMISSÃO DE UM USUÁRIO
+    // BUSCAR USUÁRIO POR ID (COMPATIBILIDADE)
+    // =====================================
+    public function buscarPorId($id)
+    {
+        return $this->findById((int)$id);
+    }
+
+    // =====================================
+    // ALTERAR PERMISSÃO DE UM USUÁRIO (EXCETO ADMIN / ÚLTIMO ADMIN)
     // =====================================
     public function alterarPermissao($id, $novaPermissao)
     {
-        $sql = "UPDATE users SET User_perm = ? WHERE User_id = ?";
+        if ($this->isLastAdmin((int)$id)) {
+            return false;
+        }
+
+        $sql = "UPDATE users SET User_perm = ? WHERE User_id = ? AND User_perm != 'A'";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$novaPermissao, $id]);
     }
@@ -184,6 +321,10 @@ class User
     // =====================================
     public function alternarStatus($id, $status)
     {
+        if ((int)$status === 0 && $this->isLastAdmin((int)$id)) {
+            return false;
+        }
+
         $sql = "UPDATE users SET User_active = ? WHERE User_id = ?";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$status, $id]);
@@ -194,6 +335,10 @@ class User
     // =====================================
     public function excluir($id)
     {
+        if ($this->isLastAdmin((int)$id)) {
+            return false;
+        }
+
         $sql = "DELETE FROM users WHERE User_id = ?";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$id]);
@@ -204,13 +349,12 @@ class User
     // =====================================
     public function gerarCodigoVerificacao($userId, $tipo = 'Login2FA')
     {
-        // Invalida códigos anteriores não usados do mesmo tipo para evitar sobrecarga
         $invalidate = $this->pdo->prepare("UPDATE verification_codes SET Code_used = 1 WHERE User_id = ? AND Code_type = ? AND Code_used = 0");
         $invalidate->execute([$userId, $tipo]);
 
         $codigo = (string) random_int(100000, 999999);
         $expiraEm = date('Y-m-d H:i:s', strtotime('+15 minutes'));
-        $tokenHash = password_hash($codigo, PASSWORD_DEFAULT);
+        $tokenHash = password_hash($codigo, PASSWORD_BCRYPT);
 
         $sql = "INSERT INTO verification_codes (User_id, Code_token, Code_type, Code_expires_at) VALUES (?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);

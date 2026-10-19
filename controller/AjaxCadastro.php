@@ -3,11 +3,9 @@ header('Content-Type: application/json');
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/User.php";
 require_once __DIR__ . "/../core/Session.php";
-require_once __DIR__ . "/../helpers/EmailHelper.php";
+require_once __DIR__ . "/../helpers/BrevoEmailService.php";
 
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+Session::iniciar();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $data = json_decode(file_get_contents('php://input'), true);
@@ -45,7 +43,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         (time() - $_SESSION['pending_registration']['sent_at']) < 30 &&
         (time() < ($_SESSION['pending_registration']['expires_at'] ?? 0))
     ) {
-        // Atualiza nome/senha na sessão caso o usuário tenha corrigido, mantendo o código já enviado recentemente
         $_SESSION['pending_registration']['nome'] = $nome;
         $_SESSION['pending_registration']['senha_hash'] = password_hash($senha, PASSWORD_DEFAULT);
         $_SESSION['verificar_tipo'] = 'Cadastro';
@@ -58,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    // Gera o código de 6 dígitos e guarda os dados APENAS na sessão até a confirmação
+    // Gera o código de 6 dígitos e guarda os dados na sessão até a confirmação
     $codigo = (string) random_int(100000, 999999);
 
     $_SESSION['pending_registration'] = [
@@ -67,13 +64,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         'senha_hash' => password_hash($senha, PASSWORD_DEFAULT),
         'token_hash' => password_hash($codigo, PASSWORD_DEFAULT),
         'sent_at'    => time(),
-        'expires_at' => time() + (15 * 60), // Expira em 15 minutos
+        'expires_at' => time() + (15 * 60),
         'attempts'   => 0
     ];
     $_SESSION['verificar_tipo'] = 'Cadastro';
     unset($_SESSION['verificar_user_id']);
 
-    EmailHelper::enviarCodigo($email, $codigo, 'Cadastro');
+    $brevoService = new BrevoEmailService();
+    $enviado = $brevoService->enviarConfirmacaoCadastro($email, $nome, $codigo);
+
+    if (!$enviado) {
+        unset($_SESSION['pending_registration'], $_SESSION['verificar_tipo']);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Não foi possível enviar o e-mail de confirmação no momento. Verifique seu endereço de e-mail ou tente novamente em instantes.'
+        ]);
+        exit;
+    }
 
     echo json_encode([
         'success' => true,

@@ -1,11 +1,10 @@
 <?php
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/User.php";
-require_once __DIR__ . "/../helpers/EmailHelper.php";
+require_once __DIR__ . "/../core/Session.php";
+require_once __DIR__ . "/../helpers/BrevoEmailService.php";
 
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+Session::iniciar();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nome = trim($_POST['nome'] ?? '');
@@ -35,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    // Não salva no banco ainda: guarda os dados na sessão até confirmar o código
+    // Guarda os dados na sessão até confirmar o código
     $codigo = (string) random_int(100000, 999999);
 
     $_SESSION['pending_registration'] = [
@@ -50,7 +49,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['verificar_tipo'] = 'Cadastro';
     unset($_SESSION['verificar_user_id']);
 
-    EmailHelper::enviarCodigo($email, $codigo, 'Cadastro');
+    $brevoService = new BrevoEmailService();
+    $enviado = $brevoService->enviarConfirmacaoCadastro($email, $nome, $codigo);
+
+    if (!$enviado) {
+        unset($_SESSION['pending_registration'], $_SESSION['verificar_tipo']);
+        echo "
+        <script>
+        alert('Não foi possível enviar o e-mail de confirmação no momento. Tente novamente em instantes.');
+        window.location='../Index.php';
+        </script>
+        ";
+        exit;
+    }
 
     echo "
     <script>

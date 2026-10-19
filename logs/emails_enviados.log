@@ -1,1 +1,7 @@
 # Log de auditoria de envios de e-mail (Códigos OTP/2FA omitidos por segurança)
+[2026-10-19 14:30:17] [INFO] [BrevoEmailService] Sucesso HTTP 201 | Destinatário: ka***@gmail.com | Assunto: Bem-vindo(a) ao MB Studio — Confirme seu Cadastro
+[2026-10-19 14:36:37] [INFO] [BrevoEmailService] Sucesso HTTP 201 | Destinatário: ac***@gmail.com | Assunto: Bem-vindo(a) ao MB Studio — Confirme seu Cadastro
+[2026-10-19 14:50:01] [INFO] [BrevoEmailService] Sucesso HTTP 201 | Destinatário: ka***@gmail.com | Assunto: Bem-vindo(a) ao MB Studio — Confirme seu Cadastro
+[2026-10-19 14:55:25] [INFO] [BrevoEmailService] Sucesso HTTP 201 | Destinatário: ka***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio
+[2026-10-19 16:25:10] [INFO] [BrevoEmailService] Sucesso HTTP 201 | Destinatário: ka***@gmail.com | Assunto: Bem-vindo(a) ao MB Studio — Confirme seu Cadastro
+[2026-10-19 16:25:35] [INFO] [BrevoEmailService] Sucesso HTTP 201 | Destinatário: ka***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio

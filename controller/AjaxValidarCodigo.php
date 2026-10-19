@@ -117,10 +117,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             unset($_SESSION['verificar_user_id'], $_SESSION['verificar_tipo'], $_SESSION['temp_login_dados']);
 
+            $mustChange = !empty($dados['User_must_change_pass']);
+            $basePath = Session::getBasePath();
+
             echo json_encode([
-                'success' => true,
-                'perm'    => $dados['User_perm'],
-                'message' => 'Código validado! Redirecionando...'
+                'success'          => true,
+                'perm'             => $dados['User_perm'],
+                'must_change_pass' => $mustChange,
+                'redirect'         => $mustChange ? ($basePath . '/primeiro-acesso') : null,
+                'message'          => 'Código validado! Redirecionando...'
             ]);
             exit;
         }

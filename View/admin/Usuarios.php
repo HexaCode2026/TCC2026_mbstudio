@@ -277,22 +277,33 @@ function getIniciais($nome) {
                                         <?php endif; ?>
                                     </td>
 
-                                    <!-- Permissão (Formulário Original Preservado) -->
+                                    <!-- Permissão de Acesso -->
                                     <td>
-                                        <form action="../../controller/AlterarPermissao.php" method="POST" class="perm-form-container">
-                                            <input type="hidden" name="User_id" value="<?= $u['User_id'] ?>">
-                                            <select name="User_perm" class="select-luxury-perm" aria-label="Permissão do Usuário">
-                                                <option value="C" <?= $u['User_perm'] == 'C' ? 'selected' : '' ?>>👤 Cliente (C)</option>
-                                                <option value="F" <?= $u['User_perm'] == 'F' ? 'selected' : '' ?>>✂️ Funcionário (F)</option>
-                                                <option value="A" <?= $u['User_perm'] == 'A' ? 'selected' : '' ?>>👑 Admin (A)</option>
-                                            </select>
-                                            <button type="submit" class="btn-luxury-save" title="Salvar alteração de permissão">
-                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                        <?php if ($u['User_perm'] === 'A' || $isSelf): ?>
+                                            <span class="admin-role-locked-badge" title="Usuários com permissão de Administrador não podem ter seu cargo alterado.">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                                 </svg>
-                                                Salvar
-                                            </button>
-                                        </form>
+                                                👑 Admin (A) — Cargo Protegido
+                                            </span>
+                                        <?php else: ?>
+                                            <form action="../../controller/AlterarPermissao.php" method="POST" class="perm-form-container">
+                                                <?= Session::csrfField() ?>
+                                                <input type="hidden" name="User_id" value="<?= $u['User_id'] ?>">
+                                                <select name="User_perm" class="select-luxury-perm" aria-label="Permissão do Usuário">
+                                                    <option value="C" <?= $u['User_perm'] == 'C' ? 'selected' : '' ?>>👤 Cliente (C)</option>
+                                                    <option value="F" <?= $u['User_perm'] == 'F' ? 'selected' : '' ?>>✂️ Funcionário (F)</option>
+                                                    <option value="A" <?= $u['User_perm'] == 'A' ? 'selected' : '' ?>>👑 Admin (A)</option>
+                                                </select>
+                                                <button type="submit" class="btn-luxury-save" title="Salvar alteração de permissão">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                                    </svg>
+                                                    Salvar
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
                                     </td>
 
                                     <!-- Ações (Alternar Status / Excluir) -->
@@ -301,6 +312,7 @@ function getIniciais($nome) {
                                             <?php if(!$isSelf): ?>
                                                 <!-- Alternar Status (Ativar / Desativar) -->
                                                 <form action="../../controller/AlternarStatusUsuario.php" method="POST" style="margin: 0;">
+                                                    <?= Session::csrfField() ?>
                                                     <input type="hidden" name="User_id" value="<?= $u['User_id'] ?>">
                                                     <input type="hidden" name="User_active" value="<?= $u['User_active'] == 1 ? 0 : 1 ?>">
                                                     <?php if($u['User_active'] == 1): ?>
@@ -325,6 +337,7 @@ function getIniciais($nome) {
 
                                                 <!-- Excluir Usuário Fisicamente -->
                                                 <form action="../../controller/ExcluirUsuario.php" method="POST" onsubmit="return confirm('Atenção: Tem certeza que deseja excluir fisicamente o usuário \'<?= htmlspecialchars(addslashes($u['User_name'])) ?>\'? Esta ação é irreversível.');" style="margin: 0;">
+                                                    <?= Session::csrfField() ?>
                                                     <input type="hidden" name="User_id" value="<?= $u['User_id'] ?>">
                                                     <button type="submit" class="btn-action-luxury btn-delete-luxury" title="Excluir usuário permanentemente">
                                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

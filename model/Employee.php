@@ -464,5 +464,22 @@ class Employee
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // =====================================
+    // LISTAR PROFISSIONAIS EM DESTAQUE (HOME)
+    // =====================================
+    public function listarDestaquesHome(int $limite = 4): array
+    {
+        $sql = "SELECT e.Emp_id, u.User_name, e.Emp_photo, e.Emp_specialty, e.Emp_bio 
+                FROM employees e
+                JOIN users u ON e.User_id = u.User_id
+                WHERE u.User_perm = 'F'
+                ORDER BY u.User_name ASC
+                LIMIT :limite";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
 }
 ?>

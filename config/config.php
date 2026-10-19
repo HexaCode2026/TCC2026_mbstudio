@@ -26,7 +26,24 @@ if (!function_exists('mb_load_env')) {
     }
 }
 
+// Carrega o arquivo .env localizado dentro da pasta config/ (padrão MVC do projeto)
+mb_load_env(__DIR__ . '/.env');
+// Fallback caso exista um .env na raiz
 mb_load_env(__DIR__ . '/../.env');
+
+// Função global compatível com padrão MVC / CodeIgniter para registro centralizado de logs
+if (!function_exists('log_message')) {
+    function log_message($level, $message) {
+        $logDir = __DIR__ . '/../logs';
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0755, true);
+        }
+        $levelUpper = strtoupper((string)$level);
+        $entry = "[" . date('Y-m-d H:i:s') . "] [{$levelUpper}] " . $message . PHP_EOL;
+        $targetFile = ($levelUpper === 'ERROR') ? ($logDir . '/erros_email.log') : ($logDir . '/emails_enviados.log');
+        @file_put_contents($targetFile, $entry, FILE_APPEND);
+    }
+}
 
 // Configurações do sistema via Variáveis de Ambiente
 if (!defined("DB_HOST")) define("DB_HOST", getenv("DB_HOST") ?: "localhost");

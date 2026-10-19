@@ -66,6 +66,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             unset($_SESSION['verificar_user_id'], $_SESSION['verificar_tipo'], $_SESSION['temp_login_dados']);
 
+            if (!empty($dados['User_must_change_pass'])) {
+                header("Location: " . Session::getBasePath() . "/primeiro-acesso");
+                exit;
+            }
+
             switch ($dados['User_perm']) {
                 case "A": header("Location: ../View/admin/Home.php"); break;
                 case "F": header("Location: ../View/funcionario/Home.php"); break;

@@ -1,94 +1,17 @@
 <?php
 // ============================================================================
-// CONTROLLER: Inicialização da Sessão e Controle de Acesso
+// CONTROLLER / MODEL: Inicialização de Sessão e Carregamento via MVC
 // ============================================================================
-require_once 'core/Session.php';
-Session::iniciar();
+require_once __DIR__ . '/controller/HomeController.php';
 
-if (isset($_SESSION['User_perm']) && empty($_GET['preview'])) {
-    if ($_SESSION['User_perm'] === 'A') {
-        header("Location: View/admin/Home.php");
-        exit;
-    } elseif ($_SESSION['User_perm'] === 'F') {
-        header("Location: View/funcionario/Home.php");
-        exit;
-    }
-}
+$homeController = new HomeController($pdo ?? null);
+$homeController->verificarAcesso();
 
-// ============================================================================
-// MODEL / CONTROLLER: Consulta e Preparação de Dados para a View
-// ============================================================================
-$servicos = [];
-$funcionarios = [];
-$novidades = [];
-$destaques = [];
-
-try {
-    if (file_exists('config/conexao.php')) {
-        require_once 'config/conexao.php';
-        require_once 'model/Imagem.php';
-
-        if (isset($pdo)) {
-            // Buscar serviços ativos
-            $stmtServicos = $pdo->query("SELECT * FROM services 
-                                         WHERE Ser_active = 1 
-                                         ORDER BY Ser_id ASC 
-                                         LIMIT 6");
-            $servicos = $stmtServicos ? $stmtServicos->fetchAll(PDO::FETCH_ASSOC) : [];
-
-            // Buscar funcionários cadastrados
-            $stmtEmp = $pdo->query("SELECT e.Emp_id, u.User_name, e.Emp_photo, e.Emp_specialty, e.Emp_bio 
-                                    FROM employees e
-                                    JOIN users u ON e.User_id = u.User_id
-                                    WHERE u.User_perm = 'F'
-                                    ORDER BY u.User_name ASC
-                                    LIMIT 4");
-            $funcionarios = $stmtEmp ? $stmtEmp->fetchAll(PDO::FETCH_ASSOC) : [];
-
-            // Buscar serviços recentes ativos como novidades
-            $stmtServ = $pdo->query("SELECT * FROM services 
-                                     WHERE Ser_active = 1 
-                                     ORDER BY Ser_id DESC 
-                                     LIMIT 3");
-            $novidades = $stmtServ ? $stmtServ->fetchAll(PDO::FETCH_ASSOC) : [];
-
-            // ── Hero Slideshow: Imagens gerenciáveis pelo Admin (tabela site_images via model/Imagem.php) ──
-            $imagemModel = new Imagem($pdo);
-            $slidesHeroDb = $imagemModel->listarAtivasHero(__DIR__);
-
-            if (!empty($slidesHeroDb)) {
-                foreach ($slidesHeroDb as $sh) {
-                    $rawSub = trim($sh['Img_subtitle'] ?? '');
-                    if ($rawSub !== '' && is_numeric(str_replace(',', '.', $rawSub))) {
-                        $rawSub = 'R$ ' . number_format((float)str_replace(',', '.', $rawSub), 2, ',', '.');
-                    }
-                    $destaques[] = [
-                        'title'    => $sh['Img_title'],
-                        'subtitle' => $rawSub,
-                        'image'    => $sh['Img_path']
-                    ];
-                }
-            } else {
-                // Fallback automático para serviços ativos com imagem caso não haja slides ativos
-                foreach ($servicos as $s) {
-                    $imgPath = $s['Ser_image'] ?? '';
-                    if (!empty($imgPath) && (file_exists($imgPath) || file_exists(__DIR__ . '/' . $imgPath))) {
-                        $destaques[] = [
-                            'title'    => $s['Ser_name'],
-                            'subtitle' => 'R$ ' . number_format((float)$s['Ser_price'], 2, ',', '.'),
-                            'image'    => $imgPath
-                        ];
-                    }
-                }
-            }
-        }
-    }
-} catch (Exception $e) {
-    $servicos = [];
-    $funcionarios = [];
-    $novidades = [];
-    $destaques = [];
-}
+$dadosHome    = $homeController->carregarDadosHome(__DIR__);
+$servicos     = $dadosHome['servicos'];
+$funcionarios = $dadosHome['funcionarios'];
+$novidades    = $dadosHome['novidades'];
+$destaques    = $dadosHome['destaques'];
 
 $globalCssVer = @filemtime(__DIR__ . '/assets/css/global.css') ?: '2.5';
 $homeCssVer   = @filemtime(__DIR__ . '/assets/css/home.css') ?: '2.5';

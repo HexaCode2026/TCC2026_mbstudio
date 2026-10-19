@@ -16,6 +16,8 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
+Session::validarCsrf();
+
 $appoId = filter_input(INPUT_POST, 'appo_id', FILTER_VALIDATE_INT);
 $paymentMethod = $_POST['payment_method'] ?? null;
 $userId = $_SESSION['User_id'];

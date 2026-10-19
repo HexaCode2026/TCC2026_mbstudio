@@ -36,8 +36,12 @@ $funcionario = $stmtFunc->fetch(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirmar Agendamento | MB Studio</title>
-    <link rel="stylesheet" href="../../assets/css/global.css">
-    <link rel="stylesheet" href="../../assets/css/cliente/confirmar.css">
+    <?php
+    $globalCssVer = @filemtime(__DIR__ . '/../../assets/css/global.css') ?: '3.0';
+    $confCssVer   = @filemtime(__DIR__ . '/../../assets/css/cliente/confirmar.css') ?: '3.0';
+    ?>
+    <link rel="stylesheet" href="../../assets/css/global.css?v=<?= $globalCssVer ?>">
+    <link rel="stylesheet" href="../../assets/css/cliente/confirmar.css?v=<?= $confCssVer ?>">
 </head>
 <body class="cliente-page">
 

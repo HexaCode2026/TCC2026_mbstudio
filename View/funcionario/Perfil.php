@@ -15,7 +15,8 @@ $employeeModel = new Employee($pdo);
 
 $dadosFuncionario = $employeeModel->buscarPorUserId($userId);
 
-
+$globalCssVer = @filemtime(__DIR__ . '/../../assets/css/global.css') ?: '3.0';
+$funcCssVer   = @filemtime(__DIR__ . '/../../assets/css/funcionario.css') ?: '3.0';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -28,9 +29,11 @@ $dadosFuncionario = $employeeModel->buscarPorUserId($userId);
 
     <title>Meu Perfil | MB Studio</title>
 
-    <link rel="stylesheet" href="../../assets/css/global.css">
-
-    <link rel="stylesheet" href="../../assets/css/funcionario.css">
+    <link rel="stylesheet" href="../../assets/css/global.css?v=<?= $globalCssVer ?>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/funcionario.css?v=<?= $funcCssVer ?>">
 
 </head>
 
@@ -47,17 +50,48 @@ $dadosFuncionario = $employeeModel->buscarPorUserId($userId);
 
         <div class="main-container">
 
+            <!-- NAVEGAÇÃO SUPERIOR OPERACIONAL -->
+            <div class="perfil-top-nav">
+                <a href="Home.php" class="btn-back-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Voltar ao Início
+                </a>
+
+                <div class="perfil-nav-right">
+                    <a href="Agenda.php" class="btn-back-link">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        Minha Agenda
+                    </a>
+                    <a href="Disponibilidade.php" class="btn-back-link">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Meus Horários
+                    </a>
+                </div>
+            </div>
 
             <!-- INTRODUÇÃO DA PÁGINA -->
 
             <section class="employee-profile-intro">
 
-                <span class="golden-accent-detail"></span>
+                <div class="perfil-badge">
+                    <span>✦ Conta Profissional ✦</span>
+                </div>
 
-                <h1 class="employee-profile-title">Meu Perfil</h1>
+                <h1 class="employee-profile-title">Meu <span class="cursiva-gold">Perfil</span></h1>
 
                 <p class="employee-profile-subtitle">
-                    Atualize suas informações profissionais e seus dados de acesso.
+                    Atualize suas informações profissionais, foto de apresentação e seus dados de acesso.
                 </p>
 
             </section>

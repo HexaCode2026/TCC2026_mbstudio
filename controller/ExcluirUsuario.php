@@ -1,21 +1,23 @@
 <?php
-require_once "../config/conexao.php";
-require_once "../core/Session.php";
-require_once "../model/User.php";
+require_once __DIR__ . "/../config/conexao.php";
+require_once __DIR__ . "/../core/Session.php";
+require_once __DIR__ . "/../model/User.php";
 
 Session::iniciar();
 
 // Proteção: Apenas Admin
-if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'A') {
+if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] !== 'A') {
     header("Location: ../Index.php");
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $userId = $_POST['User_id'] ?? null;
+    Session::validarCsrf();
 
-    if ($userId) {
-        // Não deixar o admin se excluir acidentalmente (opcional, mas recomendado)
+    $userId = filter_input(INPUT_POST, 'User_id', FILTER_VALIDATE_INT);
+
+    if ($userId && $userId > 0) {
+        // Impede auto-exclusão do administrador logado
         if ($userId != $_SESSION['User_id']) {
             $userModel = new User($pdo);
             $userModel->excluir($userId);

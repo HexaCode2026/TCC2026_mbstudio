@@ -12,24 +12,62 @@ if (!isset($_SESSION['User_id']) || ($_SESSION['User_perm'] ?? '') !== 'A') {
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    Session::validarCsrf();
+
     $acao = $_POST['acao'] ?? '';
     $imagemModel = new Imagem($pdo);
 
-    // Função auxiliar para upload seguro de imagem
+    // Função auxiliar para upload estritamente validado de imagem (Allowlist + MIME Magic Bytes + Limite 5MB)
     $processarUpload = function ($inputName, $subFolder = 'carousel', $prefix = 'img_') {
-        if (!isset($_FILES[$inputName]) || $_FILES[$inputName]['error'] !== UPLOAD_ERR_OK) {
+        if (!isset($_FILES[$inputName]) || $_FILES[$inputName]['error'] === UPLOAD_ERR_NO_FILE) {
             return null;
         }
-        $ext = strtolower(pathinfo($_FILES[$inputName]['name'], PATHINFO_EXTENSION));
-        $permitidas = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'];
-        if (!in_array($ext, $permitidas)) {
+        if ($_FILES[$inputName]['error'] !== UPLOAD_ERR_OK) {
             return false;
         }
 
-        $fileName = uniqid($prefix) . "." . $ext;
+        // 1. Limite de tamanho: máximo 5MB
+        if ($_FILES[$inputName]['size'] > 5 * 1024 * 1024) {
+            return false;
+        }
+
+        // 2. Validação da extensão em lista branca
+        $ext = strtolower(pathinfo($_FILES[$inputName]['name'], PATHINFO_EXTENSION));
+        $permitidas = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'];
+        if (!in_array($ext, $permitidas, true)) {
+            return false;
+        }
+
+        // 3. Validação de MIME real via finfo (Magic Bytes)
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeReal = $finfo->file($_FILES[$inputName]['tmp_name']);
+        $mapaMimes = [
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/webp' => 'webp',
+            'image/gif'  => 'gif',
+            'image/avif' => 'avif'
+        ];
+
+        if (!array_key_exists($mimeReal, $mapaMimes)) {
+            return false;
+        }
+
+        // 4. Verificação estrutural de imagem
+        if ($mimeReal !== 'image/avif' && !@getimagesize($_FILES[$inputName]['tmp_name'])) {
+            return false;
+        }
+
+        $subPastasPermitidas = ['carousel', 'services'];
+        if (!in_array($subFolder, $subPastasPermitidas, true)) {
+            $subFolder = 'carousel';
+        }
+
+        $extSegura = $mapaMimes[$mimeReal];
+        $fileName = $prefix . bin2hex(random_bytes(8)) . "." . $extSegura;
         $uploadDir = __DIR__ . "/../assets/img/" . $subFolder . "/";
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
+            mkdir($uploadDir, 0755, true);
         }
 
         $uploadPath = $uploadDir . $fileName;
@@ -85,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if ($acao === 'status') {
         $id = (int)($_POST['Img_id'] ?? 0);
-        $novoStatus = (int)($_POST['novo_status'] ?? 0);
+        $novoStatus = (int)($_POST['novo_status'] ?? 0) === 1 ? 1 : 0;
         if ($id > 0) {
             $imagemModel->alternarStatus($id, $novoStatus);
         }
@@ -123,4 +161,3 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 header("Location: ../View/admin/Imagens.php");
 exit;
-

@@ -1,0 +1,13 @@
+# Arquivos de Ambiente e Segredos
+.env
+.env.*
+!.env.example
+
+# Logs de Sistema e Erros
+/logs/*.log
+
+# Dependências e Temporários
+/vendor/
+.DS_Store
+Thumbs.db
+

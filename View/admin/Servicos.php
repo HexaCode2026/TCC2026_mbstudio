@@ -420,18 +420,18 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
                                             </div>
                                         </details>
 
-                                        <!-- AÇÃO DE EXCLUIR -->
-                                        <a href="../../controller/ExcluirServico.php?id=<?= $s['Ser_id'] ?>"
-                                            class="btn-delete-luxury"
-                                            onclick="return confirm('Tem certeza que deseja excluir o serviço \'<?= htmlspecialchars(addslashes($s['Ser_name'])) ?>\'?');"
-                                            title="Excluir serviço"
-                                        >
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                                <polyline points="3 6 5 6 21 6"></polyline>
-                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                            </svg>
-                                            Excluir
-                                        </a>
+                                        <!-- AÇÃO DE EXCLUIR (POST SEGURO COM CSRF) -->
+                                        <form action="../../controller/ExcluirServico.php" method="POST" style="display: inline-block; margin: 0;" onsubmit="return confirm('Tem certeza que deseja excluir o serviço \'<?= htmlspecialchars(addslashes($s['Ser_name'])) ?>\'?');">
+                                            <input type="hidden" name="id" value="<?= (int)$s['Ser_id'] ?>">
+                                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(Session::gerarTokenCsrf()) ?>">
+                                            <button type="submit" class="btn-delete-luxury" title="Excluir serviço">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                </svg>
+                                                Excluir
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

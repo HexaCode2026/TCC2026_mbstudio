@@ -11,6 +11,8 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
+Session::validarCsrf();
+
 $userId = $_SESSION['User_id'];
 
 $clientModel = new Client($pdo);

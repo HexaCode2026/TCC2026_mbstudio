@@ -61,14 +61,18 @@ if (!empty($minhasDisponibilidades)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disponibilidade | MB Studio</title>
 
-    <link rel="stylesheet" href="../../assets/css/global.css">
+    <?php
+    $globalCssVer = @filemtime(__DIR__ . '/../../assets/css/global.css') ?: '3.0';
+    $dispCssVer   = @filemtime(__DIR__ . '/../../assets/css/funcionario/disponibilidade.css') ?: '3.0';
+    ?>
+    <link rel="stylesheet" href="../../assets/css/global.css?v=<?= $globalCssVer ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
         rel="stylesheet">
 
-    <link rel="stylesheet" href="../../assets/css/funcionario/disponibilidade.css">
+    <link rel="stylesheet" href="../../assets/css/funcionario/disponibilidade.css?v=<?= $dispCssVer ?>">
 </head>
 
 <body>
@@ -247,7 +251,6 @@ if (!empty($minhasDisponibilidades)) {
                         <button type="button" class="btn-lote btn-lote-disp" onclick="salvarLote('Disponivel')">✓ Disponível</button>
                         <button type="button" class="btn-lote btn-lote-folga" onclick="salvarLote('Folga')">☕ Folga</button>
                         <button type="button" class="btn-lote btn-lote-ferias" onclick="salvarLote('Ferias')">✈ Férias</button>
-                        <button type="button" class="btn-lote btn-lote-bloq" onclick="salvarLote('Bloqueado')">⛔ Bloqueado</button>
                     </div>
                     <!-- Formulário oculto preenchido pelo JS -->
                     <form action="../../controller/EditarDisponibilidade.php" method="POST" id="formLoteData"
@@ -294,11 +297,8 @@ if (!empty($minhasDisponibilidades)) {
                                             <input type="hidden" name="Ava_id" value="<?= htmlspecialchars($disp['Ava_id']) ?>">
                                             <select name="Ava_status" class="select-disp-status" required>
                                                 <option value="Disponivel" <?= $disp['Ava_status'] === 'Disponivel' ? 'selected' : '' ?>>Disponível</option>
-                                                <option value="Folga" <?= $disp['Ava_status'] === 'Folga' ? 'selected' : '' ?>>
-                                                    Folga</option>
-                                                <option value="Ferias" <?= $disp['Ava_status'] === 'Ferias' ? 'selected' : '' ?>>
-                                                    Férias</option>
-                                                <option value="Bloqueado" <?= $disp['Ava_status'] === 'Bloqueado' ? 'selected' : '' ?>>Bloqueado</option>
+                                                <option value="Folga" <?= $disp['Ava_status'] === 'Folga' ? 'selected' : '' ?>>Folga</option>
+                                                <option value="Ferias" <?= $disp['Ava_status'] === 'Ferias' ? 'selected' : '' ?>>Férias</option>
                                             </select>
                                             <button type="submit" class="btn-save-disp">Salvar</button>
                                         </form>
@@ -689,7 +689,6 @@ if (!empty($minhasDisponibilidades)) {
                             <option value="Disponivel" selected>Disponível</option>
                             <option value="Folga">Folga</option>
                             <option value="Ferias">Férias</option>
-                            <option value="Bloqueado">Bloqueado</option>
                         </select>
                         <input type="hidden" name="horarios[${count}][start]" value="${startTimeStr}">
                         <input type="hidden" name="horarios[${count}][end]" value="${endTimeStr}">

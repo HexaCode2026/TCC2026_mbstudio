@@ -32,6 +32,11 @@
 
 namespace PHPMailer\PHPMailer;
 
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    exit('Acesso direto via navegador bloqueado por política de segurança.');
+}
+
 /**
  * Aliases for League Provider Classes
  * Make sure you have added these to your composer.json and run `composer install`

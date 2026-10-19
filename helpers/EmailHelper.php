@@ -2,7 +2,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// Inclui os arquivos do PHPMailer que acabamos de baixar
+require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../libs/PHPMailer/src/Exception.php';
 require_once __DIR__ . '/../libs/PHPMailer/src/PHPMailer.php';
 require_once __DIR__ . '/../libs/PHPMailer/src/SMTP.php';
@@ -17,11 +17,12 @@ class EmailHelper {
             $textoIntro = 'Seu código de verificação é:';
         }
         
+        $codigoSafe = htmlspecialchars((string)$codigo, ENT_QUOTES, 'UTF-8');
         $mensagem = "
         <div style='font-family: Arial, sans-serif; text-align: center; color: #333;'>
             <h2>MB Studio</h2>
             <p>$textoIntro</p>
-            <h1 style='letter-spacing: 5px; color: #b98527; font-size: 32px;'>$codigo</h1>
+            <h1 style='letter-spacing: 5px; color: #b98527; font-size: 32px;'>$codigoSafe</h1>
             <p>Este código expira em 15 minutos.</p>
             <hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;'>
             <p style='font-size: 12px; color: #777;'>Se não foi você que solicitou, pode ignorar este e-mail.</p>
@@ -32,59 +33,45 @@ class EmailHelper {
 
         try {
             // =========================================================
-            // CONFIGURAÇÕES DO SERVIDOR SMTP (Ajuste com seus dados!)
+            // CONFIGURAÇÕES DO SERVIDOR SMTP VIA VARIÁVEIS DE AMBIENTE (.env)
             // =========================================================
-            
-            // Ativa o SMTP
+            $smtpHost = getenv('SMTP_HOST') ?: 'smtp.gmail.com';
+            $smtpPort = (int)(getenv('SMTP_PORT') ?: 587);
+            $smtpUser = getenv('SMTP_USER') ?: '';
+            $smtpPass = getenv('SMTP_PASS') ?: '';
+            $smtpFrom = getenv('SMTP_FROM') ?: $smtpUser;
+            $smtpName = getenv('SMTP_FROM_NAME') ?: 'MB Studio';
+
             $mail->isSMTP();
-            
-            // Host do servidor de e-mail (Ex: smtp.gmail.com)
-            $mail->Host       = 'smtp.gmail.com'; 
-            
-            // Requer autenticação SMTP
+            $mail->Host       = $smtpHost;
             $mail->SMTPAuth   = true;
-            
-            // Seu E-mail que vai ENVIAR as mensagens
-            $mail->Username   = 'Hexa.code2026@gmail.com';
-            
-            // Sua Senha de Aplicativo (Não é a senha normal do email!)
-            $mail->Password   = 'fiiz fmnb vxsf zhik'; 
-            
-            // Ativa criptografia segura
+            $mail->Username   = $smtpUser;
+            $mail->Password   = $smtpPass;
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            
-            // Porta TCP (587 para STARTTLS no Gmail)
-            $mail->Port       = 587;
-            
-            // Configura charset e linguagem
-            $mail->CharSet = 'UTF-8';
+            $mail->Port       = $smtpPort;
+            $mail->CharSet    = 'UTF-8';
             $mail->setLanguage('pt_br');
 
             // =========================================================
             // CONFIGURAÇÕES DA MENSAGEM
             // =========================================================
-            
-            // Quem está enviando
-            $mail->setFrom('Hexa.code2026@gmail.com', 'MB Studio');
-            
-            // Quem vai receber
+            $mail->setFrom($smtpFrom, $smtpName);
             $mail->addAddress($email);
-            
-            // Formato HTML
             $mail->isHTML(true);
             $mail->Subject = $assunto;
             $mail->Body    = $mensagem;
-            $mail->AltBody = "Seu código de verificação é: $codigo. Expira em 15 minutos.";
+            $mail->AltBody = "Seu código de verificação é: $codigoSafe. Expira em 15 minutos.";
 
             $mail->send();
             
-            // Mantemos o log apenas para registro de controle interno
-            $logStr = "[" . date('Y-m-d H:i:s') . "] REAL-EMAIL: $email | CODIGO: $codigo | TIPO: $tipo\n";
+            // Log de auditoria SEGURO: mascara o destinatário e NUNCA grava o código 2FA/OTP em texto puro
+            $partesEmail = explode('@', $email);
+            $emailMascarado = substr($partesEmail[0], 0, 2) . '***@' . ($partesEmail[1] ?? 'dominio');
+            $logStr = "[" . date('Y-m-d H:i:s') . "] DESTINATARIO: $emailMascarado | TIPO: $tipo | STATUS: ENVIADO\n";
             @file_put_contents(__DIR__ . '/../logs/emails_enviados.log', $logStr, FILE_APPEND);
             
             return true;
         } catch (Exception $e) {
-            // Em caso de erro, salva no log de erros para você poder debugar
             $logErro = "[" . date('Y-m-d H:i:s') . "] ERRO EMAIL: " . $mail->ErrorInfo . "\n";
             @file_put_contents(__DIR__ . '/../logs/erros_email.log', $logErro, FILE_APPEND);
             return false;

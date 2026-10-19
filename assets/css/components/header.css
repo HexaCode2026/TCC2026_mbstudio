@@ -156,7 +156,7 @@ body {
 
 /* ==========================================================================
    MODO CELULAR & TABLET COMPACTO (<= 860px)
-   Canto Direito com Botão Login / Cadastrar + Botão de 3 Pontinhos (⋮)
+   Canto Direito apenas com o Botão de 3 Pontinhos (⋮) sem duplicar o botão do desktop
    ========================================================================== */
 @media (max-width: 860px) {
     .header-main-bar {
@@ -166,16 +166,10 @@ body {
         padding: 0 14px;
     }
 
-    /* Mantém o botão de Login/Cadastrar visível no canto direito ao lado dos 3 pontinhos */
-    .header-auth {
-        display: flex !important;
-        align-items: center;
-    }
-
-    .header-auth .auth-btn {
-        padding: 6px 12px;
-        min-height: 38px;
-        font-size: 12.5px;
+    /* Oculta o botão de perfil/login do desktop no modo celular para não duplicar com os 3 pontinhos */
+    .header-auth,
+    #desktopAuthDropdown {
+        display: none !important;
     }
 
     /* Botão de 3 Pontinhos no Canto Direito */

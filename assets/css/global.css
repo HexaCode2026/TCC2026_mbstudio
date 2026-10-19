@@ -515,10 +515,11 @@ table tbody tr:hover {
     border-bottom: 1px solid var(--border);
 }
 
+.modal-header h2,
 .modal-header h3 {
     font-family: var(--font-sans);
-    font-size: 1.125rem;
-    font-weight: 600;
+    font-size: 1.15rem;
+    font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.02em;
     margin: 0;
@@ -528,21 +529,22 @@ table tbody tr:hover {
     width: 34px;
     height: 34px;
     border-radius: var(--radius-md);
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--text-muted);
+    border: 1px solid var(--border);
+    background: var(--bg-subtle);
+    color: var(--text-secondary);
     font-size: 1.35rem;
     line-height: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: all var(--transition-fast);
 }
 
 .btn-close-modal:hover {
-    background: var(--bg-subtle);
-    color: var(--text-primary);
-    border-color: var(--border);
+    background: #FEE2E2;
+    color: #B91C1C;
+    border-color: #FECACA;
 }
 
 .modal-body {
@@ -551,20 +553,31 @@ table tbody tr:hover {
     gap: var(--space-4);
 }
 
-.info-resumo {
-    background: var(--bg-subtle);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: var(--space-4);
+.modal-body form {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
-    font-size: 0.9rem;
+    gap: 16px;
+}
+
+.info-resumo {
+    background: #F8FAFC;
+    border: 1px solid #CBD5E1;
+    border-left: 4px solid var(--color-primary, #B8860B);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.92rem;
     color: var(--text-secondary);
 }
 
 .info-resumo p {
     margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .info-resumo strong {
@@ -572,30 +585,84 @@ table tbody tr:hover {
     font-weight: 600;
 }
 
+/* Campo de Observação em Modais e Finalização de Pedido */
+.modal-textarea,
+#modalClientObs,
+#modalObsTexto,
+.form-group-obs textarea,
+#observacao {
+    width: 100%;
+    min-height: 96px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md, 8px);
+    border: 1.5px solid #CBD5E1;
+    background-color: #F8FAFC;
+    color: #0F172A;
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+    box-sizing: border-box;
+}
+
+.modal-textarea::placeholder,
+#modalClientObs::placeholder,
+#modalObsTexto::placeholder,
+.form-group-obs textarea::placeholder,
+#observacao::placeholder {
+    color: #64748B;
+    font-style: normal;
+}
+
+.modal-textarea:hover,
+#modalClientObs:hover,
+#modalObsTexto:hover,
+.form-group-obs textarea:hover,
+#observacao:hover {
+    border-color: #94A3B8;
+    background-color: #FFFFFF;
+}
+
+.modal-textarea:focus,
+#modalClientObs:focus,
+#modalObsTexto:focus,
+.form-group-obs textarea:focus,
+#observacao:focus {
+    background-color: #FFFFFF;
+    border-color: var(--color-primary, #B8860B);
+    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.18);
+    color: #0F172A;
+}
+
 .payment-section {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: 10px;
 }
 
 .payment-title {
     display: block;
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.78rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--text-muted);
+    color: #334155;
+    margin: 0;
 }
 
 .payment-options {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-3);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
 }
 
 .payment-card {
     position: relative;
     cursor: pointer;
+    display: block;
 }
 
 .payment-card input[type="radio"] {
@@ -610,58 +677,63 @@ table tbody tr:hover {
     justify-content: center;
     gap: var(--space-2);
     padding: 12px 14px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    min-height: 46px;
+    background: #F8FAFC;
+    border: 1.5px solid #CBD5E1;
     border-radius: var(--radius-md);
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: #1E293B;
     box-shadow: var(--shadow-resting);
     transition: all var(--transition-fast);
     text-align: center;
 }
 
 .payment-card:hover .payment-label {
-    border-color: var(--gold-border);
-    background: var(--gold-lighter);
-    color: var(--text-primary);
+    border-color: #94A3B8;
+    background: #FFFFFF;
+    color: #0F172A;
 }
 
 .payment-card input[type="radio"]:checked + .payment-label {
-    background: var(--gold-lighter);
-    border-color: var(--color-primary);
-    color: var(--gold-darker);
-    box-shadow: 0 0 0 1px var(--color-primary);
+    background: #FEFCE8;
+    border-color: #B8860B;
+    color: #8A6508;
+    font-weight: 700;
+    box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.25);
 }
 
 .modal-actions {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--space-3);
-    margin-top: var(--space-2);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--border);
+    gap: 10px;
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid #E2E8F0;
 }
 
 .btn-cancelar-modal {
     padding: 10px 18px;
+    min-height: 42px;
     border-radius: var(--radius-md);
-    border: 1px solid var(--border);
-    background: var(--bg-card);
-    color: var(--text-secondary);
+    border: 1.5px solid #CBD5E1;
+    background: #FFFFFF;
+    color: #334155;
     font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
 }
 
 .btn-cancelar-modal:hover {
-    background: var(--bg-subtle);
-    color: var(--text-primary);
+    background: #F1F5F9;
+    border-color: #94A3B8;
+    color: #0F172A;
 }
 
 .btn-confirmar-modal {
     padding: 10px 20px;
+    min-height: 42px;
     border-radius: var(--radius-md);
     border: 1px solid transparent;
     background: var(--color-success);
@@ -721,4 +793,36 @@ table tbody tr:hover {
     height: 100%;
     object-fit: cover;
     object-position: center;
+}
+
+/* Botão Global de Cancelamento de Agendamento (Cliente) */
+.btn-cancel-appo {
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background-color: #FFF1F2;
+    border: 1.5px solid #FECDD3;
+    color: #BE123C;
+    padding: 8px 16px;
+    min-height: 38px;
+    border-radius: 9999px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(190, 18, 60, 0.06);
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 140ms ease, box-shadow 160ms ease;
+    white-space: nowrap;
+}
+
+.btn-cancel-appo:hover {
+    background-color: #E11D48;
+    border-color: #E11D48;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px -2px rgba(225, 29, 72, 0.35);
 }

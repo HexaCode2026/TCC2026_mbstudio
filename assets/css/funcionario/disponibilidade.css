@@ -1,18 +1,26 @@
 /* ==========================================================================
-   MB STUDIO — GESTÃO DE DISPONIBILIDADE DO PROFISSIONAL
-   Padrão: Linear, Stripe & Raycast | Surface Architecture & Responsive Grid
+   MB STUDIO — GESTÃO DE DISPONIBILIDADE DO PROFISSIONAL (MEUS HORÁRIOS)
+   Paleta: High-Contrast Slate & Gold Work Interface (Eficiência + Elegância)
    ========================================================================== */
+
+body {
+    background-color: #F1F5F9;
+    background-image: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.07) 0%, transparent 55%);
+    color: #0F172A;
+}
 
 .pagina-disponibilidade {
     width: 100%;
-    max-width: 1320px;
+    max-width: 1360px;
     margin: 0 auto;
-    padding: clamp(28px, 4vw, 44px) clamp(16px, 3.5vw, 36px) 80px;
+    padding: clamp(24px, 3.5vw, 40px) clamp(16px, 3vw, 32px) 80px;
     box-sizing: border-box;
     overflow-x: clip;
 }
 
-/* Top Navigation */
+/* ==========================================================================
+   1. NAVEGAÇÃO SUPERIOR & CABEÇALHO OPERACIONAL
+   ========================================================================== */
 .disp-top-nav {
     display: flex;
     justify-content: space-between;
@@ -26,93 +34,107 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: var(--text-secondary, #334155);
-    background: var(--bg-card, #FFFFFF);
-    border: 1px solid var(--border, #E2E8F0);
+    color: #1E293B;
+    background: #FFFFFF;
+    border: 1.5px solid #CBD5E1;
     padding: 9px 18px;
     min-height: 42px;
-    border-radius: var(--radius-full, 9999px);
+    border-radius: 9999px;
     font-size: 13.5px;
     font-weight: 600;
     text-decoration: none;
-    box-shadow: var(--shadow-resting);
-    transition: all var(--transition-fast, 150ms ease);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    transition: all 150ms ease;
+}
+
+.btn-back-link svg {
+    color: #B8860B;
 }
 
 .btn-back-link:hover {
-    background: var(--gold-lighter, #FDFAF0);
-    border-color: var(--gold-primary, #D4AF37);
-    color: var(--gold-darker, #8A6508);
-    box-shadow: var(--shadow-hover);
+    background: #0F172A;
+    border-color: #0F172A;
+    color: #F8FAFC;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.14);
     transform: translateY(-1px);
 }
 
-/* Header */
+.btn-back-link:hover svg {
+    color: #D4AF37;
+}
+
 .disp-header-box {
-    text-align: center;
-    margin-bottom: 32px;
-    position: relative;
+    text-align: left;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-left: 5px solid #D4AF37;
+    border-radius: 14px;
+    padding: clamp(20px, 3vw, 28px) clamp(20px, 3vw, 32px);
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
 }
 
 .disp-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 5px 16px;
-    background: var(--gold-lighter, #FDFAF0);
-    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.35));
-    border-radius: var(--radius-full, 9999px);
-    color: var(--gold-darker, #8A6508);
-    font-size: 11.5px;
+    padding: 5px 14px;
+    background: #0F172A;
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    border-radius: 9999px;
+    color: #F3E5AB;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .disp-title,
 .tituloPagina {
     font-family: var(--font-heading, 'Playfair Display', serif);
-    font-size: clamp(26px, 3.5vw, 36px);
+    font-size: clamp(24px, 3vw, 32px);
     font-weight: 700;
-    color: var(--text-primary, #0F172A);
+    color: #0F172A;
     letter-spacing: -0.025em;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .disp-subtitle,
 .subtitulo {
-    font-size: 15px;
-    color: var(--text-muted, #64748B);
-    max-width: 620px;
-    margin: 0 auto;
-    line-height: 1.55;
+    font-size: 14.5px;
+    color: #475569;
+    max-width: 760px;
+    margin: 0;
+    line-height: 1.5;
 }
 
-/* Seção de Formulário / Calendário */
+/* ==========================================================================
+   2. CARD PRINCIPAL DE CADASTRO & CALENDÁRIO INTERATIVO
+   ========================================================================== */
 .disp-main-card,
 .cadastro-grid-card {
-    background: var(--bg-card, #FFFFFF);
-    border: 1px solid var(--border, #E2E8F0);
-    border-radius: var(--radius-lg, 12px);
-    padding: clamp(22px, 3.5vw, 36px);
-    box-shadow: var(--shadow-resting);
-    margin-bottom: 36px;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 14px;
+    padding: clamp(22px, 3.2vw, 34px);
+    box-shadow: 0 6px 18px -4px rgba(15, 23, 42, 0.07);
+    margin-bottom: 32px;
 }
 
 .card-grade-layout {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(24px, 4vw, 36px);
-    align-items: start;
+    grid-template-columns: 1.05fr 1fr;
+    gap: clamp(24px, 3.5vw, 36px);
+    align-items: stretch;
 }
 
-/* Calendário */
+/* Calendário Operacional */
 .calendario-container,
 .cards {
-    background: var(--bg-subtle, #F8FAFC);
-    border: 1px solid var(--border, #E2E8F0);
-    border-radius: var(--radius-lg, 12px);
+    background: #F8FAFC;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 12px;
     padding: 22px;
 }
 
@@ -120,7 +142,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #E2E8F0;
 }
 
 .calendario-mes,
@@ -128,30 +152,31 @@
     font-family: var(--font-heading, 'Playfair Display', serif);
     font-size: 18px;
     font-weight: 700;
-    color: var(--text-primary, #0F172A);
+    color: #0F172A;
     text-transform: capitalize;
 }
 
 .calendario-btn {
     width: 38px;
     height: 38px;
-    border: 1px solid var(--border, #E2E8F0);
-    border-radius: var(--radius-md, 8px);
-    background: var(--bg-card, #FFFFFF);
-    color: var(--text-primary, #0F172A);
+    border: 1.5px solid #CBD5E1;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: #0F172A;
     font-size: 18px;
+    font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--shadow-resting);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
     transition: all 150ms ease;
 }
 
 .calendario-btn:hover {
-    background: var(--gold-lighter, #FDFAF0);
-    border-color: var(--gold-primary, #D4AF37);
-    color: var(--gold-darker, #8A6508);
+    background: #0F172A;
+    border-color: #0F172A;
+    color: #F3E5AB;
 }
 
 .calendario-semana,
@@ -163,69 +188,77 @@
 }
 
 .calendario-semana {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .calendario-semana span {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--text-muted, #64748B);
+    font-size: 11px;
+    font-weight: 700;
+    color: #334155;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .calendario-dias button {
     width: 100%;
-    min-height: 40px;
-    border: 1px solid var(--border, #E2E8F0);
-    border-radius: var(--radius-md, 8px);
-    background: var(--bg-card, #FFFFFF);
-    color: var(--text-primary, #0F172A);
+    min-height: 42px;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: #0F172A;
     font-size: 13.5px;
-    font-weight: 600;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
     cursor: pointer;
-    transition: all 150ms ease;
+    transition: all 140ms ease;
 }
 
 .calendario-dias button:hover:not(:disabled) {
-    background: var(--gold-lighter, #FDFAF0);
-    border-color: var(--gold-primary, #D4AF37);
-    color: var(--gold-darker, #8A6508);
+    background: #FEFCE8;
+    border-color: #B8860B;
+    color: #8A6508;
+    transform: translateY(-1px);
 }
 
 .calendario-dias button:disabled {
-    background: transparent;
-    border-color: transparent;
-    color: #CBD5E1;
-    opacity: 0.55;
+    background: #F1F5F9;
+    border-color: #E2E8F0;
+    color: #94A3B8;
+    opacity: 0.6;
     cursor: not-allowed;
 }
 
 .calendario-dias button.dia-selecionado {
-    background: var(--gold-gradient, linear-gradient(135deg, #D4AF37, #B8860B)) !important;
-    border-color: var(--gold-dark, #B8860B) !important;
+    background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%) !important;
+    border-color: #8A6508 !important;
     color: #0F172A !important;
-    font-weight: 700 !important;
-    box-shadow: var(--shadow-gold);
+    font-weight: 800 !important;
+    box-shadow: 0 4px 12px rgba(184, 134, 11, 0.35);
 }
 
-/* Coluna Direita (Campos) */
+/* Coluna Direita (Serviço & Janela de Atendimento) */
 .coluna-direita {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background: #F8FAFC;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 12px;
+    padding: 24px;
 }
 
 .area-servico {
-    margin-bottom: 22px;
+    margin-bottom: 24px;
 }
 
 .titulo-servicos,
 .titulo-horarios {
-    font-family: var(--font-heading, 'Playfair Display', serif);
-    font-size: 18px;
+    font-family: var(--font-sans);
+    font-size: 13px;
     font-weight: 700;
-    color: var(--text-primary, #0F172A);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #1E293B;
     margin-bottom: 10px;
 }
 
@@ -234,86 +267,102 @@
     width: 100%;
     min-height: 46px;
     padding: 10px 14px;
-    border: 1px solid var(--border, #E2E8F0);
-    border-radius: var(--radius-md, 8px);
-    background-color: var(--bg-subtle, #F8FAFC);
-    color: var(--text-primary, #0F172A);
-    font-size: 15px;
-    font-weight: 500;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 9px;
+    background-color: #FFFFFF;
+    color: #0F172A;
+    font-size: 14.5px;
+    font-weight: 600;
     outline: none;
-    transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+    cursor: pointer;
+}
+
+#Dis_ser:hover {
+    border-color: #94A3B8;
 }
 
 #Dis_ser:focus {
-    background-color: var(--bg-card, #FFFFFF);
-    border-color: var(--color-primary, #B8860B);
-    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.14);
+    background-color: #FFFFFF;
+    border-color: #B8860B;
+    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.18);
 }
 
 .area-horarios {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
-    margin-bottom: 12px;
 }
 
 .campo-horario label {
     display: block;
     margin-bottom: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-muted, #64748B);
+    font-size: 12px;
+    font-weight: 700;
+    color: #334155;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
 }
 
 .campo-horario input {
     width: 100%;
     min-height: 46px;
-    padding: 8px 12px;
-    border: 1px solid var(--border, #E2E8F0);
-    border-radius: var(--radius-md, 8px);
-    background: var(--bg-subtle, #F8FAFC);
-    color: var(--text-primary, #0F172A);
+    padding: 8px 14px;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 9px;
+    background: #FFFFFF;
+    color: #0F172A;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
     outline: none;
-    transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.campo-horario input:hover {
+    border-color: #94A3B8;
 }
 
 .campo-horario input:focus {
-    background: var(--bg-card, #FFFFFF);
-    border-color: var(--color-primary, #B8860B);
-    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.14);
+    background: #FFFFFF;
+    border-color: #B8860B;
+    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.18);
 }
 
-/* Seção de Horários Gerados */
+/* ==========================================================================
+   3. SEÇÃO DE HORÁRIOS DE ATENDIMENTO CALCULADOS
+   ========================================================================== */
 .secao-horarios-gerados {
     margin-top: 26px;
-    border-top: 1px solid var(--border, #E2E8F0);
+    border-top: 1px solid #E2E8F0;
     padding-top: 22px;
 }
 
 .label-horarios-titulo {
-    font-family: var(--font-heading, 'Playfair Display', serif);
-    font-size: 18px;
-    color: var(--text-primary, #0F172A);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #1E293B;
     margin-bottom: 12px;
     display: block;
 }
 
 #Dis_scheduled-times {
-    background: var(--bg-subtle, #F8FAFC);
-    border: 1px solid var(--border, #E2E8F0);
-    border-radius: var(--radius-md, 8px);
+    background: #F8FAFC;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 12px;
     padding: 18px;
 }
 
 #lista-horarios-vazia {
-    color: var(--text-muted, #64748B);
+    color: #475569;
     font-size: 14px;
+    font-weight: 500;
     text-align: center;
-    padding: 8px 0;
+    padding: 12px 8px;
 }
 
 #lista-horarios {
@@ -321,49 +370,55 @@
     padding: 0;
     margin: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
     gap: 12px;
 }
 
 #lista-horarios li {
-    background: var(--bg-card, #FFFFFF);
-    border: 1px solid var(--border, #E2E8F0);
-    border-radius: var(--radius-md, 8px);
+    background: #FFFFFF;
+    border: 1.5px solid #CBD5E1;
+    border-left: 4px solid #D4AF37;
+    border-radius: 10px;
     padding: 12px 14px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: var(--shadow-resting);
+    gap: 10px;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.04);
 }
 
 #lista-horarios li strong {
-    color: var(--text-primary, #0F172A);
+    color: #0F172A;
     font-size: 13.5px;
-    font-weight: 600;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
 }
 
 .status-select {
-    background: var(--bg-subtle, #F8FAFC);
-    color: var(--text-primary, #0F172A);
-    border: 1px solid var(--border, #E2E8F0);
+    background: #F8FAFC;
+    color: #0F172A;
+    border: 1.5px solid #CBD5E1;
     padding: 6px 10px;
-    border-radius: var(--radius-sm, 6px);
+    min-height: 36px;
+    border-radius: 7px;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
     outline: none;
     cursor: pointer;
+    transition: border-color 150ms ease, background-color 150ms ease;
 }
 
 .status-select:focus {
-    border-color: var(--color-primary, #B8860B);
-    background: var(--bg-card, #FFFFFF);
+    border-color: #B8860B;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.18);
 }
 
-/* Botão de Salvar */
+/* Botão de Salvar Disponibilidade */
 .disp-submit-row {
     display: flex;
     justify-content: flex-end;
-    margin-top: 20px;
+    margin-top: 22px;
 }
 
 #btnSalvar {
@@ -371,58 +426,64 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    background: var(--gold-gradient, linear-gradient(135deg, #D4AF37, #B8860B));
+    background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
     color: #0F172A;
     font-family: var(--font-sans);
-    font-weight: 700;
-    font-size: 14px;
+    font-weight: 800;
+    font-size: 14.5px;
     padding: 12px 28px;
-    min-height: 46px;
-    border-radius: var(--radius-md, 8px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: var(--shadow-resting), 0 4px 12px rgba(184, 134, 11, 0.22);
+    min-height: 48px;
+    border-radius: 10px;
+    border: 1px solid #9A6F05;
+    box-shadow: 0 4px 14px rgba(184, 134, 11, 0.28);
     cursor: pointer;
+    transition: all 150ms ease;
 }
 
 #btnSalvar:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: var(--shadow-gold);
+    box-shadow: 0 8px 20px rgba(184, 134, 11, 0.38);
     filter: brightness(1.04);
 }
 
 #btnSalvar:disabled {
-    opacity: 0.5;
+    background: #E2E8F0;
+    border-color: #CBD5E1;
+    color: #64748B;
+    opacity: 0.75;
     cursor: not-allowed;
     box-shadow: none;
 }
 
 /* ==========================================================================
-   LISTAGEM DAS DISPONIBILIDADES CADASTRADAS
+   4. LISTAGEM DAS DISPONIBILIDADES CADASTRADAS
    ========================================================================== */
 .secao-cadastradas {
-    background: var(--bg-card, #FFFFFF);
-    border: 1px solid var(--border, #E2E8F0);
-    border-radius: var(--radius-lg, 12px);
-    padding: clamp(22px, 3.5vw, 32px);
-    box-shadow: var(--shadow-resting);
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 14px;
+    padding: clamp(22px, 3.2vw, 32px);
+    box-shadow: 0 6px 18px -4px rgba(15, 23, 42, 0.07);
 }
 
 .secao-cadastradas-header {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #E2E8F0;
 }
 
 .secao-cadastradas h2 {
     font-family: var(--font-heading, 'Playfair Display', serif);
     font-size: 22px;
     font-weight: 700;
-    color: var(--text-primary, #0F172A);
+    color: #0F172A;
     margin: 0;
 }
 
 .filtro-cadastradas-bar {
-    background: var(--bg-subtle, #F8FAFC);
-    border: 1px solid var(--border, #E2E8F0);
-    border-radius: var(--radius-md, 8px);
+    background: #F8FAFC;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 10px;
     padding: 16px 20px;
     margin-bottom: 20px;
     display: flex;
@@ -440,11 +501,11 @@
 }
 
 .filtro-group-item label {
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--text-muted, #64748B);
+    color: #1E293B;
 }
 
 .filtro-selects-inline {
@@ -456,34 +517,41 @@
 
 .filtro-cadastradas-bar select {
     padding: 8px 12px;
-    min-height: 38px;
-    border-radius: var(--radius-sm, 6px);
-    border: 1px solid var(--border, #E2E8F0);
-    background: var(--bg-card, #FFFFFF);
-    color: var(--text-primary, #0F172A);
+    min-height: 40px;
+    border-radius: 8px;
+    border: 1.5px solid #CBD5E1;
+    background: #FFFFFF;
+    color: #0F172A;
     font-size: 13.5px;
-    font-weight: 500;
+    font-weight: 600;
     outline: none;
     cursor: pointer;
-    transition: border-color 150ms ease;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.filtro-cadastradas-bar select:hover:not(:disabled) {
+    border-color: #94A3B8;
 }
 
 .filtro-cadastradas-bar select:focus:not(:disabled) {
-    border-color: var(--color-primary, #B8860B);
+    border-color: #B8860B;
+    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.16);
 }
 
 .filtro-cadastradas-bar select:disabled {
     opacity: 0.55;
     cursor: not-allowed;
-    background: #F1F5F9;
+    background: #E2E8F0;
+    color: #64748B;
 }
 
 /* Ações em Lote */
 .lote-actions-card,
 #acoes-lote-data {
-    background: var(--gold-lighter, #FDFAF0);
-    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.35));
-    border-radius: var(--radius-md, 8px);
+    background: #FEFCE8;
+    border: 1.5px solid #FDE047;
+    border-left: 4px solid #B8860B;
+    border-radius: 10px;
     padding: 16px 20px;
     margin-bottom: 20px;
 }
@@ -491,7 +559,8 @@
 .lote-actions-title {
     display: block;
     font-size: 13px;
-    color: var(--gold-darker, #8A6508);
+    font-weight: 700;
+    color: #8A6508;
     margin-bottom: 10px;
 }
 
@@ -503,40 +572,41 @@
 }
 
 .btn-lote {
-    padding: 8px 14px;
-    min-height: 36px;
-    border-radius: var(--radius-sm, 6px);
-    font-size: 12.5px;
-    font-weight: 600;
+    padding: 8px 16px;
+    min-height: 38px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
-    border: 1px solid var(--border, #E2E8F0);
-    background: var(--bg-card, #FFFFFF);
-    color: var(--text-secondary, #334155);
-    box-shadow: var(--shadow-resting);
+    border: 1.5px solid #CBD5E1;
+    background: #FFFFFF;
+    color: #1E293B;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    transition: all 150ms ease;
 }
 
 .btn-lote-disp:hover {
-    background: #ECFDF5;
-    color: #047857;
-    border-color: #A7F3D0;
+    background: #059669;
+    color: #FFFFFF;
+    border-color: #047857;
 }
 
 .btn-lote-folga:hover {
-    background: #FFFBEB;
-    color: #B45309;
-    border-color: #FDE68A;
+    background: #D97706;
+    color: #FFFFFF;
+    border-color: #B45309;
 }
 
 .btn-lote-ferias:hover {
-    background: #EFF6FF;
-    color: #1D4ED8;
-    border-color: #BFDBFE;
+    background: #2563EB;
+    color: #FFFFFF;
+    border-color: #1D4ED8;
 }
 
 .btn-lote-bloq:hover {
-    background: #FEF2F2;
-    color: #B91C1C;
-    border-color: #FECACA;
+    background: #DC2626;
+    color: #FFFFFF;
+    border-color: #B91C1C;
 }
 
 /* Tabela de Disponibilidades */
@@ -544,9 +614,10 @@
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border: 1px solid var(--border, #E2E8F0);
-    border-radius: var(--radius-lg, 12px);
-    background: var(--bg-card, #FFFFFF);
+    border: 1px solid #CBD5E1;
+    border-radius: 12px;
+    background: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
 }
 
 .disp-table,
@@ -558,22 +629,27 @@
 }
 
 #tabelaDisponibilidades th {
-    background: var(--bg-subtle, #F8FAFC);
-    color: var(--text-muted, #64748B);
-    font-size: 0.75rem;
-    font-weight: 600;
+    background: #0F172A;
+    color: #F8FAFC;
+    font-size: 11.5px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     padding: 14px 18px;
-    border-bottom: 1px solid var(--border, #E2E8F0);
+    border-bottom: 2px solid #D4AF37;
 }
 
 #tabelaDisponibilidades td {
     padding: 14px 18px;
-    border-bottom: 1px solid var(--border-fine, rgba(0, 0, 0, 0.06));
-    font-size: 13.5px;
-    color: var(--text-secondary, #334155);
+    border-bottom: 1px solid #E2E8F0;
+    font-size: 14px;
+    color: #1E293B;
     vertical-align: middle;
+    font-variant-numeric: tabular-nums;
+}
+
+#tabelaDisponibilidades tbody tr:nth-child(even) td {
+    background-color: #F8FAFC;
 }
 
 #tabelaDisponibilidades tbody tr:last-child td {
@@ -581,46 +657,54 @@
 }
 
 #tabelaDisponibilidades tbody tr:hover td {
-    background-color: var(--bg-subtle, #F8FAFC);
+    background-color: #FEFCE8;
 }
 
 .disp-time-start {
-    color: var(--gold-darker, #8A6508);
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #0F172A;
+    color: #F3E5AB;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 13px;
 }
 
 .disp-time-end {
-    color: var(--text-muted, #64748B);
+    color: #334155;
+    font-weight: 600;
 }
 
 .disp-service-name {
-    font-weight: 500;
-    color: var(--text-primary, #0F172A);
+    font-weight: 700;
+    color: #0F172A;
 }
 
 /* Pills de Status de Disponibilidade */
 .status-disp-disponivel {
-    background: #ECFDF5;
-    color: #047857;
-    border: 1px solid #A7F3D0;
+    background: #D1FAE5;
+    color: #065F46;
+    border: 1.5px solid #34D399;
 }
 
 .status-disp-folga {
-    background: #FFFBEB;
-    color: #B45309;
-    border: 1px solid #FDE68A;
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1.5px solid #F59E0B;
 }
 
 .status-disp-ferias {
-    background: #EFF6FF;
-    color: #1D4ED8;
-    border: 1px solid #BFDBFE;
+    background: #DBEAFE;
+    color: #1E40AF;
+    border: 1.5px solid #60A5FA;
 }
 
 .status-disp-bloqueado {
-    background: #FEF2F2;
-    color: #B91C1C;
-    border: 1px solid #FECACA;
+    background: #FEE2E2;
+    color: #991B1B;
+    border: 1.5px solid #F87171;
 }
 
 /* Formulário de Edição Inline na Tabela */
@@ -632,48 +716,51 @@
 
 .select-disp-status {
     padding: 6px 10px;
-    min-height: 34px;
-    border-radius: var(--radius-sm, 6px);
-    border: 1px solid var(--border, #E2E8F0);
-    background: var(--bg-subtle, #F8FAFC);
-    color: var(--text-primary, #0F172A);
+    min-height: 36px;
+    border-radius: 7px;
+    border: 1.5px solid #CBD5E1;
+    background: #FFFFFF;
+    color: #0F172A;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
     outline: none;
     cursor: pointer;
 }
 
 .select-disp-status:focus {
-    border-color: var(--color-primary, #B8860B);
-    background: var(--bg-card, #FFFFFF);
+    border-color: #B8860B;
+    box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.18);
 }
 
 .btn-save-disp {
-    padding: 6px 12px;
-    min-height: 34px;
-    border-radius: var(--radius-sm, 6px);
-    border: 1px solid transparent;
-    background: var(--gold-gradient, linear-gradient(135deg, #D4AF37, #B8860B));
+    padding: 7px 14px;
+    min-height: 36px;
+    border-radius: 7px;
+    border: 1px solid #9A6F05;
+    background: linear-gradient(135deg, #D4AF37, #B8860B);
     color: #0F172A;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 12.5px;
+    font-weight: 700;
     cursor: pointer;
+    box-shadow: 0 1px 3px rgba(184, 134, 11, 0.2);
 }
 
 .btn-save-disp:hover {
-    filter: brightness(1.05);
+    filter: brightness(1.06);
+    transform: translateY(-1px);
 }
 
 .btn-delete-disp {
-    padding: 6px 12px;
-    min-height: 34px;
-    border-radius: var(--radius-sm, 6px);
-    border: 1px solid #FECACA;
+    padding: 7px 14px;
+    min-height: 36px;
+    border-radius: 7px;
+    border: 1.5px solid #FCA5A5;
     background: #FEF2F2;
     color: #B91C1C;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 12.5px;
+    font-weight: 700;
     cursor: pointer;
+    transition: all 150ms ease;
 }
 
 .btn-delete-disp:hover {
@@ -684,12 +771,13 @@
 
 .empty-disp-state {
     text-align: center;
-    padding: 36px 20px;
-    color: var(--text-muted, #64748B);
+    padding: 40px 20px;
+    color: #475569;
     font-size: 14.5px;
-    background: var(--bg-subtle, #F8FAFC);
-    border: 1px dashed var(--border, #E2E8F0);
-    border-radius: var(--radius-md, 8px);
+    font-weight: 500;
+    background: #F8FAFC;
+    border: 1.5px dashed #CBD5E1;
+    border-radius: 10px;
 }
 
 @media (max-width: 850px) {

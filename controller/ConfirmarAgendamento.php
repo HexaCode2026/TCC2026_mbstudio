@@ -1,32 +1,34 @@
 <?php
-session_start();
+require_once __DIR__ . "/../core/Session.php";
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/Appointment.php";
 
+Session::iniciar();
+
 // APENAS Administradores ou Funcionários podem confirmar um agendamento.
-// Clientes NÃO têm permissão para confirmar seus próprios agendamentos (Regra de Negócio).
-if (!isset($_SESSION['User_id']) || !in_array($_SESSION['User_perm'], ['A', 'F'])) {
+if (!isset($_SESSION['User_id']) || !in_array($_SESSION['User_perm'] ?? '', ['A', 'F'], true)) {
     header("Location: ../Index.php");
     exit;
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" || isset($_GET['id'])) {
-    $appoId = $_POST['id'] ?? $_GET['id'] ?? null;
-    $userId = $_SESSION['User_id'];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    Session::validarCsrf();
+
+    $appoId = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+    $userId = (int)$_SESSION['User_id'];
     $userPerm = $_SESSION['User_perm'];
 
-    if (!$appoId) {
-        $redirect = ($userPerm === 'A') ? "../View/admin/Agenda.php" : "../View/funcionario/Agenda.php";
+    $redirect = ($userPerm === 'A') ? "../View/admin/Agenda.php" : "../View/funcionario/Agenda.php";
+
+    if (!$appoId || $appoId <= 0) {
         header("Location: $redirect?erro=id_invalido");
         exit;
     }
 
     $appointmentModel = new Appointment($pdo);
-    
+
     // Verificação da máquina de estados: Só pode confirmar se estiver Pendente
     $currentAppo = $appointmentModel->buscarPorId($appoId);
-    $redirect = ($userPerm === 'A') ? "../View/admin/Agenda.php" : "../View/funcionario/Agenda.php";
-    
     if (!$currentAppo || $currentAppo['Appo_status'] !== 'Pendente') {
         header("Location: $redirect?erro=status_invalido_para_confirmacao");
         exit;
@@ -45,12 +47,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" || isset($_GET['id'])) {
             exit;
         }
     }
-    // Se for Admin ('A'), $empId continua null, permitindo o bypass implementado no model.
 
-    // Tentar atualizar status
     $success = $appointmentModel->atualizarStatus($appoId, $empId, 'Confirmado');
-
-    $redirect = ($userPerm === 'A') ? "../View/admin/Agenda.php" : "../View/funcionario/Agenda.php";
 
     if ($success) {
         header("Location: $redirect?sucesso=agendamento_confirmado");

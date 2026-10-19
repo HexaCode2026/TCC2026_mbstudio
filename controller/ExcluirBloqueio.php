@@ -1,18 +1,29 @@
 <?php
-session_start();
+require_once __DIR__ . "/../core/Session.php";
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/EmployeeBlock.php";
 
+Session::iniciar();
+
 // Apenas Funcionário
-if (!isset($_SESSION['User_id']) || $_SESSION['User_perm'] !== 'F') {
+if (!isset($_SESSION['User_id']) || ($_SESSION['User_perm'] ?? '') !== 'F') {
     header("Location: ../Index.php");
     exit;
 }
 
-$blockId = $_GET['id'] ?? null;
-$userId = $_SESSION['User_id'];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    Session::validarCsrf();
+    $blockId = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+} elseif (isset($_GET['id']) && !empty($_SERVER['HTTP_REFERER'])) {
+    Session::validarCsrf();
+    $blockId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+} else {
+    $blockId = null;
+}
 
-if (!$blockId) {
+$userId = (int)$_SESSION['User_id'];
+
+if (!$blockId || $blockId <= 0) {
     header("Location: ../View/funcionario/Bloqueios.php?erro=id_invalido");
     exit;
 }

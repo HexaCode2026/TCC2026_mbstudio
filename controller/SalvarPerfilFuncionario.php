@@ -61,7 +61,7 @@ if($_SERVER["REQUEST_METHOD"] != "POST"){
 
 }
 
-
+Session::validarCsrf();
 
 $userId = $_SESSION['User_id'];
 

@@ -21,12 +21,16 @@ $primeiroNome = explode(' ', trim($userName))[0];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Profissional | MB Studio</title>
 
-    <link rel="stylesheet" href="../../assets/css/global.css">
+    <?php
+    $globalCssVer = @filemtime(__DIR__ . '/../../assets/css/global.css') ?: '3.0';
+    $homeCssVer   = @filemtime(__DIR__ . '/../../assets/css/funcionario/home.css') ?: '3.0';
+    ?>
+    <link rel="stylesheet" href="../../assets/css/global.css?v=<?= $globalCssVer ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="../../assets/css/funcionario/home.css">
+    <link rel="stylesheet" href="../../assets/css/funcionario/home.css?v=<?= $homeCssVer ?>">
 </head>
 
 <body>
@@ -83,6 +87,14 @@ $primeiroNome = explode(' ', trim($userName))[0];
                             <polyline points="10 9 9 9 8 9"></polyline>
                         </svg>
                         Ver Minha Agenda
+                    </a>
+
+                    <a href="Bloqueios.php" class="btn-quick-link">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        Pausas e Bloqueios
                     </a>
 
                     <a href="Perfil.php" class="btn-quick-link">

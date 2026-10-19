@@ -1,21 +1,25 @@
 <?php
-session_start();
+require_once __DIR__ . "/../core/Session.php";
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/Appointment.php";
+
+Session::iniciar();
 
 if (!isset($_SESSION['User_id']) || !isset($_SESSION['User_perm'])) {
     header("Location: ../Index.php");
     exit;
 }
 
-$userId = $_SESSION['User_id'];
+$userId = (int)$_SESSION['User_id'];
 $userPerm = $_SESSION['User_perm'];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $appoId = $_POST['appo_id'] ?? null;
+    Session::validarCsrf();
+
+    $appoId = filter_input(INPUT_POST, 'appo_id', FILTER_VALIDATE_INT);
     $cancelReason = trim($_POST['cancel_reason'] ?? 'Desistência');
 
-    if (!$appoId) {
+    if (!$appoId || $appoId <= 0) {
         header("Location: ../Index.php?erro=id_invalido");
         exit;
     }

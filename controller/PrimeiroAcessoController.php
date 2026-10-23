@@ -48,7 +48,7 @@ class PrimeiroAcessoController
     public function salvar(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: " . $this->basePath . "/primeiro-acesso");
+            header("Location: " . $this->basePath . "/View/PrimeiroAcesso.php");
             exit;
         }
 
@@ -67,26 +67,26 @@ class PrimeiroAcessoController
 
         if (mb_strlen($novaSenha) < 8) {
             Session::setFlash('error', 'A nova senha deve conter no mínimo 8 caracteres.');
-            header("Location: " . $this->basePath . "/primeiro-acesso");
+            header("Location: " . $this->basePath . "/View/PrimeiroAcesso.php");
             exit;
         }
 
         if ($novaSenha !== $confirmarSenha) {
             Session::setFlash('error', 'A confirmação de senha não coincide com a nova senha digitada.');
-            header("Location: " . $this->basePath . "/primeiro-acesso");
+            header("Location: " . $this->basePath . "/View/PrimeiroAcesso.php");
             exit;
         }
 
         if (strtolower(trim($novaSenha)) === 'admin123') {
             Session::setFlash('error', 'Por segurança, você não pode reutilizar a senha temporária padrão (admin123).');
-            header("Location: " . $this->basePath . "/primeiro-acesso");
+            header("Location: " . $this->basePath . "/View/PrimeiroAcesso.php");
             exit;
         }
 
         $hashAtual = $this->userModel->findPasswordHashById($userId);
         if ($hashAtual !== null && password_verify($novaSenha, $hashAtual)) {
             Session::setFlash('error', 'A nova senha deve ser diferente da senha temporária atual.');
-            header("Location: " . $this->basePath . "/primeiro-acesso");
+            header("Location: " . $this->basePath . "/View/PrimeiroAcesso.php");
             exit;
         }
 
@@ -95,7 +95,7 @@ class PrimeiroAcessoController
 
         if (!$atualizado) {
             Session::setFlash('error', 'Ocorreu um erro ao salvar sua nova senha. Tente novamente.');
-            header("Location: " . $this->basePath . "/primeiro-acesso");
+            header("Location: " . $this->basePath . "/View/PrimeiroAcesso.php");
             exit;
         }
 

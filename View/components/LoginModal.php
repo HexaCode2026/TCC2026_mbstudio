@@ -233,7 +233,7 @@ async function handleAjaxLogin(event) {
         
         if (data.success) {
             if (data.must_change_pass || data.redirect) {
-                window.location.href = data.redirect || `${basePath}/primeiro-acesso`;
+                window.location.href = data.redirect || `${basePath}/View/PrimeiroAcesso.php`;
                 return;
             }
 
@@ -335,7 +335,7 @@ async function handleAjaxVerificacao(event) {
             showModalMessage('verificacao-modal-msg', false, data.message);
             setTimeout(() => {
                 if (data.must_change_pass || data.redirect) {
-                    window.location.href = data.redirect || `${basePath}/primeiro-acesso`;
+                    window.location.href = data.redirect || `${basePath}/View/PrimeiroAcesso.php`;
                 } else if (data.action === 'login') {
                     switchModalView('view-login');
                     if (data.email && document.getElementById('modal-email')) {

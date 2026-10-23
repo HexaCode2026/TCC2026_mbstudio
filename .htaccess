@@ -10,11 +10,11 @@ Options -Indexes
     RewriteEngine On
 
     # Rotas de Primeiro Acesso (Troca Obrigatória de Senha)
-    RewriteRule ^primeiro-acesso/?$ controller/PrimeiroAcessoController.php?action=index [L,QSA]
+    RewriteRule ^primeiro-acesso/?$ View/PrimeiroAcesso.php [L,QSA]
     RewriteRule ^primeiro-acesso/salvar/?$ controller/PrimeiroAcessoController.php?action=salvar [L,QSA]
 
     # Rotas de Perfil Administrativo (Restrito a User_perm = 'A')
-    RewriteRule ^admin/perfil/?$ controller/PerfilController.php?action=index [L,QSA]
+    RewriteRule ^admin/perfil/?$ View/admin/Perfil.php [L,QSA]
     RewriteRule ^admin/perfil/atualizar/?$ controller/PerfilController.php?action=atualizar [L,QSA]
 
     # Rota amigável de diagnóstico de e-mail (/teste-email)

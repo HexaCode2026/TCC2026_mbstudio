@@ -99,7 +99,7 @@ $perfilCssVer = @filemtime(__DIR__ . '/../../assets/css/admin/perfil.css') ?: '1
 
         <!-- Card do Formulário de Perfil -->
         <div class="profile-form-card">
-            <form action="<?= $basePath ?>/admin/perfil/atualizar" method="POST" autocomplete="off">
+            <form action="<?= $basePath ?>/controller/PerfilController.php?action=atualizar" method="POST" autocomplete="off">
                 <?= Session::csrfField() ?>
 
                 <div class="profile-section-block">

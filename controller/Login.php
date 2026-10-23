@@ -39,10 +39,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Se for primeiro acesso com troca obrigatória de senha (User_must_change_pass == 1),
-        // autentica na sessão restrita e redireciona diretamente para /primeiro-acesso
+        // autentica na sessão restrita e redireciona diretamente para a tela de primeiro acesso
         if (!empty($dados['User_must_change_pass'])) {
             Session::login($dados);
-            header("Location: " . Session::getBasePath() . "/primeiro-acesso");
+            header("Location: " . Session::getBasePath() . "/View/PrimeiroAcesso.php");
             exit;
         }
 

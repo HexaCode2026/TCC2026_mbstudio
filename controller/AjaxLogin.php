@@ -45,14 +45,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
 
-        // Se User_must_change_pass == 1, inicia sessão restrita e redireciona diretamente para /primeiro-acesso
+        // Se User_must_change_pass == 1, inicia sessão restrita e redireciona diretamente para a tela de primeiro acesso
         if (!empty($dados['User_must_change_pass'])) {
             Session::login($dados);
             $basePath = Session::getBasePath();
             echo json_encode([
                 'success'          => true,
                 'must_change_pass' => true,
-                'redirect'         => $basePath . '/primeiro-acesso',
+                'redirect'         => $basePath . '/View/PrimeiroAcesso.php',
                 'perm'             => $dados['User_perm'],
                 'message'          => 'Primeiro acesso detectado. Redirecionando para definição de nova senha...'
             ]);

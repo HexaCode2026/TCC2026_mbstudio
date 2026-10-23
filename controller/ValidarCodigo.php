@@ -67,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             unset($_SESSION['verificar_user_id'], $_SESSION['verificar_tipo'], $_SESSION['temp_login_dados']);
 
             if (!empty($dados['User_must_change_pass'])) {
-                header("Location: " . Session::getBasePath() . "/primeiro-acesso");
+                header("Location: " . Session::getBasePath() . "/View/PrimeiroAcesso.php");
                 exit;
             }
 

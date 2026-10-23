@@ -81,13 +81,14 @@ class Session {
 
         if (
             in_array($scriptName, $rotasPermitidasScripts, true) ||
-            strpos($requestUri, '/primeiro-acesso') !== false
+            stripos($requestUri, 'PrimeiroAcesso') !== false ||
+            stripos($requestUri, 'primeiro-acesso') !== false
         ) {
             return;
         }
 
         $basePath = self::getBasePath();
-        header("Location: " . $basePath . "/primeiro-acesso");
+        header("Location: " . $basePath . "/View/PrimeiroAcesso.php");
         exit;
     }
 

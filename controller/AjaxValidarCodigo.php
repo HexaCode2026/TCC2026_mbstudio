@@ -124,7 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 'success'          => true,
                 'perm'             => $dados['User_perm'],
                 'must_change_pass' => $mustChange,
-                'redirect'         => $mustChange ? ($basePath . '/primeiro-acesso') : null,
+                'redirect'         => $mustChange ? ($basePath . '/View/PrimeiroAcesso.php') : null,
                 'message'          => 'Código validado! Redirecionando...'
             ]);
             exit;

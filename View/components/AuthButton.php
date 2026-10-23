@@ -30,7 +30,7 @@ $authCssVer = @filemtime(__DIR__ . '/../../assets/css/components/authbutton.css'
                         <a href="<?= $basePath ?>/View/funcionario/Perfil.php" class="auth-dropdown-item">Meu Perfil</a>
                     <?php elseif (isset($_SESSION['User_perm']) && $_SESSION['User_perm'] == 'A'): ?>
                         <a href="<?= $basePath ?>/View/admin/Dashboard.php" class="auth-dropdown-item">Painel Administrativo</a>
-                        <a href="<?= $basePath ?>/admin/perfil" class="auth-dropdown-item">Meu Perfil</a>
+                        <a href="<?= $basePath ?>/View/admin/Perfil.php" class="auth-dropdown-item">Meu Perfil</a>
                     <?php else: ?>
                         <a href="<?= $basePath ?>/View/cliente/MeusAgendamentos.php" class="auth-dropdown-item">Meus Agendamentos</a>
                         <a href="<?= $basePath ?>/View/cliente/Perfil.php" class="auth-dropdown-item">Meu Perfil</a>

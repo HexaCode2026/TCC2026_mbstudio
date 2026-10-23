@@ -274,7 +274,7 @@ $globalCssVer = @filemtime(__DIR__ . '/../assets/css/global.css') ?: '3.0';
                 • Não é permitido reutilizar a senha temporária padrão (<code>admin123</code>).
             </div>
 
-            <form action="<?= $basePath ?>/primeiro-acesso/salvar" method="POST" autocomplete="off">
+            <form action="<?= $basePath ?>/controller/PrimeiroAcessoController.php?action=salvar" method="POST" autocomplete="off">
                 <?= Session::csrfField() ?>
 
                 <div class="form-group-isolated">

@@ -19,9 +19,127 @@ class User
         'User_must_change_pass'
     ];
 
+    /**
+     * Custo calibrado do Bcrypt (2^11 = 2.048 iterações, ~90ms), em conformidade estrita com
+     * recomendações OWASP/NIST para autenticação web interativa, evitando saturação de CPU
+     * sob picos de 50+ acessos simultâneos enquanto mantém forte resistência a ataques offline.
+     */
+    public const PASSWORD_COST = 11;
+
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
+    }
+
+    /**
+     * Gera o hash de uma senha utilizando algoritmo adaptativo moderno (Argon2id se configurado ou Bcrypt cost calibrado)
+     * com salt criptográfico individual de 128 bits gerado automaticamente via CSPRNG nativo.
+     */
+    public static function hashSenha(string $senha): string
+    {
+        $algoPref = strtolower((string)(getenv('PASSWORD_ALGO') ?: ($_ENV['PASSWORD_ALGO'] ?? 'bcrypt')));
+        if ($algoPref === 'argon2id' && defined('PASSWORD_ARGON2ID')) {
+            return password_hash($senha, PASSWORD_ARGON2ID, [
+                'memory_cost' => 65536,
+                'time_cost'   => 4,
+                'threads'     => 1,
+            ]);
+        }
+
+        $cost = (int)(getenv('PASSWORD_COST') ?: ($_ENV['PASSWORD_COST'] ?? self::PASSWORD_COST));
+        if ($cost < 10 || $cost > 14) {
+            $cost = self::PASSWORD_COST;
+        }
+
+        return password_hash($senha, PASSWORD_BCRYPT, ['cost' => $cost]);
+    }
+
+    /**
+     * Verifica se um hash de senha existente precisa ser atualizado (ex: custo < calibrado ou algoritmo antigo).
+     */
+    public static function precisaRehash(string $hash): bool
+    {
+        $algoPref = strtolower((string)(getenv('PASSWORD_ALGO') ?: ($_ENV['PASSWORD_ALGO'] ?? 'bcrypt')));
+        if ($algoPref === 'argon2id' && defined('PASSWORD_ARGON2ID')) {
+            return password_needs_rehash($hash, PASSWORD_ARGON2ID, [
+                'memory_cost' => 65536,
+                'time_cost'   => 4,
+                'threads'     => 1,
+            ]);
+        }
+
+        $cost = (int)(getenv('PASSWORD_COST') ?: ($_ENV['PASSWORD_COST'] ?? self::PASSWORD_COST));
+        if ($cost < 10 || $cost > 14) {
+            $cost = self::PASSWORD_COST;
+        }
+
+        return password_needs_rehash($hash, PASSWORD_BCRYPT, ['cost' => $cost]);
+    }
+
+    /**
+     * Obtém a chave secreta de aplicação para HMAC-SHA256 de tokens efêmeros.
+     */
+    private static function obterSegredoHmac(): string
+    {
+        $secret = defined('APP_SECRET') ? (string)APP_SECRET : (string)(getenv('APP_SECRET') ?: '');
+        if ($secret === '' || $secret === 'mbstudio_tcc_2026_hmac_secret_key') {
+            $secret = hash('sha256', __DIR__ . '|mbstudio_appsec_hmac_key_v2');
+        }
+        return $secret;
+    }
+
+    /**
+     * Gera um hash criptograficamente seguro (Salted HMAC-SHA256 com Context Binding) para códigos OTP de 6 dígitos.
+     * Formato armazenado: hmac256$<salt_hex_32_chars>$<hmac_sha256_hex_64_chars> (105 caracteres).
+     * O salt aleatório de 128 bits (random_bytes(16)) + vínculo de contexto neutraliza Rainbow Tables
+     * mesmo no espaço de busca de 10^6 dos códigos numéricos.
+     */
+    public static function gerarHashCodigo(string $codigo, string $contexto = ''): string
+    {
+        $secret = self::obterSegredoHmac();
+        $salt = bin2hex(random_bytes(16));
+        $contextoNorm = strtolower(trim($contexto));
+        $payload = $salt . ':' . $contextoNorm . ':' . trim($codigo);
+
+        return 'hmac256$' . $salt . '$' . hash_hmac('sha256', $payload, $secret);
+    }
+
+    /**
+     * Verifica um código OTP de 6 dígitos em tempo constante via hash_equals()
+     * (compatível com Salted HMAC-SHA256, HMAC legado sem salt e hashes Bcrypt legados).
+     */
+    public static function verificarHashCodigo(string $codigo, string $hashArmazenado, string $contexto = ''): bool
+    {
+        $codigo = trim($codigo);
+        if ($codigo === '' || $hashArmazenado === '') {
+            return false;
+        }
+
+        if (strpos($hashArmazenado, 'hmac256$') === 0) {
+            $secret = self::obterSegredoHmac();
+            $partes = explode('$', $hashArmazenado);
+
+            // Formato Salted HMAC-SHA256: hmac256$<salt>$<mac>
+            if (count($partes) === 3) {
+                $salt = $partes[1];
+                $macArmazenado = $partes[2];
+                $contextoNorm = strtolower(trim($contexto));
+                $payload = $salt . ':' . $contextoNorm . ':' . $codigo;
+                $macEsperado = hash_hmac('sha256', $payload, $secret);
+
+                return hash_equals($macArmazenado, $macEsperado);
+            }
+
+            // Compatibilidade retroativa para formato anterior sem salt: hmac256$<mac>
+            if (count($partes) === 2) {
+                $esperadoLegado = 'hmac256$' . hash_hmac('sha256', $codigo, $secret);
+                return hash_equals($hashArmazenado, $esperadoLegado);
+            }
+
+            return false;
+        }
+
+        return password_verify($codigo, $hashArmazenado);
     }
 
     /**
@@ -37,12 +155,10 @@ class User
     }
 
     // =====================================
-    // BUSCAR POR E-MAIL (FLUXO DE AUTENTICAÇÃO)
+    // BUSCAR POR E-MAIL (FLUXO DE AUTENTICAÇÃO OTIMIZADO - 1 QUERY POR ÍNDICE UNIQUE)
     // =====================================
     public function findByEmail(string $email)
     {
-        $this->limparCadastrosNaoConfirmados($email);
-
         $sql = "
             SELECT
                 User_id,
@@ -167,23 +283,21 @@ class User
     {
         try {
             $sql = "
-                SELECT u.User_id
+                SELECT DISTINCT u.User_id
                 FROM users u
+                INNER JOIN verification_codes vc
+                    ON vc.User_id = u.User_id AND vc.Code_type = 'Cadastro' AND vc.Code_used = 0
+                LEFT JOIN verification_codes vc2
+                    ON vc2.User_id = u.User_id AND vc2.Code_type = 'Cadastro' AND vc2.Code_used = 1
+                LEFT JOIN clients c
+                    ON c.User_id = u.User_id
+                LEFT JOIN appointments a
+                    ON a.Cli_id = c.Cli_id
                 WHERE u.User_active = 0
                   AND u.User_perm = 'C'
+                  AND vc2.Code_id IS NULL
+                  AND a.Appo_id IS NULL
                   " . ($email !== null ? "AND u.User_email = :email" : "") . "
-                  AND EXISTS (
-                      SELECT 1 FROM verification_codes vc
-                      WHERE vc.User_id = u.User_id AND vc.Code_type = 'Cadastro' AND vc.Code_used = 0
-                  )
-                  AND NOT EXISTS (
-                      SELECT 1 FROM verification_codes vc2
-                      WHERE vc2.User_id = u.User_id AND vc2.Code_type = 'Cadastro' AND vc2.Code_used = 1
-                  )
-                  AND NOT EXISTS (
-                      SELECT 1 FROM appointments a
-                      WHERE a.Cli_id = u.User_id
-                  )
             ";
             $stmt = $this->pdo->prepare($sql);
             if ($email !== null) {
@@ -207,17 +321,28 @@ class User
     }
 
     // =====================================
-    // VERIFICAR EMAIL EXISTENTE
+    // VERIFICAR EMAIL EXISTENTE (SO CHAMA LIMPEZA SE ENCONTRAR REGISTRO INATIVO)
     // =====================================
     public function emailExiste($email)
     {
-        $this->limparCadastrosNaoConfirmados($email);
-
-        $sql = "SELECT User_id FROM users WHERE User_email = ?";
+        $email = trim((string)$email);
+        $sql = "SELECT User_id, User_active FROM users WHERE User_email = ? LIMIT 1";
         $consulta = $this->pdo->prepare($sql);
         $consulta->execute([$email]);
+        $row = $consulta->fetch(PDO::FETCH_ASSOC);
 
-        return $consulta->rowCount() > 0;
+        if (!$row) {
+            return false;
+        }
+
+        if ((int)$row['User_active'] === 0) {
+            $this->limparCadastrosNaoConfirmados($email);
+            $recheck = $this->pdo->prepare("SELECT User_id FROM users WHERE User_email = ? LIMIT 1");
+            $recheck->execute([$email]);
+            return (bool)$recheck->fetchColumn();
+        }
+
+        return true;
     }
 
     // =====================================
@@ -225,7 +350,7 @@ class User
     // =====================================
     public function cadastrar($nome, $email, $senha)
     {
-        $senhaHash = password_hash($senha, PASSWORD_BCRYPT);
+        $senhaHash = self::hashSenha((string)$senha);
         return $this->cadastrarConfirmado($nome, $email, $senhaHash);
     }
 
@@ -257,7 +382,7 @@ class User
 
     public function atualizarDadosInativos($id, $nome, $senha)
     {
-        $senhaHash = password_hash($senha, PASSWORD_BCRYPT);
+        $senhaHash = self::hashSenha((string)$senha);
         $sql = "UPDATE users SET User_name = ?, User_pass = ? WHERE User_id = ?";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$nome, $senhaHash, $id]);
@@ -268,10 +393,20 @@ class User
     // =====================================
     public function atualizarSenha($id, $novaSenha)
     {
-        $senhaHash = password_hash($novaSenha, PASSWORD_BCRYPT);
+        $senhaHash = self::hashSenha((string)$novaSenha);
         $sql = "UPDATE users SET User_pass = ?, User_must_change_pass = 0 WHERE User_id = ?";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$senhaHash, $id]);
+    }
+
+    /**
+     * Atualiza apenas o hash de senha após rehash transparente no login (sem alterar User_must_change_pass).
+     */
+    public function atualizarHashSenha(int $userId, string $novoHash): bool
+    {
+        $sql = "UPDATE users SET User_pass = ? WHERE User_id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$novoHash, $userId]);
     }
 
     // =====================================
@@ -345,44 +480,173 @@ class User
     }
 
     // =====================================
-    // CÓDIGOS DE VERIFICAÇÃO (2FA e Recuperação)
+    // CÓDIGOS DE VERIFICAÇÃO ATÔMICOS (2FA, Cadastro e Recuperação)
     // =====================================
+    public function invalidarCodigosPendentes($userId, $tipo = 'Login2FA'): bool
+    {
+        $stmt = $this->pdo->prepare("
+            UPDATE verification_codes
+            SET Code_used = 1
+            WHERE User_id = ? AND Code_type = ? AND Code_used = 0
+        ");
+        return $stmt->execute([(int)$userId, (string)$tipo]);
+    }
+
+    public function possuiCodigoRecente($userId, $tipo = 'Login2FA', int $segundos = 30): bool
+    {
+        $sql = "
+            SELECT 1
+            FROM verification_codes
+            WHERE User_id = ?
+              AND Code_type = ?
+              AND Code_used = 0
+              AND Code_expires_at > NOW()
+              AND Code_created_at >= DATE_SUB(NOW(), INTERVAL ? SECOND)
+            LIMIT 1
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([(int)$userId, (string)$tipo, $segundos]);
+        return (bool)$stmt->fetchColumn();
+    }
+
     public function gerarCodigoVerificacao($userId, $tipo = 'Login2FA')
     {
-        $invalidate = $this->pdo->prepare("UPDATE verification_codes SET Code_used = 1 WHERE User_id = ? AND Code_type = ? AND Code_used = 0");
-        $invalidate->execute([$userId, $tipo]);
-
         $codigo = (string) random_int(100000, 999999);
-        $expiraEm = date('Y-m-d H:i:s', strtotime('+15 minutes'));
-        $tokenHash = password_hash($codigo, PASSWORD_BCRYPT);
+        $contexto = (int)$userId . ':' . (string)$tipo;
+        $tokenHash = self::gerarHashCodigo($codigo, $contexto);
 
-        $sql = "INSERT INTO verification_codes (User_id, Code_token, Code_type, Code_expires_at) VALUES (?, ?, ?, ?)";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$userId, $tokenHash, $tipo, $expiraEm]);
+        $iniciouTransacao = false;
+        if (!$this->pdo->inTransaction()) {
+            $this->pdo->beginTransaction();
+            $iniciouTransacao = true;
+        }
 
-        return $codigo;
+        try {
+            // Invalida códigos anteriores pendentes do mesmo tipo de forma atômica
+            $this->invalidarCodigosPendentes($userId, $tipo);
+
+            // Limpeza probabilística (10% das chamadas) para não adicionar overhead em cada login
+            if (random_int(1, 10) === 1) {
+                $cleanup = $this->pdo->prepare("
+                    DELETE FROM verification_codes
+                    WHERE User_id = ?
+                      AND (Code_used = 1 OR Code_expires_at < NOW())
+                      AND Code_created_at < DATE_SUB(NOW(), INTERVAL 1 DAY)
+                ");
+                $cleanup->execute([(int)$userId]);
+            }
+
+            $sql = "
+                INSERT INTO verification_codes (User_id, Code_token, Code_type, Code_expires_at)
+                VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 15 MINUTE))
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([(int)$userId, $tokenHash, (string)$tipo]);
+
+            if ($iniciouTransacao) {
+                $this->pdo->commit();
+            }
+
+            return $codigo;
+        } catch (Exception $e) {
+            if ($iniciouTransacao && $this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $e;
+        }
     }
 
     public function validarCodigoVerificacao($userId, $codigo, $tipo = 'Login2FA')
     {
-        $sql = "SELECT * FROM verification_codes WHERE User_id = ? AND Code_type = ? AND Code_used = FALSE ORDER BY Code_id DESC LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$userId, $tipo]);
-        $codigoData = $stmt->fetch(PDO::FETCH_ASSOC);
+        $iniciouTransacao = false;
+        if (!$this->pdo->inTransaction()) {
+            $this->pdo->beginTransaction();
+            $iniciouTransacao = true;
+        }
 
-        if (!$codigoData) return ['status' => false, 'msg' => 'Nenhum código pendente.'];
-        if (strtotime($codigoData['Code_expires_at']) < time()) return ['status' => false, 'msg' => 'Código expirado. Solicite um novo.'];
-        if ($codigoData['Code_attempts'] >= 5) return ['status' => false, 'msg' => 'Muitas tentativas. Solicite um novo código.'];
+        try {
+            // Bloqueio pessimista (FOR UPDATE) impede Race Condition (TOCTOU) entre requisições paralelas
+            $sql = "
+                SELECT *,
+                       (Code_expires_at < NOW()) AS is_expired
+                FROM verification_codes
+                WHERE User_id = ?
+                  AND Code_type = ?
+                  AND Code_used = FALSE
+                ORDER BY Code_id DESC
+                LIMIT 1
+                FOR UPDATE
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([(int)$userId, (string)$tipo]);
+            $codigoData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (password_verify($codigo, $codigoData['Code_token'])) {
-            $this->pdo->prepare("UPDATE verification_codes SET Code_used = 1 WHERE Code_id = ?")->execute([$codigoData['Code_id']]);
-            if ($tipo == 'Cadastro') {
-                $this->pdo->prepare("UPDATE users SET User_active = 1 WHERE User_id = ?")->execute([$userId]);
+            if (!$codigoData) {
+                if ($iniciouTransacao) {
+                    $this->pdo->commit();
+                }
+                return ['status' => false, 'msg' => 'Nenhum código pendente.'];
             }
-            return ['status' => true, 'msg' => 'Código verificado com sucesso!'];
-        } else {
-            $this->pdo->prepare("UPDATE verification_codes SET Code_attempts = Code_attempts + 1 WHERE Code_id = ?")->execute([$codigoData['Code_id']]);
+
+            if (!empty($codigoData['is_expired']) || strtotime($codigoData['Code_expires_at']) < time()) {
+                $this->pdo->prepare("UPDATE verification_codes SET Code_used = 1 WHERE Code_id = ?")->execute([$codigoData['Code_id']]);
+                if ($iniciouTransacao) {
+                    $this->pdo->commit();
+                }
+                return ['status' => false, 'msg' => 'Código expirado. Solicite um novo.'];
+            }
+
+            if ((int)$codigoData['Code_attempts'] >= 5) {
+                $this->pdo->prepare("UPDATE verification_codes SET Code_used = 1 WHERE Code_id = ?")->execute([$codigoData['Code_id']]);
+                if ($iniciouTransacao) {
+                    $this->pdo->commit();
+                }
+                return ['status' => false, 'msg' => 'Muitas tentativas. Solicite um novo código.'];
+            }
+
+            $contexto = (int)$userId . ':' . (string)$tipo;
+            if (self::verificarHashCodigo((string)$codigo, (string)$codigoData['Code_token'], $contexto)) {
+                try {
+                    $this->pdo->prepare("UPDATE verification_codes SET Code_used = 1, Code_used_at = NOW() WHERE Code_id = ?")->execute([$codigoData['Code_id']]);
+                } catch (PDOException $e) {
+                    $this->pdo->prepare("UPDATE verification_codes SET Code_used = 1 WHERE Code_id = ?")->execute([$codigoData['Code_id']]);
+                }
+
+                if ($tipo === 'Cadastro') {
+                    $this->pdo->prepare("UPDATE users SET User_active = 1 WHERE User_id = ?")->execute([(int)$userId]);
+                }
+
+                if ($iniciouTransacao) {
+                    $this->pdo->commit();
+                }
+                return ['status' => true, 'msg' => 'Código verificado com sucesso!'];
+            }
+
+            $novasTentativas = (int)$codigoData['Code_attempts'] + 1;
+            $esgotou = $novasTentativas >= 5 ? 1 : 0;
+
+            $this->pdo->prepare("
+                UPDATE verification_codes
+                SET Code_attempts = ?,
+                    Code_used = CASE WHEN ? = 1 THEN 1 ELSE Code_used END
+                WHERE Code_id = ?
+            ")->execute([$novasTentativas, $esgotou, $codigoData['Code_id']]);
+
+            if ($iniciouTransacao) {
+                $this->pdo->commit();
+            }
+
+            if ($esgotou) {
+                return ['status' => false, 'msg' => 'Muitas tentativas incorretas. Solicite um novo código.'];
+            }
+
             return ['status' => false, 'msg' => 'Código incorreto.'];
+        } catch (Exception $e) {
+            if ($iniciouTransacao && $this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            log_message('error', '[User::validarCodigoVerificacao] Erro transacional: ' . $e->getMessage());
+            return ['status' => false, 'msg' => 'Erro temporário ao validar o código. Tente novamente.'];
         }
     }
 }

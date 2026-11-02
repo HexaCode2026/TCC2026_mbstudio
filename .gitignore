@@ -6,11 +6,12 @@ config/.env
 config/.env.*
 !config/.env.example
 
-# Logs de Sistema e Erros
+# Logs de Sistema, Semáforos e Erros
 /logs/*.log
+/logs/*.lock
+/logs/.*.lock
 
 # Dependências e Temporários
 /vendor/
 .DS_Store
 Thumbs.db
-

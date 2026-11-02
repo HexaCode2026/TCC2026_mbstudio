@@ -41,3 +41,9 @@
 
 [2026-10-23 00:33:56] [ERROR] [BrevoEmailService] Erro da API Brevo ao enviar para kaio.gois013@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio | HTTP 401 - Resposta da API: {"message":"We have detected you are using an unrecognised IP address 2804:7f0:471:dc7:1d2f:461a:bd9c:a69a. If you performed this action make sure to add the new IP address in this link: https://app.brevo.com/security/authorised_ips","code":"unauthorized"}
 
+[2026-11-02 18:21:21] [ERROR] [EmailHelper] Falha ao enviar para kaio.gois013@gmail.com: Credenciais SMTP (SMTP_HOST, SMTP_USER ou SMTP_PASS) não configuradas no arquivo .env.
+[2026-11-02 18:22:35] [ERROR] [EmailHelper] Falha ao enviar para kaio.gois013@gmail.com: Credenciais SMTP (SMTP_HOST, SMTP_USER ou SMTP_PASS) não configuradas no arquivo .env.
+[2026-11-02 18:22:45] [ERROR] [EmailHelper] Falha ao enviar para kaio.gois013@gmail.com: Credenciais SMTP (SMTP_HOST, SMTP_USER ou SMTP_PASS) não configuradas no arquivo .env.
+[2026-11-02 18:23:06] [ERROR] [EmailHelper] Falha ao enviar para acacia40028922@gmail.com: Credenciais SMTP (SMTP_HOST, SMTP_USER ou SMTP_PASS) não configuradas no arquivo .env.
+[2026-11-02 18:24:17] [ERROR] [EmailHelper] Falha ao enviar para kaio.gois013@gmail.com: Credenciais SMTP (SMTP_HOST, SMTP_USER ou SMTP_PASS) não configuradas no arquivo .env.
+[2026-11-02 18:24:25] [ERROR] [EmailHelper][PHPMailer] Erro SMTP ao enviar para kaio.gois013@gmail.com | Assunto: Teste SMTP MB Studio | Detalhe: SMTP Error: Could not connect to SMTP host. Failed to connect to server SMTP server error: Failed to connect to server Additional SMTP info: php_network_getaddresses: getaddrinfo for smtp.gmail.com failed: Este host n�o � conhecido. 

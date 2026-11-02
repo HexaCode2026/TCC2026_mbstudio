@@ -38,77 +38,101 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $userId = (int)$_SESSION['User_id'];
+    // Libera o lock de sessão antes de iniciar a transação concorrente no banco
+    Session::liberarLock();
 
-    try {
-        // Inicia Transação ACID com bloqueio pessimista (FOR UPDATE) para prevenir Race Condition / Overbooking
-        $pdo->beginTransaction();
+    // 1. Consulta leitura da duração do serviço FORA da transação para reduzir o tempo de retenção de locks
+    $stmtSer = $pdo->prepare("SELECT Ser_duration FROM services WHERE Ser_id = ? AND Ser_active = 1 LIMIT 1");
+    $stmtSer->execute([$ser_id]);
+    $duracao = (int)$stmtSer->fetchColumn();
 
-        // 1. Obter Cli_id correspondente
-        $stmtCli = $pdo->prepare("SELECT Cli_id FROM clients WHERE User_id = ? FOR UPDATE");
-        $stmtCli->execute([$userId]);
-        $cli_id = $stmtCli->fetchColumn();
+    if ($duracao > 0) {
+        $fim = date('H:i:s', strtotime("+$duracao minutes", strtotime($hora)));
+    } else {
+        $fim = date('H:i:s', strtotime("+1 hour", strtotime($hora)));
+    }
 
-        if (!$cli_id) {
-            $stmtInsert = $pdo->prepare("INSERT INTO clients (User_id) VALUES (?)");
-            $stmtInsert->execute([$userId]);
-            $cli_id = $pdo->lastInsertId();
-        }
+    $maxTentativasDeadlock = 3;
+    $tentativa = 0;
 
-        // 2. Calcular Appo_end com base na duração do serviço
-        $stmtSer = $pdo->prepare("SELECT Ser_duration FROM services WHERE Ser_id = ? AND Ser_active = 1");
-        $stmtSer->execute([$ser_id]);
-        $duracao = (int)$stmtSer->fetchColumn();
+    while ($tentativa < $maxTentativasDeadlock) {
+        $tentativa++;
+        try {
+            // Transação curta e atômica com bloqueio pessimista indexado (FOR UPDATE)
+            $pdo->beginTransaction();
 
-        if ($duracao > 0) {
-            $fim = date('H:i:s', strtotime("+$duracao minutes", strtotime($hora)));
-        } else {
-            $fim = date('H:i:s', strtotime("+1 hour", strtotime($hora)));
-        }
+            // Obter ou criar Cli_id correspondente
+            $stmtCli = $pdo->prepare("SELECT Cli_id FROM clients WHERE User_id = ? LIMIT 1");
+            $stmtCli->execute([$userId]);
+            $cli_id = $stmtCli->fetchColumn();
 
-        // Validação de Segurança 2: Evitar Overbooking com Agendamentos Existentes (Lock FOR UPDATE)
-        $sqlCheckAppo = "SELECT Appo_id FROM appointments 
-                         WHERE Emp_id = ? AND Appo_date = ? 
-                         AND Appo_status NOT LIKE 'Cancelado%' 
-                         AND (Appo_start < ? AND Appo_end > ?)
-                         FOR UPDATE";
-        $stmtCheckAppo = $pdo->prepare($sqlCheckAppo);
-        $stmtCheckAppo->execute([$emp_id, $data, $fim, $hora]);
-        if ($stmtCheckAppo->rowCount() > 0) {
-            $pdo->rollBack();
-            header("Location: ../View/cliente/Servicos.php?erro=horario_indisponivel");
+            if (!$cli_id) {
+                $stmtInsert = $pdo->prepare("INSERT INTO clients (User_id) VALUES (?)");
+                $stmtInsert->execute([$userId]);
+                $cli_id = $pdo->lastInsertId();
+            }
+
+            // Validação de Segurança 2: Evitar Overbooking com Agendamentos Existentes (usa índice composto Emp_id + Appo_date)
+            $sqlCheckAppo = "SELECT Appo_id FROM appointments 
+                             WHERE Emp_id = ? AND Appo_date = ? 
+                             AND Appo_status NOT LIKE 'Cancelado%' 
+                             AND (Appo_start < ? AND Appo_end > ?)
+                             FOR UPDATE";
+            $stmtCheckAppo = $pdo->prepare($sqlCheckAppo);
+            $stmtCheckAppo->execute([$emp_id, $data, $fim, $hora]);
+            if ($stmtCheckAppo->fetchColumn()) {
+                $pdo->rollBack();
+                header("Location: ../View/cliente/Servicos.php?erro=horario_indisponivel");
+                exit;
+            }
+
+            // Validação de Segurança 3: Evitar Overbooking com Bloqueios/Pausas do Funcionário (usa índice composto Emp_id + Block_date)
+            $sqlCheckBlock = "SELECT Block_id FROM employee_blocks 
+                              WHERE Emp_id = ? AND Block_date = ? 
+                              AND (Block_start < ? AND Block_end > ?)
+                              FOR UPDATE";
+            $stmtCheckBlock = $pdo->prepare($sqlCheckBlock);
+            $stmtCheckBlock->execute([$emp_id, $data, $fim, $hora]);
+            if ($stmtCheckBlock->fetchColumn()) {
+                $pdo->rollBack();
+                header("Location: ../View/cliente/Servicos.php?erro=horario_bloqueado");
+                exit;
+            }
+
+            // Inserir agendamento com status inicial "Pendente"
+            $sql = "INSERT INTO appointments (Cli_id, Emp_id, Ser_id, Appo_date, Appo_start, Appo_end, Appo_status, Appo_observation)
+                    VALUES (?, ?, ?, ?, ?, ?, 'Pendente', ?)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$cli_id, $emp_id, $ser_id, $data, $hora, $fim, $observacao]);
+
+            $pdo->commit();
+
+            header("Location: ../View/cliente/MeusAgendamentos.php?sucesso=agendado");
+            exit;
+        } catch (PDOException $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            // Retry automático com backoff exponencial + jitter em caso de Deadlock (1213) ou Lock Wait Timeout (1205)
+            $sqlState   = (string)$e->getCode();
+            $driverCode = (int)($e->errorInfo[1] ?? 0);
+            if (($sqlState === '40001' || $driverCode === 1213 || $driverCode === 1205) && $tentativa < $maxTentativasDeadlock) {
+                usleep(random_int(25000, 75000) * $tentativa);
+                continue;
+            }
+
+            log_message('error', "[Agendar] Erro PDO ao agendar (User_id={$userId}, Emp_id={$emp_id}, Data={$data}): " . $e->getMessage());
+            header("Location: ../View/cliente/Servicos.php?erro=falha_agendamento");
+            exit;
+        } catch (Exception $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            log_message('error', "[Agendar] Erro geral ao agendar: " . $e->getMessage());
+            header("Location: ../View/cliente/Servicos.php?erro=falha_agendamento");
             exit;
         }
-
-        // Validação de Segurança 3: Evitar Overbooking com Bloqueios/Pausas do Funcionário (Lock FOR UPDATE)
-        $sqlCheckBlock = "SELECT Block_id FROM employee_blocks 
-                          WHERE Emp_id = ? AND Block_date = ? 
-                          AND (Block_start < ? AND Block_end > ?)
-                          FOR UPDATE";
-        $stmtCheckBlock = $pdo->prepare($sqlCheckBlock);
-        $stmtCheckBlock->execute([$emp_id, $data, $fim, $hora]);
-        if ($stmtCheckBlock->rowCount() > 0) {
-            $pdo->rollBack();
-            header("Location: ../View/cliente/Servicos.php?erro=horario_bloqueado");
-            exit;
-        }
-
-        // 3. Inserir agendamento com status inicial "Pendente"
-        $sql = "INSERT INTO appointments (Cli_id, Emp_id, Ser_id, Appo_date, Appo_start, Appo_end, Appo_status, Appo_observation)
-                VALUES (?, ?, ?, ?, ?, ?, 'Pendente', ?)";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$cli_id, $emp_id, $ser_id, $data, $hora, $fim, $observacao]);
-
-        $pdo->commit();
-
-        // 4. Redirecionar para o painel de visualização do cliente
-        header("Location: ../View/cliente/MeusAgendamentos.php?sucesso=agendado");
-        exit;
-    } catch (Exception $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
-        header("Location: ../View/cliente/Servicos.php?erro=falha_agendamento");
-        exit;
     }
 } else {
     header("Location: ../Index.php");

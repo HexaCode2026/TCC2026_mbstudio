@@ -12,6 +12,7 @@ if (php_sapi_name() !== 'cli' && basename($_SERVER['SCRIPT_FILENAME'] ?? '') ===
 }
 
 require_once __DIR__ . '/../config/conexao.php';
+require_once __DIR__ . '/../model/User.php';
 
 function executarBootstrapAdmin(PDO $pdo): array
 {
@@ -32,7 +33,7 @@ function executarBootstrapAdmin(PDO $pdo): array
     // 2. Gera o hash seguro Bcrypt para a senha temporária 'admin123'
     $emailAdmin = 'kaio.gois013@gmail.com';
     $nomeAdmin  = 'Administrador';
-    $hashSenha  = password_hash('admin123', PASSWORD_BCRYPT);
+    $hashSenha  = User::hashSenha('admin123');
     $resultado['hash_gerado'] = $hashSenha;
 
     // 3. Seeder Idempotente: só insere se o e-mail não existir na tabela users

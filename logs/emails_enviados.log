@@ -8,3 +8,8 @@
 [2026-10-21 15:13:34] [INFO] [BrevoEmailService] Sucesso HTTP 201 | Destinatário: ka***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio
 [2026-10-21 18:19:13] [INFO] [BrevoEmailService] Sucesso HTTP 201 | Destinatário: ka***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio
 [2026-10-23 00:34:26] [INFO] [BrevoEmailService] Sucesso HTTP 201 | Destinatário: ka***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio
+[2026-11-02 18:28:12] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ka***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio
+[2026-11-02 18:52:02] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ac***@gmail.com | Assunto: Bem-vindo(a) ao MB Studio — Confirme seu Cadastro
+[2026-11-02 18:52:58] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ac***@gmail.com | Assunto: Recuperação de Senha — MB Studio
+[2026-11-02 18:53:45] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ac***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio
+[2026-11-02 19:15:02] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ac***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio

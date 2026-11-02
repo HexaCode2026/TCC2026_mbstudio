@@ -3,9 +3,7 @@ require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/User.php";
 require_once __DIR__ . "/../core/Session.php";
 
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+Session::iniciar();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $codigo = trim($_POST['codigo'] ?? '');
@@ -32,7 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
 
-        if (password_verify($codigo, $pending['token_hash'])) {
+        $contextoCadastro = strtolower((string)($pending['email'] ?? '')) . ':Cadastro';
+        if (User::verificarHashCodigo($codigo, (string)$pending['token_hash'], $contextoCadastro)) {
             if (!$usuario->emailExiste($pending['email'])) {
                 $usuario->cadastrarConfirmado(
                     $pending['nome'],
@@ -64,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             Session::login($dados);
 
-            unset($_SESSION['verificar_user_id'], $_SESSION['verificar_tipo'], $_SESSION['temp_login_dados']);
+            unset($_SESSION['verificar_user_id'], $_SESSION['verificar_tipo'], $_SESSION['temp_login_dados'], $_SESSION['login2fa_sent_at']);
 
             if (!empty($dados['User_must_change_pass'])) {
                 header("Location: " . Session::getBasePath() . "/View/PrimeiroAcesso.php");

@@ -1,191 +1,79 @@
 <?php
 
-
-class Dashboard{
-
-
+class Dashboard
+{
     private $pdo;
+    private ?array $resumoCache = null;
 
-
-
-    public function __construct($pdo){
-
+    public function __construct($pdo)
+    {
         $this->pdo = $pdo;
-
     }
 
-
-
-
-    // Total de usuários
-
-    public function totalUsuarios(){
-
+    /**
+     * Consolida as 6 contagens do painel administrativo em uma única query agregada,
+     * reduzindo de 6 round-trips ao banco para apenas 1.
+     */
+    public function obterResumoGeral(): array
+    {
+        if ($this->resumoCache !== null) {
+            return $this->resumoCache;
+        }
 
         $sql = "
-
-        SELECT COUNT(*) AS total
-
-        FROM users
-
+            SELECT
+                COUNT(*) AS total_usuarios,
+                 COALESCE(SUM(CASE WHEN User_perm = 'C' THEN 1 ELSE 0 END), 0) AS total_clientes,
+                 COALESCE(SUM(CASE WHEN User_perm = 'F' THEN 1 ELSE 0 END), 0) AS total_funcionarios,
+                 COALESCE(SUM(CASE WHEN User_perm = 'A' THEN 1 ELSE 0 END), 0) AS total_administradores,
+                (SELECT COUNT(*) FROM services) AS total_servicos,
+                (SELECT COUNT(*) FROM appointments) AS total_agendamentos
+            FROM users
         ";
 
-
         $stmt = $this->pdo->query($sql);
+        $row = $stmt ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
 
+        $this->resumoCache = [
+            'usuarios'        => (int)($row['total_usuarios'] ?? 0),
+            'clientes'        => (int)($row['total_clientes'] ?? 0),
+            'funcionarios'    => (int)($row['total_funcionarios'] ?? 0),
+            'administradores' => (int)($row['total_administradores'] ?? 0),
+            'servicos'        => (int)($row['total_servicos'] ?? 0),
+            'agendamentos'    => (int)($row['total_agendamentos'] ?? 0),
+        ];
 
-        return $stmt->fetch()['total'];
-
-
+        return $this->resumoCache;
     }
 
-
-
-
-
-
-    // Total clientes
-
-    public function totalClientes(){
-
-
-        $sql = "
-
-        SELECT COUNT(*) AS total
-
-        FROM users
-
-        WHERE User_perm = 'C'
-
-        ";
-
-
-        $stmt = $this->pdo->query($sql);
-
-
-        return $stmt->fetch()['total'];
-
-
+    public function totalUsuarios(): int
+    {
+        return $this->obterResumoGeral()['usuarios'];
     }
 
-
-
-
-
-
-    // Total funcionários
-
-    public function totalFuncionarios(){
-
-
-        $sql = "
-
-        SELECT COUNT(*) AS total
-
-        FROM users
-
-        WHERE User_perm = 'F'
-
-        ";
-
-
-        $stmt = $this->pdo->query($sql);
-
-
-        return $stmt->fetch()['total'];
-
-
+    public function totalClientes(): int
+    {
+        return $this->obterResumoGeral()['clientes'];
     }
 
-
-
-
-
-
-
-    // Total administradores
-
-    public function totalAdministradores(){
-
-
-        $sql = "
-
-        SELECT COUNT(*) AS total
-
-        FROM users
-
-        WHERE User_perm = 'A'
-
-        ";
-
-
-        $stmt = $this->pdo->query($sql);
-
-
-        return $stmt->fetch()['total'];
-
-
+    public function totalFuncionarios(): int
+    {
+        return $this->obterResumoGeral()['funcionarios'];
     }
 
-
-
-
-
-
-
-    // Total serviços
-
-    public function totalServicos(){
-
-
-        $sql = "
-
-        SELECT COUNT(*) AS total
-
-        FROM services
-
-        ";
-
-
-        $stmt = $this->pdo->query($sql);
-
-
-        return $stmt->fetch()['total'];
-
-
+    public function totalAdministradores(): int
+    {
+        return $this->obterResumoGeral()['administradores'];
     }
 
-
-
-
-
-
-
-    // Total agendamentos
-
-    public function totalAgendamentos(){
-
-
-        $sql = "
-
-        SELECT COUNT(*) AS total
-
-        FROM appointments
-
-        ";
-
-
-        $stmt = $this->pdo->query($sql);
-
-
-        return $stmt->fetch()['total'];
-
-
+    public function totalServicos(): int
+    {
+        return $this->obterResumoGeral()['servicos'];
     }
 
-
-
-
+    public function totalAgendamentos(): int
+    {
+        return $this->obterResumoGeral()['agendamentos'];
+    }
 }
-
 ?>

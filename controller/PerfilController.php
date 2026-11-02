@@ -113,7 +113,7 @@ class PerfilController
                 exit;
             }
 
-            $novoHash = password_hash($novaSenha, PASSWORD_BCRYPT);
+            $novoHash = User::hashSenha($novaSenha);
         }
 
         $sucesso = $this->userModel->updateProfile($userId, $nomeLimpo, $novoHash);

@@ -3,30 +3,38 @@
 class Availability {
 
     private $pdo;
+    private static ?bool $temColunaSerIdCache = null;
 
     public function __construct($pdo) {
         $this->pdo = $pdo;
     }
 
     /**
-     * Verifica e garante que a coluna Ser_id exista na tabela availabilities
-     * 
-     * @return bool
+     * Verifica e garante que a coluna Ser_id exista na tabela availabilities,
+     * utilizando cache estático em memória para evitar queries repetidas na mesma requisição.
      */
-    private function verificarColunaSerId() {
+    private function verificarColunaSerId(): bool {
+        if (self::$temColunaSerIdCache !== null) {
+            return self::$temColunaSerIdCache;
+        }
+
         try {
             $this->pdo->query("SELECT Ser_id FROM availabilities LIMIT 1");
+            self::$temColunaSerIdCache = true;
             return true;
         } catch (Exception $e) {
             try {
                 $this->pdo->exec("ALTER TABLE availabilities ADD COLUMN Ser_id INT NULL AFTER Emp_id");
                 $this->pdo->exec("ALTER TABLE availabilities ADD CONSTRAINT fk_availabilities_service FOREIGN KEY (Ser_id) REFERENCES services(Ser_id) ON DELETE SET NULL");
+                self::$temColunaSerIdCache = true;
                 return true;
             } catch (Exception $ex) {
                 try {
                     $this->pdo->exec("ALTER TABLE availabilities ADD COLUMN Ser_id INT NULL");
+                    self::$temColunaSerIdCache = true;
                     return true;
                 } catch (Exception $ex2) {
+                    self::$temColunaSerIdCache = false;
                     return false;
                 }
             }
@@ -35,12 +43,6 @@ class Availability {
 
     /**
      * Salva ou atualiza os blocos de horários de disponibilidade para um funcionário em uma data
-     * 
-     * @param int $empId ID do funcionário (Emp_id)
-     * @param int $serId ID do serviço (Ser_id)
-     * @param string $date Data no formato YYYY-MM-DD
-     * @param array $horarios Array de slots com start, end e status
-     * @return bool
      */
     public function salvarDisponibilidades($empId, $serId, $date, array $horarios) {
         $temSerId = $this->verificarColunaSerId();
@@ -48,12 +50,10 @@ class Availability {
             $this->pdo->beginTransaction();
 
             if ($temSerId && $serId) {
-                // Remover disponibilidades anteriores do mesmo funcionário na mesma data para o mesmo serviço
                 $deleteSql = "DELETE FROM availabilities WHERE Emp_id = ? AND Ser_id = ? AND Ava_date = ?";
                 $deleteStmt = $this->pdo->prepare($deleteSql);
                 $deleteStmt->execute([$empId, $serId, $date]);
 
-                // Inserir cada faixa de horário com seu respectivo status
                 $insertSql = "INSERT INTO availabilities (Emp_id, Ser_id, Ava_date, Ava_start, Ava_end, Ava_status) 
                               VALUES (?, ?, ?, ?, ?, ?)";
                 $insertStmt = $this->pdo->prepare($insertSql);
@@ -103,30 +103,17 @@ class Availability {
             $this->pdo->commit();
             return true;
         } catch (Exception $e) {
-            $this->pdo->rollBack();
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
             return false;
         }
     }
 
-    /**
-     * Atualiza / edita os blocos de horários de disponibilidade para um funcionário em uma data
-     * 
-     * @param int $empId ID do funcionário (Emp_id)
-     * @param string $date Data no formato YYYY-MM-DD
-     * @param array $horarios Array de slots com start, end e status
-     * @return bool
-     */
     public function editarDisponibilidades($empId, $serId, $date, array $horarios) {
         return $this->salvarDisponibilidades($empId, $serId, $date, $horarios);
     }
 
-    /**
-     * Exclui todas as disponibilidades cadastradas para um funcionário em uma data
-     * 
-     * @param int $empId ID do funcionário (Emp_id)
-     * @param string $date Data no formato YYYY-MM-DD
-     * @return bool
-     */
     public function excluirDisponibilidades($empId, $date) {
         try {
             $sql = "DELETE FROM availabilities WHERE Emp_id = ? AND Ava_date = ?";
@@ -137,17 +124,6 @@ class Availability {
         }
     }
 
-    /**
-     * Atualiza / edita uma disponibilidade específica pelo Ava_id
-     * 
-     * @param int $avaId ID da disponibilidade (Ava_id)
-     * @param int $empId ID do funcionário (Emp_id)
-     * @param string $status Novo status
-     * @param string|null $date Nova data (opcional)
-     * @param string|null $start Novo horário de início (opcional)
-     * @param string|null $end Novo horário de término (opcional)
-     * @return bool
-     */
     public function editarPorId($avaId, $empId, $status, $date = null, $start = null, $end = null) {
         try {
             if ($date && $start && $end) {
@@ -168,13 +144,6 @@ class Availability {
         }
     }
 
-    /**
-     * Exclui uma disponibilidade específica pelo Ava_id
-     * 
-     * @param int|array $avaId ID da disponibilidade (Ava_id) ou array de IDs
-     * @param int $empId ID do funcionário (Emp_id)
-     * @return bool
-     */
     public function excluirPorId($avaId, $empId) {
         try {
             if (is_array($avaId)) {
@@ -193,9 +162,6 @@ class Availability {
         }
     }
 
-    /**
-     * Busca disponibilidades cadastradas para um funcionário a partir de uma data ou futuras
-     */
     public function listarPorFuncionario($empId, $dataMinima = null) {
         $temSerId = $this->verificarColunaSerId();
 
@@ -233,9 +199,6 @@ class Availability {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Busca disponibilidades cadastradas para um funcionário em uma data
-     */
     public function buscarPorData($empId, $date) {
         $sql = "SELECT * FROM availabilities 
                 WHERE Emp_id = ? AND Ava_date = ? 

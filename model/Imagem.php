@@ -3,18 +3,24 @@
 class Imagem
 {
     private $pdo;
+    private static bool $tabelaVerificada = false;
 
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
-        $this->garantirTabela();
     }
 
     /**
-     * Cria a tabela site_images caso ainda não exista e popula com os destaques iniciais
+     * Cria a tabela site_images apenas sob demanda (Lazy Initialization) caso uma consulta lance erro 42S02,
+     * eliminando contenção de Metadata Lock (DDL) em cada carregamento da Home.
      */
-    private function garantirTabela()
+    private function garantirTabela(): void
     {
+        if (self::$tabelaVerificada) {
+            return;
+        }
+        self::$tabelaVerificada = true;
+
         try {
             $sql = "
                 CREATE TABLE IF NOT EXISTS site_images (
@@ -25,12 +31,12 @@ class Imagem
                     Img_section VARCHAR(50) NOT NULL DEFAULT 'hero',
                     Img_order INT NOT NULL DEFAULT 1,
                     Img_active TINYINT(1) NOT NULL DEFAULT 1,
-                    Img_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    Img_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    INDEX idx_img_section_active_order (Img_section, Img_active, Img_order)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
             ";
             $this->pdo->exec($sql);
 
-            // Se a tabela acabou de ser criada e estiver vazia, importa imagens existentes dos serviços ativos
             $count = (int) $this->pdo->query("SELECT COUNT(*) FROM site_images")->fetchColumn();
             if ($count === 0) {
                 $stmtServ = $this->pdo->query("
@@ -61,13 +67,28 @@ class Imagem
      */
     public function listarTodas($secao = null)
     {
-        if ($secao) {
-            $stmt = $this->pdo->prepare("SELECT * FROM site_images WHERE Img_section = ? ORDER BY Img_order ASC, Img_id DESC");
-            $stmt->execute([$secao]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            if ($secao) {
+                $stmt = $this->pdo->prepare("SELECT * FROM site_images WHERE Img_section = ? ORDER BY Img_order ASC, Img_id DESC");
+                $stmt->execute([$secao]);
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+            $stmt = $this->pdo->query("SELECT * FROM site_images ORDER BY Img_order ASC, Img_id DESC");
+            return $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+        } catch (PDOException $e) {
+            $this->garantirTabela();
+            try {
+                if ($secao) {
+                    $stmt = $this->pdo->prepare("SELECT * FROM site_images WHERE Img_section = ? ORDER BY Img_order ASC, Img_id DESC");
+                    $stmt->execute([$secao]);
+                    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+                }
+                $stmt = $this->pdo->query("SELECT * FROM site_images ORDER BY Img_order ASC, Img_id DESC");
+                return $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+            } catch (Exception $ex) {
+                return [];
+            }
         }
-        $stmt = $this->pdo->query("SELECT * FROM site_images ORDER BY Img_order ASC, Img_id DESC");
-        return $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
     }
 
     /**
@@ -75,13 +96,28 @@ class Imagem
      */
     public function listarAtivasHero($projectRootDir = null)
     {
-        $stmt = $this->pdo->prepare("
-            SELECT * FROM site_images
-            WHERE Img_section = 'hero' AND Img_active = 1
-            ORDER BY Img_order ASC, Img_id DESC
-        ");
-        $stmt->execute();
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $this->pdo->prepare("
+                SELECT * FROM site_images
+                WHERE Img_section = 'hero' AND Img_active = 1
+                ORDER BY Img_order ASC, Img_id DESC
+            ");
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $this->garantirTabela();
+            try {
+                $stmt = $this->pdo->prepare("
+                    SELECT * FROM site_images
+                    WHERE Img_section = 'hero' AND Img_active = 1
+                    ORDER BY Img_order ASC, Img_id DESC
+                ");
+                $stmt->execute();
+                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (Exception $ex) {
+                $rows = [];
+            }
+        }
 
         if (!$projectRootDir) {
             $projectRootDir = realpath(__DIR__ . '/../');
@@ -112,11 +148,20 @@ class Imagem
      */
     public function adicionar($titulo, $subtitulo, $caminho, $secao = 'hero', $ordem = 1, $ativo = 1)
     {
-        $stmt = $this->pdo->prepare("
-            INSERT INTO site_images (Img_title, Img_subtitle, Img_path, Img_section, Img_order, Img_active)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ");
-        return $stmt->execute([$titulo, $subtitulo, $caminho, $secao, (int)$ordem, (int)$ativo]);
+        try {
+            $stmt = $this->pdo->prepare("
+                INSERT INTO site_images (Img_title, Img_subtitle, Img_path, Img_section, Img_order, Img_active)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ");
+            return $stmt->execute([$titulo, $subtitulo, $caminho, $secao, (int)$ordem, (int)$ativo]);
+        } catch (PDOException $e) {
+            $this->garantirTabela();
+            $stmt = $this->pdo->prepare("
+                INSERT INTO site_images (Img_title, Img_subtitle, Img_path, Img_section, Img_order, Img_active)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ");
+            return $stmt->execute([$titulo, $subtitulo, $caminho, $secao, (int)$ordem, (int)$ativo]);
+        }
     }
 
     /**
@@ -178,4 +223,3 @@ class Imagem
     }
 }
 ?>
-

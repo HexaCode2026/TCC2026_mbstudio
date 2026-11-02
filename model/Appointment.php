@@ -10,9 +10,9 @@ class Appointment
     }
 
     /**
-     * Lista todos os agendamentos de um determinado funcionário com dados complementares do cliente e serviço.
+     * Lista os agendamentos de um determinado funcionário com dados complementares do cliente e serviço (com limite de segurança contra estouro de memória).
      */
-    public function listarPorFuncionario($empId, $filtroData = null, $filtroStatus = null)
+    public function listarPorFuncionario($empId, $filtroData = null, $filtroStatus = null, int $limite = 500)
     {
         $sql = "SELECT 
                     a.Appo_id,
@@ -51,10 +51,14 @@ class Appointment
             $params[':status'] = $filtroStatus;
         }
 
-        $sql .= " ORDER BY a.Appo_date DESC, a.Appo_start ASC";
+        $sql .= " ORDER BY a.Appo_date DESC, a.Appo_start ASC LIMIT :limite";
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        $stmt->bindValue(':limite', max(1, min(2000, $limite)), PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -88,9 +92,8 @@ class Appointment
     /**
      * Atualiza o status de um agendamento.
      */
-    public function atualizarStatus($appoId, $empId = null, $status, $cancelBy = null, $cancelReason = null, $cliId = null)
+    public function atualizarStatus($appoId, $empId = null, $status = '', $cancelBy = null, $cancelReason = null, $cliId = null)
     {
-        // Garantir que o funcionário só atualize seus próprios agendamentos
         if ($empId !== null) {
             $sqlCheck = "SELECT Appo_id FROM appointments WHERE Appo_id = :id AND Emp_id = :emp_id";
             $stmtCheck = $this->pdo->prepare($sqlCheck);
@@ -100,7 +103,6 @@ class Appointment
             }
         }
         
-        // Garantir que o cliente só cancele seus próprios agendamentos
         if ($cliId !== null) {
             $sqlCheck = "SELECT Appo_id FROM appointments WHERE Appo_id = :id AND Cli_id = :cli_id";
             $stmtCheck = $this->pdo->prepare($sqlCheck);
@@ -170,7 +172,6 @@ class Appointment
 
     /**
      * Finaliza um atendimento registrando a forma de pagamento de maneira estritamente atômica.
-     * Retorna true se a operação modificou exatamente 1 linha (sucesso + autorização).
      */
     public function finalizarComPagamento($appoId, $paymentMethod, $empId = null)
     {
@@ -180,7 +181,6 @@ class Appointment
         }
 
         if ($empId !== null) {
-            // Fluxo do Funcionário
             $sql = "UPDATE appointments 
                     SET Appo_status = 'Concluido', 
                         Appo_payment_method = :payment_method 
@@ -194,7 +194,6 @@ class Appointment
                 ':emp_id' => $empId
             ]);
         } else {
-            // Fluxo do Administrador
             $sql = "UPDATE appointments 
                     SET Appo_status = 'Concluido', 
                         Appo_payment_method = :payment_method 

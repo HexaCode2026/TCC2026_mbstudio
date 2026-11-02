@@ -13,11 +13,9 @@ CREATE TABLE users(
     User_perm ENUM('A','F','C') DEFAULT 'C',
     User_active BOOLEAN DEFAULT TRUE,
     User_must_change_pass BOOLEAN DEFAULT FALSE,
-    User_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    User_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_users_perm_active (User_perm, User_active)
 );
-
--- Migração segura caso a tabela já exista no ambiente:
--- ALTER TABLE users ADD COLUMN User_must_change_pass BOOLEAN DEFAULT FALSE AFTER User_active;
 
 -- Seeder Idempotente do Administrador Inicial (Senha temporária: 'admin123' com Bcrypt)
 INSERT INTO users (User_name, User_email, User_pass, User_perm, User_active, User_must_change_pass)
@@ -35,7 +33,7 @@ CREATE TABLE clients(
     User_id INT UNIQUE NOT NULL,
     Cli_phone VARCHAR(20),
     Cli_birth DATE,
-    Cli_observation TEXT, -- Observações internas que os funcionários podem adicionar
+    Cli_observation TEXT,
     FOREIGN KEY(User_id) REFERENCES users(User_id) ON DELETE CASCADE
 );
 
@@ -61,7 +59,8 @@ CREATE TABLE services(
     Ser_price DECIMAL(10,2) NOT NULL,
     Ser_duration INT NOT NULL,
     Ser_image VARCHAR(255),
-    Ser_active BOOLEAN DEFAULT TRUE
+    Ser_active BOOLEAN DEFAULT TRUE,
+    INDEX idx_services_active (Ser_active)
 );
 
 -- ==========================================
@@ -88,7 +87,9 @@ CREATE TABLE availabilities(
     Ava_end TIME NOT NULL,
     Ava_status ENUM('Disponivel','Folga','Ferias','Bloqueado') DEFAULT 'Disponivel',
     FOREIGN KEY(Emp_id) REFERENCES employees(Emp_id) ON DELETE CASCADE,
-    FOREIGN KEY(Ser_id) REFERENCES services(Ser_id) ON DELETE SET NULL
+    FOREIGN KEY(Ser_id) REFERENCES services(Ser_id) ON DELETE SET NULL,
+    INDEX idx_ava_lookup (Ava_date, Ser_id, Ava_status, Emp_id, Ava_start),
+    INDEX idx_ava_emp_date (Emp_id, Ava_date)
 );
 
 -- ==========================================
@@ -101,7 +102,8 @@ CREATE TABLE employee_blocks(
     Block_start TIME NOT NULL,
     Block_end TIME NOT NULL,
     Block_reason VARCHAR(255),
-    FOREIGN KEY(Emp_id) REFERENCES employees(Emp_id) ON DELETE CASCADE
+    FOREIGN KEY(Emp_id) REFERENCES employees(Emp_id) ON DELETE CASCADE,
+    INDEX idx_block_emp_date (Emp_id, Block_date, Block_start, Block_end)
 );
 
 -- ==========================================
@@ -125,18 +127,17 @@ CREATE TABLE appointments(
         'Cancelado pelo Administrador',
         'Nao Compareceu'
     ) DEFAULT 'Pendente',
-    
-    Appo_payment_method ENUM('Pix', 'Dinheiro', 'Cartão') NULL, -- Forma de pagamento selecionada na finalização
-    
+    Appo_payment_method ENUM('Pix', 'Dinheiro', 'Cartão') NULL,
     Appo_cancel_by ENUM('Cliente','Funcionario','Administrador') NULL,
     Appo_cancel_reason TEXT,
     Appo_observation TEXT,
     Appo_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Appo_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
     FOREIGN KEY(Cli_id) REFERENCES clients(Cli_id) ON DELETE CASCADE,
     FOREIGN KEY(Emp_id) REFERENCES employees(Emp_id) ON DELETE CASCADE,
-    FOREIGN KEY(Ser_id) REFERENCES services(Ser_id) ON DELETE CASCADE
+    FOREIGN KEY(Ser_id) REFERENCES services(Ser_id) ON DELETE CASCADE,
+    INDEX idx_appo_emp_date_status (Emp_id, Appo_date, Appo_status, Appo_start, Appo_end),
+    INDEX idx_appo_date_status (Appo_date, Appo_status)
 );
 
 -- ==========================================
@@ -174,6 +175,42 @@ CREATE TABLE verification_codes (
     Code_expires_at DATETIME NOT NULL,
     Code_attempts INT DEFAULT 0,
     Code_used BOOLEAN DEFAULT FALSE,
+    Code_used_at DATETIME NULL DEFAULT NULL,
     Code_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(User_id) REFERENCES users(User_id) ON DELETE CASCADE
+    FOREIGN KEY(User_id) REFERENCES users(User_id) ON DELETE CASCADE,
+    INDEX idx_verification_latest (User_id, Code_type, Code_used, Code_id DESC),
+    INDEX idx_verification_lookup (User_id, Code_type, Code_used, Code_expires_at)
 );
+
+-- ==========================================
+-- 11. IMAGENS DO CARROSSEL / DESTAQUE HOME
+-- ==========================================
+CREATE TABLE IF NOT EXISTS site_images (
+    Img_id INT AUTO_INCREMENT PRIMARY KEY,
+    Img_title VARCHAR(150) NOT NULL,
+    Img_subtitle VARCHAR(100) DEFAULT NULL,
+    Img_path VARCHAR(255) NOT NULL,
+    Img_section VARCHAR(50) NOT NULL DEFAULT 'hero',
+    Img_order INT NOT NULL DEFAULT 1,
+    Img_active TINYINT(1) NOT NULL DEFAULT 1,
+    Img_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_img_section_active_order (Img_section, Img_active, Img_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ==========================================
+-- 12. FILA ASSÍNCRONA DE E-MAILS (OUTBOX)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS email_queue (
+    Queue_id INT AUTO_INCREMENT PRIMARY KEY,
+    Recipient_email VARCHAR(150) NOT NULL,
+    Recipient_name VARCHAR(100) NOT NULL,
+    Subject VARCHAR(200) NOT NULL,
+    Body_html MEDIUMTEXT NOT NULL,
+    Body_alt TEXT NULL,
+    Status ENUM('Pendente', 'Processando', 'Enviado', 'Falha') DEFAULT 'Pendente',
+    Attempts TINYINT UNSIGNED DEFAULT 0,
+    Last_error TEXT NULL,
+    Created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Processed_at DATETIME NULL DEFAULT NULL,
+    INDEX idx_queue_status_created (Status, Attempts, Created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

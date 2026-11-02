@@ -229,7 +229,7 @@ if (!empty($nova_senha)) {
     }
 
     // Criar hash da nova senha
-    $senhaHashSalvar = password_hash($nova_senha, PASSWORD_DEFAULT);
+    $senhaHashSalvar = User::hashSenha($nova_senha);
 }
 
 // ======================================================

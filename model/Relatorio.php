@@ -6,20 +6,24 @@ class Relatorio {
         $this->pdo = $pdo;
     }
 
-    public function getDadosRelatorio($dataInicial, $dataFinal, $empId = null) {
+    public function getDadosRelatorio($dataInicial, $dataFinal, $empId = null, int $limite = 500) {
         $sql = "SELECT * FROM vw_relatorio_admin 
                 WHERE Data_Agendamento BETWEEN :dataInicial AND :dataFinal";
-        $params = ['dataInicial' => $dataInicial, 'dataFinal' => $dataFinal];
+        $params = [':dataInicial' => $dataInicial, ':dataFinal' => $dataFinal];
 
         if ($empId) {
             $sql .= " AND ID_Profissional = :empId";
-            $params['empId'] = $empId;
+            $params[':empId'] = $empId;
         }
         
-        $sql .= " ORDER BY Data_Agendamento DESC, Hora_Inicio DESC";
+        $sql .= " ORDER BY Data_Agendamento DESC, Hora_Inicio DESC LIMIT :limite";
         
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        $stmt->bindValue(':limite', max(1, min(2000, $limite)), PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

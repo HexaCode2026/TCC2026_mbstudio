@@ -1,57 +1,54 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../core/Session.php';
-require_once __DIR__ . '/../helpers/BrevoEmailService.php';
+require_once __DIR__ . '/../helpers/EmailHelper.php';
 
 Session::iniciar();
 
-$destinatario = trim($_GET['email'] ?? $_POST['email'] ?? (getenv('BREVO_FROM_EMAIL') ?: 'hexa.code2026@gmail.com'));
+$destinatario = trim($_GET['email'] ?? $_POST['email'] ?? (defined('SMTP_FROM_EMAIL') && SMTP_FROM_EMAIL !== '' ? SMTP_FROM_EMAIL : ''));
 $nomeDestino  = trim($_GET['nome'] ?? $_POST['nome'] ?? 'Teste MB Studio');
 $autoDisparar = isset($_GET['disparar']) || isset($_POST['disparar']) || (PHP_SAPI === 'cli');
 
-$brevo = new BrevoEmailService();
+$mailer = new EmailHelper();
 $resultados = [];
 
 if ($autoDisparar && filter_var($destinatario, FILTER_VALIDATE_EMAIL)) {
     // 1. Teste Template Confirmação de Cadastro
-    $ok1 = $brevo->enviarConfirmacaoCadastro($destinatario, $nomeDestino, '849201');
+    $ok1 = $mailer->enviarConfirmacaoCadastro($destinatario, $nomeDestino, '849201');
     $resultados['ConfirmacaoCadastro'] = [
-        'titulo'    => '1. Confirmação de Cadastro (enviarConfirmacaoCadastro)',
-        'sucesso'   => $ok1,
-        'http_code' => $brevo->getLastHttpCode(),
-        'resposta'  => $brevo->getLastResponse(),
-        'erro'      => $brevo->getLastError(),
+        'titulo'  => '1. Confirmação de Cadastro (enviarConfirmacaoCadastro)',
+        'sucesso' => $ok1,
+        'erro'    => $mailer->getLastError(),
     ];
 
     // 2. Teste Template Código 2FA
-    $ok2 = $brevo->enviarCodigo2FA($destinatario, $nomeDestino, '593017');
+    $ok2 = $mailer->enviarCodigo2FA($destinatario, $nomeDestino, '593017');
     $resultados['Codigo2FA'] = [
-        'titulo'    => '2. Código de Verificação 2FA (enviarCodigo2FA)',
-        'sucesso'   => $ok2,
-        'http_code' => $brevo->getLastHttpCode(),
-        'resposta'  => $brevo->getLastResponse(),
-        'erro'      => $brevo->getLastError(),
+        'titulo'  => '2. Código de Verificação 2FA (enviarCodigo2FA)',
+        'sucesso' => $ok2,
+        'erro'    => $mailer->getLastError(),
     ];
 
     // 3. Teste Template Recuperação de Senha
-    $ok3 = $brevo->enviarRecuperacaoSenha($destinatario, $nomeDestino, '718492');
+    $ok3 = $mailer->enviarRecuperacaoSenha($destinatario, $nomeDestino, '718492');
     $resultados['RecuperacaoSenha'] = [
-        'titulo'    => '3. Recuperação de Senha (enviarRecuperacaoSenha)',
-        'sucesso'   => $ok3,
-        'http_code' => $brevo->getLastHttpCode(),
-        'resposta'  => $brevo->getLastResponse(),
-        'erro'      => $brevo->getLastError(),
+        'titulo'  => '3. Recuperação de Senha (enviarRecuperacaoSenha)',
+        'sucesso' => $ok3,
+        'erro'    => $mailer->getLastError(),
     ];
 }
 
 if (PHP_SAPI === 'cli' || (($_GET['format'] ?? '') === 'json')) {
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode([
-        'endpoint'   => 'https://api.brevo.com/v3/smtp/email',
-        'from_email' => getenv('BREVO_FROM_EMAIL'),
-        'from_name'  => getenv('BREVO_FROM_NAME'),
-        'to_email'   => $destinatario,
-        'results'    => $resultados,
+        'mailer'      => 'PHPMailer (SMTP)',
+        'smtp_host'   => defined('SMTP_HOST') ? SMTP_HOST : '',
+        'smtp_port'   => defined('SMTP_PORT') ? SMTP_PORT : 587,
+        'smtp_secure' => defined('SMTP_SECURE') ? SMTP_SECURE : 'tls',
+        'from_email'  => defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : '',
+        'from_name'   => defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : '',
+        'to_email'    => $destinatario,
+        'results'     => $resultados,
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     exit;
 }
@@ -61,7 +58,7 @@ if (PHP_SAPI === 'cli' || (($_GET['format'] ?? '') === 'json')) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagnóstico Brevo API v3 | MB Studio</title>
+    <title>Diagnóstico PHPMailer SMTP | MB Studio</title>
     <style>
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #F8FAFC; color: #0F172A; margin: 0; padding: 40px 20px; }
         .card { max-width: 780px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 32px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05); }
@@ -79,8 +76,13 @@ if (PHP_SAPI === 'cli' || (($_GET['format'] ?? '') === 'json')) {
 </head>
 <body>
     <div class="card">
-        <h1>Diagnóstico Brevo Email Service (API v3 HTTPS)</h1>
-        <p class="sub">Remetente configurado: <strong><?= htmlspecialchars((string)getenv('BREVO_FROM_EMAIL')) ?></strong> (<?= htmlspecialchars((string)getenv('BREVO_FROM_NAME')) ?>)</p>
+        <h1>Diagnóstico PHPMailer Service (SMTP)</h1>
+        <p class="sub">
+            Servidor: <strong><?= htmlspecialchars((string)(defined('SMTP_HOST') ? SMTP_HOST : '')) ?>:<?= (int)(defined('SMTP_PORT') ? SMTP_PORT : 587) ?></strong>
+            (<?= htmlspecialchars(strtoupper((string)(defined('SMTP_SECURE') ? SMTP_SECURE : 'tls'))) ?>) |
+            Remetente: <strong><?= htmlspecialchars((string)(defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : '')) ?></strong>
+            (<?= htmlspecialchars((string)(defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : '')) ?>)
+        </p>
 
         <form method="GET" class="form-row">
             <input type="hidden" name="disparar" value="1">
@@ -94,13 +96,10 @@ if (PHP_SAPI === 'cli' || (($_GET['format'] ?? '') === 'json')) {
                     <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
                         <strong><?= htmlspecialchars($res['titulo']) ?></strong>
                         <span class="badge <?= $res['sucesso'] ? 'ok' : 'err' ?>">
-                            HTTP <?= (int)$res['http_code'] ?> — <?= $res['sucesso'] ? 'ENVIADO (201/200)' : 'FALHA' ?>
+                            <?= $res['sucesso'] ? 'ENVIADO VIA SMTP' : 'FALHA SMTP' ?>
                         </span>
                     </div>
-                    <?php if ($res['resposta']): ?>
-                        <pre><?= htmlspecialchars($res['resposta']) ?></pre>
-                    <?php endif; ?>
-                    <?php if ($res['erro']): ?>
+                    <?php if (!empty($res['erro'])): ?>
                         <pre><?= htmlspecialchars($res['erro']) ?></pre>
                     <?php endif; ?>
                 </div>
@@ -109,4 +108,3 @@ if (PHP_SAPI === 'cli' || (($_GET['format'] ?? '') === 'json')) {
     </div>
 </body>
 </html>
-

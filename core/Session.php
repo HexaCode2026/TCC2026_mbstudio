@@ -39,6 +39,17 @@ class Session {
         self::verificarPrimeiroAcesso();
     }
 
+    /**
+     * Libera imediatamente o lock exclusivo do arquivo de sessão (session_write_close)
+     * antes de operações lentas de I/O externo (ex: envio SMTP), evitando bloquear
+     * requisições concorrentes do mesmo navegador/usuário.
+     */
+    public static function liberarLock(): void {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+    }
+
     public static function login($usuario) {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -187,7 +198,7 @@ class Session {
                 $refHost = strtolower((string)parse_url($referer, PHP_URL_HOST));
                 $refPort = parse_url($referer, PHP_URL_PORT);
                 $refFull = $refPort ? ($refHost . ':' . $refPort) : $refHost;
-                if ($refHost !== $hostAtual && $refFull !== $hostAtual) {
+                if ($refHost !== $hostAtual && $refFull !== $refAtual) {
                     http_response_code(403);
                     die("Ação bloqueada por segurança: Referer externo não autorizado (CSRF Protection).");
                 }

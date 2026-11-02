@@ -409,7 +409,7 @@ if(!empty($novaSenha)){
 
     // Gera o hash da nova senha (salvamento ocorre após atualização do perfil)
 
-    $novaSenhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
+    $novaSenhaHash = User::hashSenha($novaSenha);
 
 
 }
@@ -575,7 +575,7 @@ if (
 
     // 7. Gerar nome único e mover arquivo
 
-    $nomeArquivo = 'func_' . $userId . '_' . uniqid() . '.' . $extensaoSegura;
+    $nomeArquivo = 'func_' . $userId . '_' . bin2hex(random_bytes(16)) . '.' . $extensaoSegura;
 
     $pastaDestino = __DIR__ . '/../uploads/funcionarios/';
 

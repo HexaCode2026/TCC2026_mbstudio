@@ -90,7 +90,7 @@ class PrimeiroAcessoController
             exit;
         }
 
-        $novoHash = password_hash($novaSenha, PASSWORD_BCRYPT);
+        $novoHash = User::hashSenha($novaSenha);
         $atualizado = $this->userModel->updateFirstPassword($userId, $novoHash);
 
         if (!$atualizado) {

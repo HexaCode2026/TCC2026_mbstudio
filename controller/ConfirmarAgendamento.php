@@ -51,6 +51,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $success = $appointmentModel->atualizarStatus($appoId, $empId, 'Confirmado');
 
     if ($success) {
+        Session::liberarLock();
+        try {
+            require_once __DIR__ . "/../helpers/EmailHelper.php";
+            $mailer = new EmailHelper();
+            $mailer->notificarEventoAgendamento($currentAppo, 'confirmado', ['actor_perm' => $userPerm]);
+        } catch (\Throwable $t) {
+            log_message('error', "[ConfirmarAgendamento] Falha ao notificar #{$appoId}: " . $t->getMessage());
+        }
         header("Location: $redirect?sucesso=agendamento_confirmado");
     } else {
         header("Location: $redirect?erro=falha_confirmacao_permissao");

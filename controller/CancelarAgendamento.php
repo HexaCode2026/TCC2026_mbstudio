@@ -68,6 +68,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $success = $appointmentModel->atualizarStatus($appoId, $empId, $status, $cancelBy, $cancelReason, $cliId);
 
     if ($success) {
+        Session::liberarLock();
+        try {
+            require_once __DIR__ . "/../helpers/EmailHelper.php";
+            $mailer = new EmailHelper();
+            $mailer->notificarEventoAgendamento($currentAppo, 'cancelado', [
+                'Appo_cancel_by'     => $cancelBy,
+                'Appo_cancel_reason' => $cancelReason,
+            ]);
+        } catch (\Throwable $t) {
+            log_message('error', "[CancelarAgendamento] Falha ao notificar #{$appoId}: " . $t->getMessage());
+        }
         header("Location: $redirectUrl?sucesso=agendamento_cancelado");
     } else {
         header("Location: $redirectUrl?erro=falha_cancelamento_permissao");

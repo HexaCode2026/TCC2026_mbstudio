@@ -45,6 +45,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $success = $appointmentModel->atualizarStatus($appoId, $empId, 'Nao Compareceu');
 
     if ($success) {
+        Session::liberarLock();
+        try {
+            require_once __DIR__ . "/../helpers/EmailHelper.php";
+            $mailer = new EmailHelper();
+            $mailer->notificarEventoAgendamento($currentAppo, 'nao_compareceu');
+        } catch (\Throwable $t) {
+            log_message('error', "[NaoCompareceu] Falha ao notificar #{$appoId}: " . $t->getMessage());
+        }
         header("Location: $redirect?sucesso=falta_registrada");
     } else {
         header("Location: $redirect?erro=falha_permissao");

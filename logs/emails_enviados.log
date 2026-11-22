@@ -128,3 +128,5 @@
 [2026-11-22 17:24:01] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ma***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio
 [2026-11-22 17:24:04] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ma***@gmail.com | Assunto: Recuperação de Senha — MB Studio
 [2026-11-22 17:24:52] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ac***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio
+[2026-11-22 17:44:56] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ma***@gmail.com | Assunto: Agendamento Cancelado — MB Studio
+[2026-11-22 17:44:58] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ma***@gmail.com | Assunto: Cliente Cancelou Agendamento — MB Studio

@@ -46,6 +46,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $redirect = ($userPerm === 'A') ? "../View/admin/Agenda.php" : "../View/funcionario/Agenda.php";
 
     if ($success) {
+        Session::liberarLock();
+        try {
+            require_once __DIR__ . "/../helpers/EmailHelper.php";
+            $mailer = new EmailHelper();
+            $mailer->notificarEventoAgendamento($currentAppo, 'em_atendimento');
+        } catch (\Throwable $t) {
+            log_message('error', "[IniciarAtendimento] Falha ao notificar #{$appoId}: " . $t->getMessage());
+        }
         header("Location: $redirect?sucesso=atendimento_iniciado");
     } else {
         header("Location: $redirect?erro=falha_permissao");

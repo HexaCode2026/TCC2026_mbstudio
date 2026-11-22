@@ -75,7 +75,8 @@ class Appointment
                     s.Ser_name,
                     s.Ser_price,
                     s.Ser_duration,
-                    e_user.User_name AS employee_name
+                    e_user.User_name AS employee_name,
+                    e_user.User_email AS employee_email
                 FROM appointments a
                 INNER JOIN clients c ON a.Cli_id = c.Cli_id
                 INNER JOIN users c_user ON c.User_id = c_user.User_id

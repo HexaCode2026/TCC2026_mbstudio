@@ -139,6 +139,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$cli_id, $emp_id, $ser_id, $data, $hora, $fim, $observacao]);
 
             $pdo->commit();
+            $novoAppoId = (int)$pdo->lastInsertId();
+
+            // Notifica cliente e profissional por e-mail sem bloquear o fluxo em caso de falha SMTP
+            try {
+                require_once __DIR__ . "/../model/Appointment.php";
+                require_once __DIR__ . "/../helpers/EmailHelper.php";
+                $appointmentModel = new Appointment($pdo);
+                $appoDados = $appointmentModel->buscarPorId($novoAppoId);
+                if ($appoDados) {
+                    $mailer = new EmailHelper();
+                    $mailer->notificarEventoAgendamento($appoDados, 'criado');
+                }
+            } catch (\Throwable $t) {
+                log_message('error', "[Agendar] Falha ao notificar agendamento #{$novoAppoId}: " . $t->getMessage());
+            }
 
             header("Location: ../View/cliente/MeusAgendamentos.php?sucesso=agendado");
             exit;

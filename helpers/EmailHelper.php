@@ -611,5 +611,295 @@ class EmailHelper
 
         return $this->enviar($destinatarioEmail, $destinatarioNome, $assunto, $html, $altBody);
     }
+
+    /**
+     * 4. Template Unificado de Notificação de Agendamento (Cliente e Profissional)
+     */
+    public function enviarNotificacaoAgendamento(
+        string $destinatarioEmail,
+        string $destinatarioNome,
+        string $assunto,
+        string $eyebrow,
+        string $titulo,
+        string $mensagemIntro,
+        string $statusLabel,
+        string $statusColor,
+        array $dadosAgendamento
+    ): bool {
+        $nomeSafe    = htmlspecialchars($destinatarioNome ?: 'Usuário', ENT_QUOTES, 'UTF-8');
+        $eyebrowSafe = htmlspecialchars($eyebrow, ENT_QUOTES, 'UTF-8');
+        $tituloSafe  = htmlspecialchars($titulo, ENT_QUOTES, 'UTF-8');
+        $introSafe   = htmlspecialchars($mensagemIntro, ENT_QUOTES, 'UTF-8');
+        $statusSafe  = htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8');
+
+        $servicoSafe = htmlspecialchars((string)($dadosAgendamento['Ser_name'] ?? 'Serviço'), ENT_QUOTES, 'UTF-8');
+        $clienteSafe = htmlspecialchars((string)($dadosAgendamento['client_name'] ?? 'Cliente'), ENT_QUOTES, 'UTF-8');
+        $profSafe    = htmlspecialchars((string)($dadosAgendamento['employee_name'] ?? 'Profissional'), ENT_QUOTES, 'UTF-8');
+        $dataRaw     = (string)($dadosAgendamento['Appo_date'] ?? '');
+        $dataFormat  = $dataRaw !== '' ? date('d/m/Y', strtotime($dataRaw)) : '—';
+        $horaRaw     = (string)($dadosAgendamento['Appo_start'] ?? '');
+        $horaFormat  = $horaRaw !== '' ? substr($horaRaw, 0, 5) : '—';
+        $preco       = isset($dadosAgendamento['Ser_price']) ? 'R$ ' . number_format((float)$dadosAgendamento['Ser_price'], 2, ',', '.') : '';
+        $pagamento   = htmlspecialchars((string)($dadosAgendamento['Appo_payment_method'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $motivo      = htmlspecialchars(trim((string)($dadosAgendamento['Appo_cancel_reason'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $obs         = htmlspecialchars(trim((string)($dadosAgendamento['Appo_observation'] ?? '')), ENT_QUOTES, 'UTF-8');
+
+        $linhasExtras = '';
+        if ($preco !== '') {
+            $linhasExtras .= "<tr><td style='padding: 8px 0; color: #64748B; font-size: 13.5px; border-bottom: 1px solid #E2E8F0;'>Valor</td><td style='padding: 8px 0; color: #0F172A; font-size: 13.5px; font-weight: 700; text-align: right; border-bottom: 1px solid #E2E8F0;'>{$preco}</td></tr>";
+        }
+        if ($pagamento !== '') {
+            $linhasExtras .= "<tr><td style='padding: 8px 0; color: #64748B; font-size: 13.5px; border-bottom: 1px solid #E2E8F0;'>Pagamento</td><td style='padding: 8px 0; color: #0F172A; font-size: 13.5px; font-weight: 700; text-align: right; border-bottom: 1px solid #E2E8F0;'>{$pagamento}</td></tr>";
+        }
+        if ($obs !== '') {
+            $linhasExtras .= "<tr><td style='padding: 8px 0; color: #64748B; font-size: 13.5px; border-bottom: 1px solid #E2E8F0;'>Observação</td><td style='padding: 8px 0; color: #0F172A; font-size: 13.5px; text-align: right; border-bottom: 1px solid #E2E8F0;'>{$obs}</td></tr>";
+        }
+        if ($motivo !== '') {
+            $linhasExtras .= "<tr><td style='padding: 8px 0; color: #991B1B; font-size: 13.5px; font-weight: 600;'>Motivo</td><td style='padding: 8px 0; color: #991B1B; font-size: 13.5px; text-align: right;'>{$motivo}</td></tr>";
+        }
+
+        $html = "
+        <!DOCTYPE html>
+        <html lang='pt-BR'>
+        <body style='margin: 0; padding: 0; background-color: #F4F1EA; font-family: Arial, Helvetica, sans-serif; color: #1E293B;'>
+            <table role='presentation' width='100%' cellspacing='0' cellpadding='0' border='0' style='background-color: #F4F1EA; padding: 32px 16px;'>
+                <tr>
+                    <td align='center'>
+                        <table role='presentation' width='100%' cellspacing='0' cellpadding='0' border='0' style='max-width: 560px; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E2E8F0; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);'>
+                            <tr>
+                                <td style='background-color: #0F172A; padding: 28px 32px; text-align: center; border-bottom: 3px solid #D4AF37;'>
+                                    <span style='display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #D4AF37; margin-bottom: 6px;'>{$eyebrowSafe}</span>
+                                    <h1 style='margin: 0; font-size: 22px; font-weight: 700; color: #FFFFFF; font-family: Georgia, serif;'>{$tituloSafe}</h1>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style='padding: 32px;'>
+                                    <p style='margin: 0 0 14px 0; font-size: 16px; color: #0F172A;'>Olá, <strong>{$nomeSafe}</strong>,</p>
+                                    <p style='margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #475569;'>{$introSafe}</p>
+
+                                    <div style='margin: 0 0 20px 0; text-align: center;'>
+                                        <span style='display: inline-block; padding: 6px 16px; border-radius: 999px; background-color: {$statusColor}; color: #FFFFFF; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;'>Status: {$statusSafe}</span>
+                                    </div>
+
+                                    <div style='background-color: #FAF6EC; border: 1px solid #E6D5A7; border-radius: 12px; padding: 18px 20px;'>
+                                        <table role='presentation' width='100%' cellspacing='0' cellpadding='0' border='0'>
+                                            <tr>
+                                                <td style='padding: 8px 0; color: #64748B; font-size: 13.5px; border-bottom: 1px solid #E2E8F0;'>Serviço</td>
+                                                <td style='padding: 8px 0; color: #0F172A; font-size: 13.5px; font-weight: 700; text-align: right; border-bottom: 1px solid #E2E8F0;'>{$servicoSafe}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style='padding: 8px 0; color: #64748B; font-size: 13.5px; border-bottom: 1px solid #E2E8F0;'>Data e Horário</td>
+                                                <td style='padding: 8px 0; color: #0F172A; font-size: 13.5px; font-weight: 700; text-align: right; border-bottom: 1px solid #E2E8F0;'>{$dataFormat} às {$horaFormat}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style='padding: 8px 0; color: #64748B; font-size: 13.5px; border-bottom: 1px solid #E2E8F0;'>Cliente</td>
+                                                <td style='padding: 8px 0; color: #0F172A; font-size: 13.5px; font-weight: 700; text-align: right; border-bottom: 1px solid #E2E8F0;'>{$clienteSafe}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style='padding: 8px 0; color: #64748B; font-size: 13.5px; border-bottom: 1px solid #E2E8F0;'>Profissional</td>
+                                                <td style='padding: 8px 0; color: #0F172A; font-size: 13.5px; font-weight: 700; text-align: right; border-bottom: 1px solid #E2E8F0;'>{$profSafe}</td>
+                                            </tr>
+                                            {$linhasExtras}
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style='background-color: #F8FAFC; padding: 18px 32px; text-align: center; border-top: 1px solid #E2E8F0; font-size: 12px; color: #94A3B8;'>
+                                    © " . date('Y') . " MB Studio — Todos os direitos reservados.
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>";
+
+        $altBody = "Olá, {$destinatarioNome}! {$mensagemIntro} Serviço: {$dadosAgendamento['Ser_name']} | Data: {$dataFormat} às {$horaFormat} | Status: {$statusLabel}.";
+
+        return $this->enviar($destinatarioEmail, $destinatarioNome, $assunto, $html, $altBody);
+    }
+
+    /**
+     * Orquestra as notificações por e-mail para Cliente e Profissional conforme o evento do agendamento.
+     * Eventos suportados: 'criado', 'confirmado', 'em_atendimento', 'concluido', 'nao_compareceu', 'cancelado'.
+     */
+    public function notificarEventoAgendamento(array $agendamento, string $evento, array $extra = []): array
+    {
+        $resultado = ['cliente' => false, 'funcionario' => false];
+        $dados = array_merge($agendamento, $extra);
+
+        $cliEmail  = trim((string)($dados['client_email'] ?? ''));
+        $cliNome   = (string)($dados['client_name'] ?? 'Cliente');
+        $funcEmail = trim((string)($dados['employee_email'] ?? ''));
+        $funcNome  = (string)($dados['employee_name'] ?? 'Profissional');
+        $actorPerm = (string)($extra['actor_perm'] ?? '');
+
+        $notificacoes = [];
+
+        switch ($evento) {
+            case 'criado':
+                $notificacoes['cliente'] = [
+                    'assunto' => 'Solicitação de Agendamento Recebida — MB Studio',
+                    'eyebrow' => '📅 NOVO AGENDAMENTO',
+                    'titulo'  => 'Solicitação Recebida',
+                    'intro'   => 'Recebemos sua solicitação de agendamento no MB Studio. Em breve você receberá a confirmação do profissional.',
+                    'status'  => 'Pendente',
+                    'cor'     => '#D97706',
+                ];
+                $notificacoes['funcionario'] = [
+                    'assunto' => 'Novo Agendamento na Sua Agenda — MB Studio',
+                    'eyebrow' => '🔔 NOVA SOLICITAÇÃO',
+                    'titulo'  => 'Novo Agendamento Recebido',
+                    'intro'   => 'Um cliente solicitou um novo horário na sua agenda. Acesse o painel para confirmar ou gerenciar o atendimento.',
+                    'status'  => 'Pendente',
+                    'cor'     => '#D97706',
+                ];
+                break;
+
+            case 'confirmado':
+                $notificacoes['cliente'] = [
+                    'assunto' => 'Agendamento Confirmado! — MB Studio',
+                    'eyebrow' => '✅ CONFIRMADO',
+                    'titulo'  => 'Seu Horário Está Confirmado',
+                    'intro'   => 'Ótima notícia! Seu agendamento foi confirmado. Esperamos por você no estúdio no dia e horário marcados.',
+                    'status'  => 'Confirmado',
+                    'cor'     => '#059669',
+                ];
+                if ($actorPerm === 'A') {
+                    $notificacoes['funcionario'] = [
+                        'assunto' => 'Agendamento Confirmado pela Administração — MB Studio',
+                        'eyebrow' => '✅ AGENDA ATUALIZADA',
+                        'titulo'  => 'Agendamento Confirmado',
+                        'intro'   => 'A administração confirmou o agendamento abaixo na sua agenda.',
+                        'status'  => 'Confirmado',
+                        'cor'     => '#059669',
+                    ];
+                }
+                break;
+
+            case 'em_atendimento':
+                $notificacoes['cliente'] = [
+                    'assunto' => 'Atendimento Iniciado — MB Studio',
+                    'eyebrow' => '✂️ EM ATENDIMENTO',
+                    'titulo'  => 'Seu Atendimento Começou',
+                    'intro'   => 'Seu atendimento no MB Studio foi iniciado. Desejamos uma excelente experiência!',
+                    'status'  => 'Em Atendimento',
+                    'cor'     => '#2563EB',
+                ];
+                break;
+
+            case 'concluido':
+                $notificacoes['cliente'] = [
+                    'assunto' => 'Atendimento Concluído — MB Studio',
+                    'eyebrow' => '✨ CONCLUÍDO',
+                    'titulo'  => 'Obrigado pela Preferência!',
+                    'intro'   => 'Seu atendimento foi finalizado com sucesso. Confira abaixo o resumo do serviço realizado.',
+                    'status'  => 'Concluído',
+                    'cor'     => '#047857',
+                ];
+                break;
+
+            case 'nao_compareceu':
+                $notificacoes['cliente'] = [
+                    'assunto' => 'Registro de Ausência — MB Studio',
+                    'eyebrow' => '⚠️ AUSÊNCIA REGISTRADA',
+                    'titulo'  => 'Não Comparecimento',
+                    'intro'   => 'Informamos que o seu agendamento foi registrado como não comparecimento. Caso precise remarcar, acesse o sistema.',
+                    'status'  => 'Não Compareceu',
+                    'cor'     => '#64748B',
+                ];
+                break;
+
+            case 'cancelado':
+                $cancelBy = (string)($dados['Appo_cancel_by'] ?? '');
+                if ($cancelBy === 'Cliente') {
+                    $notificacoes['cliente'] = [
+                        'assunto' => 'Agendamento Cancelado — MB Studio',
+                        'eyebrow' => '❌ CANCELAMENTO',
+                        'titulo'  => 'Agendamento Cancelado',
+                        'intro'   => 'Confirmamos o cancelamento do seu agendamento conforme sua solicitação.',
+                        'status'  => 'Cancelado pelo Cliente',
+                        'cor'     => '#DC2626',
+                    ];
+                    $notificacoes['funcionario'] = [
+                        'assunto' => 'Cliente Cancelou Agendamento — MB Studio',
+                        'eyebrow' => '❌ HORÁRIO LIBERADO',
+                        'titulo'  => 'Agendamento Cancelado pelo Cliente',
+                        'intro'   => 'O cliente cancelou o agendamento abaixo. Este horário voltou a ficar livre na sua agenda.',
+                        'status'  => 'Cancelado pelo Cliente',
+                        'cor'     => '#DC2626',
+                    ];
+                } elseif ($cancelBy === 'Funcionario') {
+                    $notificacoes['cliente'] = [
+                        'assunto' => 'Agendamento Cancelado pelo Profissional — MB Studio',
+                        'eyebrow' => '❌ CANCELAMENTO',
+                        'titulo'  => 'Agendamento Cancelado',
+                        'intro'   => 'Infelizmente, o profissional precisou cancelar o seu agendamento. Você pode escolher um novo horário pelo sistema.',
+                        'status'  => 'Cancelado pelo Profissional',
+                        'cor'     => '#DC2626',
+                    ];
+                    $notificacoes['funcionario'] = [
+                        'assunto' => 'Confirmação de Cancelamento — MB Studio',
+                        'eyebrow' => '❌ CANCELADO',
+                        'titulo'  => 'Agendamento Cancelado',
+                        'intro'   => 'Confirmamos o cancelamento do agendamento abaixo em sua agenda. O cliente já foi notificado.',
+                        'status'  => 'Cancelado pelo Profissional',
+                        'cor'     => '#DC2626',
+                    ];
+                } else {
+                    $notificacoes['cliente'] = [
+                        'assunto' => 'Agendamento Cancelado pela Administração — MB Studio',
+                        'eyebrow' => '❌ CANCELAMENTO',
+                        'titulo'  => 'Agendamento Cancelado',
+                        'intro'   => 'Seu agendamento foi cancelado pela administração do MB Studio. Caso deseje, realize um novo agendamento.',
+                        'status'  => 'Cancelado pelo Administrador',
+                        'cor'     => '#DC2626',
+                    ];
+                    $notificacoes['funcionario'] = [
+                        'assunto' => 'Agendamento Cancelado pela Administração — MB Studio',
+                        'eyebrow' => '❌ AGENDA ATUALIZADA',
+                        'titulo'  => 'Agendamento Cancelado',
+                        'intro'   => 'A administração cancelou o agendamento abaixo na sua agenda.',
+                        'status'  => 'Cancelado pelo Administrador',
+                        'cor'     => '#DC2626',
+                    ];
+                }
+                break;
+        }
+
+        if (isset($notificacoes['cliente']) && filter_var($cliEmail, FILTER_VALIDATE_EMAIL)) {
+            $n = $notificacoes['cliente'];
+            $resultado['cliente'] = $this->enviarNotificacaoAgendamento(
+                $cliEmail,
+                $cliNome,
+                $n['assunto'],
+                $n['eyebrow'],
+                $n['titulo'],
+                $n['intro'],
+                $n['status'],
+                $n['cor'],
+                $dados
+            );
+        }
+
+        if (isset($notificacoes['funcionario']) && filter_var($funcEmail, FILTER_VALIDATE_EMAIL)) {
+            $n = $notificacoes['funcionario'];
+            $resultado['funcionario'] = $this->enviarNotificacaoAgendamento(
+                $funcEmail,
+                $funcNome,
+                $n['assunto'],
+                $n['eyebrow'],
+                $n['titulo'],
+                $n['intro'],
+                $n['status'],
+                $n['cor'],
+                $dados
+            );
+        }
+
+        return $resultado;
+    }
 }
 ?>

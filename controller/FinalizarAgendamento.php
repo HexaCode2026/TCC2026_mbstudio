@@ -67,6 +67,17 @@ if ($success) {
             $stmtUpdateObs->execute([$cliObservation, $cliId]);
         }
     }
+    Session::liberarLock();
+    try {
+        require_once __DIR__ . "/../helpers/EmailHelper.php";
+        $appoDados = $appointmentModel->buscarPorId($appoId);
+        if ($appoDados) {
+            $mailer = new EmailHelper();
+            $mailer->notificarEventoAgendamento($appoDados, 'concluido');
+        }
+    } catch (\Throwable $t) {
+        log_message('error', "[FinalizarAgendamento] Falha ao notificar #{$appoId}: " . $t->getMessage());
+    }
     header("Location: $redirect?sucesso=atendimento_concluido");
 } else {
     header("Location: $redirect?erro=falha_permissao_ou_status");

@@ -5,6 +5,17 @@ require_once __DIR__ . '/../helpers/EmailHelper.php';
 
 Session::iniciar();
 
+if (PHP_SAPI !== 'cli' && (($_SESSION['User_perm'] ?? '') !== 'A')) {
+    if (($_GET['format'] ?? '') === 'json') {
+        http_response_code(403);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['success' => false, 'message' => 'Acesso restrito a administradores.']);
+        exit;
+    }
+    header("Location: ../Index.php");
+    exit;
+}
+
 $destinatario = trim($_GET['email'] ?? $_POST['email'] ?? (defined('SMTP_FROM_EMAIL') && SMTP_FROM_EMAIL !== '' ? SMTP_FROM_EMAIL : ''));
 $nomeDestino  = trim($_GET['nome'] ?? $_POST['nome'] ?? 'Teste MB Studio');
 $autoDisparar = isset($_GET['disparar']) || isset($_POST['disparar']) || (PHP_SAPI === 'cli');

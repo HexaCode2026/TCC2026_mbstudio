@@ -2,7 +2,7 @@
 /**
  * Script de Inicialização / Seeder Seguro (Idempotente) para Deploy
  * 1. Garante a existência da coluna User_must_change_pass na tabela users.
- * 2. Cria o usuário Administrador inicial ('kaio.gois013@gmail.com') com senha temporária
+ * 2. Cria o usuário Administrador inicial ('maisonbelle.com@gmail.com') com senha temporária
  *    'admin123' (PASSWORD_BCRYPT) e User_must_change_pass = 1 apenas se o e-mail não existir.
  */
 
@@ -31,7 +31,7 @@ function executarBootstrapAdmin(PDO $pdo): array
     }
 
     // 2. Gera o hash seguro Bcrypt para a senha temporária 'admin123'
-    $emailAdmin = 'kaio.gois013@gmail.com';
+    $emailAdmin = 'maisonbelle.com@gmail.com';
     $nomeAdmin  = 'Administrador';
     $hashSenha  = User::hashSenha('admin123');
     $resultado['hash_gerado'] = $hashSenha;

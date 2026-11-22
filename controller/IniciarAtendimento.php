@@ -1,14 +1,17 @@
 <?php
-session_start();
+require_once __DIR__ . "/../core/Session.php";
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/Appointment.php";
 
-if (!isset($_SESSION['User_id']) || !in_array($_SESSION['User_perm'], ['A', 'F'])) {
+Session::iniciar();
+
+if (!isset($_SESSION['User_id']) || !in_array($_SESSION['User_perm'] ?? '', ['A', 'F'], true)) {
     header("Location: ../Index.php");
     exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    Session::validarCsrf();
     $appoId = $_POST['appo_id'] ?? null;
     $userId = $_SESSION['User_id'];
     $userPerm = $_SESSION['User_perm'];

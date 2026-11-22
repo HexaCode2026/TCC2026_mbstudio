@@ -38,6 +38,7 @@ $sql = "SELECT a.Ava_start, a.Ava_end, e.Emp_id, u.User_name, e.Emp_photo, e.Emp
           AND a.Ava_status = 'Disponivel' 
           AND a.Ser_id = ? 
           AND u.User_perm = 'F'
+          AND u.User_active = 1
         ORDER BY a.Ava_start ASC, u.User_name ASC";
 
 $stmt = $pdo->prepare($sql);
@@ -57,11 +58,13 @@ $stmtBlock->execute([$data]);
 $bloqueiosDoDia = $stmtBlock->fetchAll(PDO::FETCH_ASSOC);
 
 // Função para gerar blocos de horários com base na duração do serviço, evitando conflitos
-function gerarHorarios($inicio, $fim, $duracao_minutos, $emp_id, $agendamentos, $bloqueios)
+function gerarHorarios($inicio, $fim, $duracao_minutos, $emp_id, $agendamentos, $bloqueios, $data = null)
 {
     $horarios = [];
     $atual = strtotime($inicio);
     $final = strtotime($fim);
+    $filtrarPassado = ($data === date('Y-m-d'));
+    $agora = time();
 
     while ($atual + ($duracao_minutos * 60) <= $final) {
         $slot_start_time = $atual;
@@ -97,9 +100,11 @@ function gerarHorarios($inicio, $fim, $duracao_minutos, $emp_id, $agendamentos, 
             }
         }
 
-        // Se não houver conflito, o horário está livre
+        // Se não houver conflito, o horário está livre (ignora horários já passados no dia atual)
         if (!$conflito) {
-            $horarios[] = date('H:i', $atual);
+            if (!$filtrarPassado || $slot_start_time > $agora) {
+                $horarios[] = date('H:i', $atual);
+            }
             $atual += ($duracao_minutos * 60); // Avança normalmente
         } else {
             // Se houver conflito, pula exatamente para o final do bloqueio mais longo que conflitou
@@ -280,7 +285,8 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
                                 $servico['Ser_duration'],
                                 $func['Emp_id'],
                                 $agendamentosDoDia,
-                                $bloqueiosDoDia
+                                $bloqueiosDoDia,
+                                $data
                             );
                             $todos_horarios = array_merge($todos_horarios, $horarios_janela);
 

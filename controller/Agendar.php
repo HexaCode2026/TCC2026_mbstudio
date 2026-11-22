@@ -31,9 +31,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Validação de Segurança 1: Data não pode ser no passado
-    if ($data < date('Y-m-d')) {
+    // Validação de Segurança 1: Data e horário não podem estar no passado
+    $hoje = date('Y-m-d');
+    if ($data < $hoje) {
         header("Location: ../View/cliente/Servicos.php?erro=data_passada");
+        exit;
+    }
+
+    $horaNormalizada = strlen($hora) === 5 ? ($hora . ':00') : $hora;
+    if ($data === $hoje && strtotime($data . ' ' . $horaNormalizada) <= time()) {
+        header("Location: ../View/cliente/Servicos.php?erro=horario_passado");
         exit;
     }
 
@@ -44,12 +51,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 1. Consulta leitura da duração do serviço FORA da transação para reduzir o tempo de retenção de locks
     $stmtSer = $pdo->prepare("SELECT Ser_duration FROM services WHERE Ser_id = ? AND Ser_active = 1 LIMIT 1");
     $stmtSer->execute([$ser_id]);
-    $duracao = (int)$stmtSer->fetchColumn();
+    $duracaoRaw = $stmtSer->fetchColumn();
+    if ($duracaoRaw === false) {
+        header("Location: ../View/cliente/Servicos.php?erro=servico_indisponivel");
+        exit;
+    }
+    $duracao = (int)$duracaoRaw;
 
     if ($duracao > 0) {
-        $fim = date('H:i:s', strtotime("+$duracao minutes", strtotime($hora)));
+        $fim = date('H:i:s', strtotime("+$duracao minutes", strtotime($horaNormalizada)));
     } else {
-        $fim = date('H:i:s', strtotime("+1 hour", strtotime($hora)));
+        $fim = date('H:i:s', strtotime("+1 hour", strtotime($horaNormalizada)));
+    }
+
+    // Validação de Segurança 1.5: Verificar se o profissional está ativo e possui disponibilidade para este serviço/data/horário
+    $sqlCheckAva = "SELECT a.Ava_id
+                    FROM availabilities a
+                    INNER JOIN employees e ON a.Emp_id = e.Emp_id
+                    INNER JOIN users u ON e.User_id = u.User_id
+                    WHERE a.Emp_id = ?
+                      AND a.Ser_id = ?
+                      AND a.Ava_date = ?
+                      AND a.Ava_status = 'Disponivel'
+                      AND a.Ava_start <= ?
+                      AND a.Ava_end >= ?
+                      AND u.User_perm = 'F'
+                      AND u.User_active = 1
+                    LIMIT 1";
+    $stmtCheckAva = $pdo->prepare($sqlCheckAva);
+    $stmtCheckAva->execute([$emp_id, $ser_id, $data, $horaNormalizada, $fim]);
+    if (!$stmtCheckAva->fetchColumn()) {
+        header("Location: ../View/cliente/Servicos.php?erro=horario_indisponivel");
+        exit;
     }
 
     $maxTentativasDeadlock = 3;

@@ -8,7 +8,7 @@ Session::iniciar();
 $sql = "SELECT e.Emp_id, u.User_name, e.Emp_photo, e.Emp_specialty, e.Emp_bio 
         FROM employees e
         JOIN users u ON e.User_id = u.User_id
-        WHERE u.User_perm = 'F'
+        WHERE u.User_perm = 'F' AND u.User_active = 1
         ORDER BY u.User_name ASC";
 
 $stmt = $pdo->query($sql);

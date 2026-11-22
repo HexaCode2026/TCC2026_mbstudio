@@ -198,7 +198,7 @@ class Session {
                 $refHost = strtolower((string)parse_url($referer, PHP_URL_HOST));
                 $refPort = parse_url($referer, PHP_URL_PORT);
                 $refFull = $refPort ? ($refHost . ':' . $refPort) : $refHost;
-                if ($refHost !== $hostAtual && $refFull !== $refAtual) {
+                if ($refHost !== $hostAtual && $refFull !== $hostAtual) {
                     http_response_code(403);
                     die("Ação bloqueada por segurança: Referer externo não autorizado (CSRF Protection).");
                 }

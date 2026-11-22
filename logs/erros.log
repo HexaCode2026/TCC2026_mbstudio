@@ -1,1 +1,3 @@
 [2026-11-02 19:18:23] [DB_CRITICAL] Database Connection Error: SQLSTATE[HY000] [2002] Foi feita uma tentativa de acesso a um soquete de uma maneira que é proibida pelas permissões de acesso
+[2026-11-22 17:03:56] [DB_CRITICAL] Database Connection Error: SQLSTATE[HY000] [2002] Foi feita uma tentativa de acesso a um soquete de uma maneira que é proibida pelas permissões de acesso
+[2026-11-22 17:04:25] [DB_CRITICAL] Database Connection Error: SQLSTATE[HY000] [2002] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente

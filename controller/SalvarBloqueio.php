@@ -1,15 +1,18 @@
 <?php
-session_start();
+require_once __DIR__ . "/../core/Session.php";
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/EmployeeBlock.php";
 
+Session::iniciar();
+
 // Apenas Funcionário
-if (!isset($_SESSION['User_id']) || $_SESSION['User_perm'] !== 'F') {
+if (!isset($_SESSION['User_id']) || ($_SESSION['User_perm'] ?? '') !== 'F') {
     header("Location: ../Index.php");
     exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    Session::validarCsrf();
     $date = $_POST['data'] ?? null;
     $start = $_POST['hora_inicio'] ?? null;
     $end = $_POST['hora_fim'] ?? null;

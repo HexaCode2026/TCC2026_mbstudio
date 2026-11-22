@@ -1,8 +1,10 @@
 <?php
 date_default_timezone_set('America/Sao_Paulo');
-session_start();
+require_once __DIR__ . "/../core/Session.php";
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/Availability.php";
+
+Session::iniciar();
 
 // Proteção para Funcionário
 if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'F') {
@@ -11,6 +13,7 @@ if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'F') {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    Session::validarCsrf();
     $userId = $_SESSION['User_id'];
     $avaId = $_POST['Ava_id'] ?? null;
     $status = $_POST['Ava_status'] ?? null;

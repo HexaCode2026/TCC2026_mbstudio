@@ -19,10 +19,10 @@ CREATE TABLE users(
 
 -- Seeder Idempotente do Administrador Inicial (Senha temporária: 'admin123' com Bcrypt)
 INSERT INTO users (User_name, User_email, User_pass, User_perm, User_active, User_must_change_pass)
-SELECT 'Administrador', 'kaio.gois013@gmail.com', '$2y$10$E4i6qMUCtr3u0eLLGiZ2UeiJhiKLarjwqgGteyi0gv7w7MlbSjide', 'A', 1, 1
+SELECT 'Administrador', 'maisonbelle.com@gmail.com', '$2y$10$E4i6qMUCtr3u0eLLGiZ2UeiJhiKLarjwqgGteyi0gv7w7MlbSjide', 'A', 1, 1
 FROM DUAL
 WHERE NOT EXISTS (
-    SELECT 1 FROM users WHERE User_email = 'kaio.gois013@gmail.com'
+    SELECT 1 FROM users WHERE User_email = 'maisonbelle.com@gmail.com'
 );
 
 -- ==========================================

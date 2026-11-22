@@ -13,3 +13,118 @@
 [2026-11-02 18:52:58] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ac***@gmail.com | Assunto: Recuperação de Senha — MB Studio
 [2026-11-02 18:53:45] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ac***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio
 [2026-11-02 19:15:02] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ac***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio
+[2026-11-22 17:12:50] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 220 smtp.gmail.com ESMTP a1e0cc1a2514c-99e6e033aafsm9413661241.7 - gsmtp
+[2026-11-22 17:12:50] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: EHLO LAPTOP-NPKSMING
+[2026-11-22 17:12:50] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 250-smtp.gmail.com at your service, [2804:7f0:471:1e9f:756b:e7f8:5411:8082]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250-SMTPUTF8
+250 LIMITS MAILMAX=1000 RCPTMAX=100
+[2026-11-22 17:12:50] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: STARTTLS
+[2026-11-22 17:12:50] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 220 2.0.0 Ready to start TLS
+[2026-11-22 17:12:51] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: EHLO LAPTOP-NPKSMING
+[2026-11-22 17:12:51] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 250-smtp.gmail.com at your service, [2804:7f0:471:1e9f:756b:e7f8:5411:8082]
+250-SIZE 35882577
+250-8BITMIME
+250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250-SMTPUTF8
+250 LIMITS MAILMAX=1000 RCPTMAX=100
+[2026-11-22 17:12:51] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: AUTH LOGIN
+[2026-11-22 17:12:51] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 334 VXNlcm5hbWU6
+[2026-11-22 17:12:51] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: [credentials hidden]
+[2026-11-22 17:12:52] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 334 UGFzc3dvcmQ6
+[2026-11-22 17:12:52] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: [credentials hidden]
+[2026-11-22 17:12:52] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials a1e0cc1a2514c-99e6e033aafsm9413661241.7 - gsmtp
+[2026-11-22 17:12:52] [INFO] [PHPMailer Debug L1] SMTP ERROR: Password command failed: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials a1e0cc1a2514c-99e6e033aafsm9413661241.7 - gsmtp
+[2026-11-22 17:12:52] [INFO] [PHPMailer Debug L2] Erro de SMTP: Não foi possível autenticar.
+[2026-11-22 17:12:52] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: QUIT
+[2026-11-22 17:12:52] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT:
+[2026-11-22 17:12:52] [INFO] [PHPMailer Debug L1] SMTP ERROR: QUIT command failed:
+[2026-11-22 17:12:52] [INFO] [PHPMailer Debug L2] Erro de SMTP: Não foi possível autenticar.
+[2026-11-22 17:12:52] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 220 smtp.gmail.com ESMTP 71dfb90a1353d-5ee8b555147sm8635591e0c.6 - gsmtp
+[2026-11-22 17:12:52] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: EHLO LAPTOP-NPKSMING
+[2026-11-22 17:12:53] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 250-smtp.gmail.com at your service, [2804:7f0:471:1e9f:756b:e7f8:5411:8082]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250-SMTPUTF8
+250 LIMITS MAILMAX=1000 RCPTMAX=100
+[2026-11-22 17:12:53] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: STARTTLS
+[2026-11-22 17:12:53] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 220 2.0.0 Ready to start TLS
+[2026-11-22 17:12:53] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: EHLO LAPTOP-NPKSMING
+[2026-11-22 17:12:53] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 250-smtp.gmail.com at your service, [2804:7f0:471:1e9f:756b:e7f8:5411:8082]
+250-SIZE 35882577
+250-8BITMIME
+250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250-SMTPUTF8
+250 LIMITS MAILMAX=1000 RCPTMAX=100
+[2026-11-22 17:12:53] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: AUTH LOGIN
+[2026-11-22 17:12:54] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 334 VXNlcm5hbWU6
+[2026-11-22 17:12:54] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: [credentials hidden]
+[2026-11-22 17:12:54] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 334 UGFzc3dvcmQ6
+[2026-11-22 17:12:54] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: [credentials hidden]
+[2026-11-22 17:12:54] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 71dfb90a1353d-5ee8b555147sm8635591e0c.6 - gsmtp
+[2026-11-22 17:12:54] [INFO] [PHPMailer Debug L1] SMTP ERROR: Password command failed: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 71dfb90a1353d-5ee8b555147sm8635591e0c.6 - gsmtp
+[2026-11-22 17:12:54] [INFO] [PHPMailer Debug L2] Erro de SMTP: Não foi possível autenticar.
+[2026-11-22 17:12:54] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: QUIT
+[2026-11-22 17:12:54] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT:
+[2026-11-22 17:12:54] [INFO] [PHPMailer Debug L1] SMTP ERROR: QUIT command failed:
+[2026-11-22 17:12:54] [INFO] [PHPMailer Debug L2] Erro de SMTP: Não foi possível autenticar.
+[2026-11-22 17:12:55] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 220 smtp.gmail.com ESMTP 71dfb90a1353d-5ee8b555137sm8763409e0c.3 - gsmtp
+[2026-11-22 17:12:55] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: EHLO LAPTOP-NPKSMING
+[2026-11-22 17:12:55] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 250-smtp.gmail.com at your service, [2804:7f0:471:1e9f:756b:e7f8:5411:8082]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250-SMTPUTF8
+250 LIMITS MAILMAX=1000 RCPTMAX=100
+[2026-11-22 17:12:55] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: STARTTLS
+[2026-11-22 17:12:55] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 220 2.0.0 Ready to start TLS
+[2026-11-22 17:12:56] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: EHLO LAPTOP-NPKSMING
+[2026-11-22 17:12:56] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 250-smtp.gmail.com at your service, [2804:7f0:471:1e9f:756b:e7f8:5411:8082]
+250-SIZE 35882577
+250-8BITMIME
+250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250-SMTPUTF8
+250 LIMITS MAILMAX=1000 RCPTMAX=100
+[2026-11-22 17:12:56] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: AUTH LOGIN
+[2026-11-22 17:12:56] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 334 VXNlcm5hbWU6
+[2026-11-22 17:12:56] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: [credentials hidden]
+[2026-11-22 17:12:56] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 334 UGFzc3dvcmQ6
+[2026-11-22 17:12:56] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: [credentials hidden]
+[2026-11-22 17:12:57] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 71dfb90a1353d-5ee8b555137sm8763409e0c.3 - gsmtp
+[2026-11-22 17:12:57] [INFO] [PHPMailer Debug L1] SMTP ERROR: Password command failed: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 71dfb90a1353d-5ee8b555137sm8763409e0c.3 - gsmtp
+[2026-11-22 17:12:57] [INFO] [PHPMailer Debug L2] Erro de SMTP: Não foi possível autenticar.
+[2026-11-22 17:12:57] [INFO] [PHPMailer Debug L1] CLIENT -> SERVER: QUIT
+[2026-11-22 17:12:57] [INFO] [PHPMailer Debug L2] SERVER -> CLIENT:
+[2026-11-22 17:12:57] [INFO] [PHPMailer Debug L1] SMTP ERROR: QUIT command failed:
+[2026-11-22 17:12:57] [INFO] [PHPMailer Debug L2] Erro de SMTP: Não foi possível autenticar.
+[2026-11-22 17:23:59] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ma***@gmail.com | Assunto: Bem-vindo(a) ao MB Studio — Confirme seu Cadastro
+[2026-11-22 17:24:01] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ma***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio
+[2026-11-22 17:24:04] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ma***@gmail.com | Assunto: Recuperação de Senha — MB Studio
+[2026-11-22 17:24:52] [INFO] [EmailHelper][PHPMailer] E-mail enviado via SMTP (smtp.gmail.com:587) | Destinatário: ac***@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio

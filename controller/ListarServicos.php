@@ -1,8 +1,9 @@
 <?php
-
-session_start();
+require_once __DIR__ . "/../core/Session.php";
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/Service.php";
+
+Session::iniciar();
 
 // Apenas Administrador
 if (!isset($_SESSION['User_id']) || $_SESSION['User_perm'] !== 'A') {

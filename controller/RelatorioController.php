@@ -3,9 +3,11 @@ require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../model/Relatorio.php";
 
 class RelatorioController {
+    private $pdo;
     private $relatorioModel;
 
     public function __construct($pdo) {
+        $this->pdo = $pdo;
         $this->relatorioModel = new Relatorio($pdo);
     }
 
@@ -41,21 +43,12 @@ class RelatorioController {
 
         $totalRegistros = count($dados);
         
-        // Exemplo de métrica extra: calcular o faturamento dos concluídos
-        $faturamentoTotal = 0;
-        foreach ($dados as $dado) {
-            if (strpos(strtolower($dado['Status']), 'concluido') !== false) {
-                $faturamentoTotal += $dado['Valor_Servico'];
-            }
-        }
+        // Faturamento real agregado direto no banco (sem limitação do LIMIT 500)
+        $faturamentoTotal = $this->relatorioModel->getFaturamentoTotal($dataInicial, $dataFinal, $empId);
 
         // Buscar funcionários para o select
         require_once __DIR__ . "/../model/Employee.php";
-        $empModel = new Employee($this->relatorioModel->pdo ?? $GLOBALS['pdo'] ?? null);
-        // Precisamos ter certeza de como o Employee usa o pdo. A view já passou $pdo.
-        // É melhor instanciar direto passando $GLOBALS['pdo'] ou o pdo que temos na conexao
-        global $pdo;
-        $empModel = new Employee($pdo);
+        $empModel = new Employee($this->pdo);
         $funcionarios = $empModel->listarEquipeAdmin();
 
         return [

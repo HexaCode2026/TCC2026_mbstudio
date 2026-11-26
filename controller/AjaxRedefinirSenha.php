@@ -23,7 +23,7 @@ if (empty($email) || empty($codigo) || empty($novaSenha)) {
     exit;
 }
 
-if (strlen($novaSenha) < 6) {
+if (mb_strlen($novaSenha) < 6) {
     echo json_encode(['success' => false, 'message' => 'A nova senha deve conter pelo menos 6 caracteres.']);
     exit;
 }
@@ -32,7 +32,7 @@ $userModel = new User($pdo);
 $userData = $userModel->login($email);
 
 if (!$userData) {
-    echo json_encode(['success' => false, 'message' => 'Usuário não encontrado.']);
+    echo json_encode(['success' => false, 'message' => 'E-mail ou código inválido.']);
     exit;
 }
 

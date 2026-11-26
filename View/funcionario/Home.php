@@ -14,7 +14,7 @@ $userName = $_SESSION['User_name'] ?? 'Profissional';
 $primeiroNome = explode(' ', trim($userName))[0];
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">

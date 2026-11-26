@@ -18,6 +18,12 @@ $userId = $_SESSION['User_id'];
 $clientModel = new Client($pdo);
 $userModel = new User($pdo);
 
+$flashRedirect = static function (string $tipo, string $msg): void {
+    Session::setFlash($tipo, $msg);
+    header("Location: ../View/cliente/Perfil.php");
+    exit;
+};
+
 // ======================================================
 // VERIFICAR SE O USUÁRIO EXISTE
 // ======================================================
@@ -25,11 +31,7 @@ $userModel = new User($pdo);
 $dadosAtuais = $clientModel->buscarPorUserId($userId);
 
 if (!$dadosAtuais) {
-    echo "<script>
-        alert('Erro: Usuário não encontrado no sistema.');
-        window.location='../View/cliente/Perfil.php';
-    </script>";
-    exit;
+    $flashRedirect('erro', 'Erro: Usuário não encontrado no sistema.');
 }
 
 // ======================================================
@@ -50,19 +52,11 @@ $confirmar_senha = $_POST['confirmar_senha'] ?? '';
 // ======================================================
 
 if (empty($nome)) {
-    echo "<script>
-        alert('O campo Nome é obrigatório.');
-        window.location='../View/cliente/Perfil.php';
-    </script>";
-    exit;
+    $flashRedirect('erro', 'O campo Nome é obrigatório.');
 }
 
 if (mb_strlen($nome) > 100) {
-    echo "<script>
-        alert('O nome não pode ultrapassar 100 caracteres.');
-        window.location='../View/cliente/Perfil.php';
-    </script>";
-    exit;
+    $flashRedirect('erro', 'O nome não pode ultrapassar 100 caracteres.');
 }
 
 // ======================================================
@@ -70,30 +64,18 @@ if (mb_strlen($nome) > 100) {
 // ======================================================
 
 if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    echo "<script>
-        alert('Por favor, informe um email válido.');
-        window.location='../View/cliente/Perfil.php';
-    </script>";
-    exit;
+    $flashRedirect('erro', 'Por favor, informe um email válido.');
 }
 
 if (strlen($email) > 150) {
-    echo "<script>
-        alert('O email não pode ultrapassar 150 caracteres.');
-        window.location='../View/cliente/Perfil.php';
-    </script>";
-    exit;
+    $flashRedirect('erro', 'O email não pode ultrapassar 150 caracteres.');
 }
 
 // Verificar email duplicado somente se o email foi alterado
 if ($email !== $dadosAtuais['User_email']) {
 
     if ($userModel->emailExiste($email)) {
-        echo "<script>
-            alert('Este email já está sendo usado por outro usuário.');
-            window.location='../View/cliente/Perfil.php';
-        </script>";
-        exit;
+        $flashRedirect('erro', 'Este email já está sendo usado por outro usuário.');
     }
 }
 
@@ -104,31 +86,19 @@ if ($email !== $dadosAtuais['User_email']) {
 if (!empty($telefone)) {
 
     if (strlen($telefone) > 20) {
-        echo "<script>
-            alert('Telefone excede o limite de caracteres.');
-            window.location='../View/cliente/Perfil.php';
-        </script>";
-        exit;
+        $flashRedirect('erro', 'Telefone excede o limite de caracteres.');
     }
 
     // Permite números, espaços, parênteses e hífen
     if (!preg_match('/^[\d\s\(\)\-]+$/', $telefone)) {
-        echo "<script>
-            alert('Telefone contém caracteres inválidos.');
-            window.location='../View/cliente/Perfil.php';
-        </script>";
-        exit;
+        $flashRedirect('erro', 'Telefone contém caracteres inválidos.');
     }
 
     // Verifica quantidade real de números
     $apenasDigitos = preg_replace('/\D/', '', $telefone);
 
     if (strlen($apenasDigitos) < 10 || strlen($apenasDigitos) > 11) {
-        echo "<script>
-            alert('O telefone deve ter 10 ou 11 dígitos.');
-            window.location='../View/cliente/Perfil.php';
-        </script>";
-        exit;
+        $flashRedirect('erro', 'O telefone deve ter 10 ou 11 dígitos.');
     }
 }
 
@@ -138,33 +108,21 @@ if (!empty($telefone)) {
 
 // Data obrigatória
 if (empty($nascimento)) {
-    echo "<script>
-        alert('A data de nascimento é obrigatória.');
-        window.location='../View/cliente/Perfil.php';
-    </script>";
-    exit;
+    $flashRedirect('erro', 'A data de nascimento é obrigatória.');
 }
 
 // Validar formato Y-m-d
 $dt = DateTime::createFromFormat('Y-m-d', $nascimento);
 
 if (!$dt || $dt->format('Y-m-d') !== $nascimento) {
-    echo "<script>
-        alert('Data de nascimento inválida.');
-        window.location='../View/cliente/Perfil.php';
-    </script>";
-    exit;
+    $flashRedirect('erro', 'Data de nascimento inválida.');
 }
 
 // Não permitir data futura
 $hoje = new DateTime();
 
 if ($dt > $hoje) {
-    echo "<script>
-        alert('A data de nascimento não pode estar no futuro.');
-        window.location='../View/cliente/Perfil.php';
-    </script>";
-    exit;
+    $flashRedirect('erro', 'A data de nascimento não pode estar no futuro.');
 }
 
 // ======================================================
@@ -174,11 +132,7 @@ if ($dt > $hoje) {
 $idade = $hoje->diff($dt)->y;
 
 if ($idade < 16) {
-    echo "<script>
-        alert('É necessário ter pelo menos 16 anos.');
-        window.location='../View/cliente/Perfil.php';
-    </script>";
-    exit;
+    $flashRedirect('erro', 'É necessário ter pelo menos 16 anos.');
 }
 
 // ======================================================
@@ -192,40 +146,24 @@ if (!empty($nova_senha)) {
 
     // Exigir senha atual
     if (empty($senha_atual)) {
-        echo "<script>
-            alert('Para alterar a senha, você precisa informar a Senha Atual.');
-            window.location='../View/cliente/Perfil.php';
-        </script>";
-        exit;
+        $flashRedirect('erro', 'Para alterar a senha, você precisa informar a Senha Atual.');
     }
 
     // Nova senha deve possuir pelo menos 6 caracteres
-    if (strlen($nova_senha) < 6) {
-        echo "<script>
-            alert('A nova senha deve ter no mínimo 6 caracteres.');
-            window.location='../View/cliente/Perfil.php';
-        </script>";
-        exit;
+    if (mb_strlen($nova_senha) < 6) {
+        $flashRedirect('erro', 'A nova senha deve ter no mínimo 6 caracteres.');
     }
 
     // Verificar confirmação
     if ($nova_senha !== $confirmar_senha) {
-        echo "<script>
-            alert('As senhas não coincidem!');
-            window.location='../View/cliente/Perfil.php';
-        </script>";
-        exit;
+        $flashRedirect('erro', 'As senhas não coincidem!');
     }
 
     // Buscar senha atual salva no banco
     $senhaSalva = $clientModel->buscarSenha($userId);
 
     if (!$senhaSalva || !password_verify($senha_atual, $senhaSalva)) {
-        echo "<script>
-            alert('Senha atual incorreta.');
-            window.location='../View/cliente/Perfil.php';
-        </script>";
-        exit;
+        $flashRedirect('erro', 'Senha atual incorreta.');
     }
 
     // Criar hash da nova senha
@@ -255,17 +193,9 @@ if ($sucesso) {
     $_SESSION['User_name'] = $nome;
     $_SESSION['User_email'] = $email;
 
-    echo "<script>
-        alert('Perfil atualizado com sucesso!');
-        window.location='../View/cliente/Perfil.php';
-    </script>";
-    exit;
+    $flashRedirect('sucesso', 'Perfil atualizado com sucesso!');
 }
 
-echo "<script>
-    alert('Ocorreu um erro ao atualizar o perfil. Tente novamente mais tarde.');
-    window.location='../View/cliente/Perfil.php';
-</script>";
-exit;
+$flashRedirect('erro', 'Ocorreu um erro ao atualizar o perfil. Tente novamente mais tarde.');
 
 ?>

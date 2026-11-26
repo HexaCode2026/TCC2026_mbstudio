@@ -34,7 +34,7 @@ foreach ($servicos as $s) {
 $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -156,6 +156,8 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
             </div>
         </div>
 
+        <?php include __DIR__ . '/../components/FlashMessage.php'; ?>
+
         <!-- FORMULÁRIO DE CADASTRO DE NOVO SERVIÇO -->
         <section class="form-section-card" id="novo-servico">
             <h2 class="form-card-title">
@@ -169,35 +171,36 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
             <p class="form-card-desc">Preencha os campos abaixo para disponibilizar um novo procedimento para agendamento.</p>
 
             <form action="../../controller/SalvarServico.php" method="POST" enctype="multipart/form-data">
+                <?= Session::csrfField() ?>
                 <div class="form-grid-two-cols">
                     <!-- Nome -->
                     <div class="form-group-luxury">
-                        <label class="label-luxury">Nome do Serviço: *</label>
-                        <input type="text" name="nome" class="input-luxury" placeholder="Ex: Corte Feminino & Escova" required>
+                        <label class="label-luxury" for="srv-nome">Nome do Serviço: *</label>
+                        <input type="text" id="srv-nome" name="nome" class="input-luxury" placeholder="Ex: Corte Feminino & Escova" required>
                     </div>
 
                     <!-- Preço -->
                     <div class="form-group-luxury">
-                        <label class="label-luxury">Preço (R$): *</label>
-                        <input type="number" step="0.01" name="preco" class="input-luxury" placeholder="Ex: 85.00" required>
+                        <label class="label-luxury" for="srv-preco">Preço (R$): *</label>
+                        <input type="number" id="srv-preco" step="0.01" min="0.01" name="preco" class="input-luxury" placeholder="Ex: 85.00" required>
                     </div>
 
                     <!-- Duração -->
                     <div class="form-group-luxury">
-                        <label class="label-luxury">Duração Estimada (Minutos): *</label>
-                        <input type="number" name="duracao" class="input-luxury" placeholder="Ex: 45" required>
+                        <label class="label-luxury" for="srv-duracao">Duração Estimada (Minutos): *</label>
+                        <input type="number" id="srv-duracao" min="1" name="duracao" class="input-luxury" placeholder="Ex: 45" required>
                     </div>
 
                     <!-- Imagem -->
                     <div class="form-group-luxury">
-                        <label class="label-luxury">Foto do Anúncio (Imagem): *</label>
-                        <input type="file" name="imagem" accept="image/*" class="input-luxury" style="padding: 9px;" required>
+                        <label class="label-luxury" for="srv-imagem">Foto do Anúncio (Imagem): *</label>
+                        <input type="file" id="srv-imagem" name="imagem" accept="image/*" class="input-luxury" style="padding: 9px;" required>
                     </div>
 
                     <!-- Descrição -->
                     <div class="form-group-luxury form-group-full">
-                        <label class="label-luxury">Descrição do Procedimento:</label>
-                        <textarea name="descricao" class="textarea-luxury" placeholder="Descreva os detalhes do serviço, benefícios e orientações para o cliente..."></textarea>
+                        <label class="label-luxury" for="srv-descricao">Descrição do Procedimento:</label>
+                        <textarea id="srv-descricao" name="descricao" class="textarea-luxury" placeholder="Descreva os detalhes do serviço, benefícios e orientações para o cliente..."></textarea>
                     </div>
 
                     <!-- Atribuir Funcionários -->
@@ -366,49 +369,51 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
                                             
                                             <div class="edit-form-box">
                                                 <form action="../../controller/EditarServico.php" method="POST" enctype="multipart/form-data">
+                                                    <?= Session::csrfField() ?>
                                                     <input type="hidden" name="id" value="<?= $s['Ser_id'] ?>">
                                                     <input type="hidden" name="imagem_atual" value="<?= htmlspecialchars($s['Ser_image'] ?? '') ?>">
 
                                                     <div style="margin-bottom: 10px;">
-                                                        <label class="label-luxury" style="font-size: 11px;">Nome:</label>
-                                                        <input type="text" name="nome" value="<?= htmlspecialchars($s['Ser_name']) ?>" class="input-luxury" style="padding: 7px 10px; font-size: 13px;" required>
+                                                        <label class="label-luxury" style="font-size: 11px;" for="edit-nome-<?= (int)$s['Ser_id'] ?>">Nome:</label>
+                                                        <input type="text" id="edit-nome-<?= (int)$s['Ser_id'] ?>" name="nome" value="<?= htmlspecialchars($s['Ser_name']) ?>" class="input-luxury" style="padding: 7px 10px; font-size: 13px;" required>
                                                     </div>
 
                                                     <div style="margin-bottom: 10px;">
-                                                        <label class="label-luxury" style="font-size: 11px;">Descrição:</label>
-                                                        <textarea name="descricao" class="textarea-luxury" style="min-height: 60px; padding: 7px 10px; font-size: 13px;"><?= htmlspecialchars($s['Ser_description'] ?? '') ?></textarea>
+                                                        <label class="label-luxury" style="font-size: 11px;" for="edit-desc-<?= (int)$s['Ser_id'] ?>">Descrição:</label>
+                                                        <textarea id="edit-desc-<?= (int)$s['Ser_id'] ?>" name="descricao" class="textarea-luxury" style="min-height: 60px; padding: 7px 10px; font-size: 13px;"><?= htmlspecialchars($s['Ser_description'] ?? '') ?></textarea>
                                                     </div>
 
                                                     <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                                                         <div style="flex: 1;">
-                                                            <label class="label-luxury" style="font-size: 11px;">Preço (R$):</label>
-                                                            <input type="number" step="0.01" name="preco" value="<?= $s['Ser_price'] ?>" class="input-luxury" style="padding: 7px 10px; font-size: 13px;" required>
+                                                            <label class="label-luxury" style="font-size: 11px;" for="edit-preco-<?= (int)$s['Ser_id'] ?>">Preço (R$):</label>
+                                                            <input type="number" id="edit-preco-<?= (int)$s['Ser_id'] ?>" step="0.01" min="0.01" name="preco" value="<?= $s['Ser_price'] ?>" class="input-luxury" style="padding: 7px 10px; font-size: 13px;" required>
                                                         </div>
                                                         <div style="flex: 1;">
-                                                            <label class="label-luxury" style="font-size: 11px;">Duração (min):</label>
-                                                            <input type="number" name="duracao" value="<?= $s['Ser_duration'] ?>" class="input-luxury" style="padding: 7px 10px; font-size: 13px;" required>
+                                                            <label class="label-luxury" style="font-size: 11px;" for="edit-duracao-<?= (int)$s['Ser_id'] ?>">Duração (min):</label>
+                                                            <input type="number" id="edit-duracao-<?= (int)$s['Ser_id'] ?>" min="1" name="duracao" value="<?= $s['Ser_duration'] ?>" class="input-luxury" style="padding: 7px 10px; font-size: 13px;" required>
                                                         </div>
                                                     </div>
 
                                                     <div style="margin-bottom: 10px;">
-                                                        <label class="label-luxury" style="font-size: 11px;">Nova Imagem (Opcional):</label>
-                                                        <input type="file" name="imagem" accept="image/*" class="input-luxury" style="padding: 6px; font-size: 12px;">
+                                                        <label class="label-luxury" style="font-size: 11px;" for="edit-img-<?= (int)$s['Ser_id'] ?>">Nova Imagem (Opcional):</label>
+                                                        <input type="file" id="edit-img-<?= (int)$s['Ser_id'] ?>" name="imagem" accept="image/*" class="input-luxury" style="padding: 6px; font-size: 12px;">
                                                     </div>
 
                                                     <div style="margin-bottom: 10px;">
-                                                        <label class="label-luxury" style="font-size: 11px;">Status:</label>
-                                                        <select name="ativo" class="select-luxury" style="padding: 7px 10px; font-size: 13px;">
+                                                        <label class="label-luxury" style="font-size: 11px;" for="edit-ativo-<?= (int)$s['Ser_id'] ?>">Status:</label>
+                                                        <select id="edit-ativo-<?= (int)$s['Ser_id'] ?>" name="ativo" class="select-luxury" style="padding: 7px 10px; font-size: 13px;">
                                                             <option value="1" <?= $s['Ser_active'] == 1 ? 'selected' : '' ?>>🟢 Ativo</option>
                                                             <option value="0" <?= $s['Ser_active'] == 0 ? 'selected' : '' ?>>🔴 Inativo</option>
                                                         </select>
                                                     </div>
 
                                                     <div style="margin-bottom: 12px;">
-                                                        <label class="label-luxury" style="font-size: 11px;">Reatribuir Funcionários:</label>
+                                                        <span class="label-luxury" style="font-size: 11px; display: block;">Reatribuir Funcionários:</span>
                                                         <div style="max-height: 90px; overflow-y: auto; background: #faf8f3; padding: 8px; border-radius: 6px; border: 1px solid rgba(184,134,11,0.2);">
+                                                            <?php $vinculados = array_filter(explode(',', (string)($s['EmployeeUserIds'] ?? ''))); ?>
                                                             <?php foreach ($funcionarios as $func): ?>
                                                                 <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; margin-bottom: 4px; cursor: pointer;">
-                                                                    <input type="checkbox" name="funcionarios[]" value="<?= $func['User_id'] ?>">
+                                                                    <input type="checkbox" name="funcionarios[]" value="<?= (int)$func['User_id'] ?>" <?= in_array((string)$func['User_id'], $vinculados, true) ? 'checked' : '' ?>>
                                                                     <span><?= htmlspecialchars($func['User_name']) ?></span>
                                                                 </label>
                                                             <?php endforeach; ?>

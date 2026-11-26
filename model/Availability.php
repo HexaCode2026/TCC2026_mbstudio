@@ -147,6 +147,9 @@ class Availability {
     public function excluirPorId($avaId, $empId) {
         try {
             if (is_array($avaId)) {
+                if (empty($avaId)) {
+                    return false;
+                }
                 $in = str_repeat('?,', count($avaId) - 1) . '?';
                 $sql = "DELETE FROM availabilities WHERE Ava_id IN ($in) AND Emp_id = ?";
                 $params = array_merge($avaId, [$empId]);

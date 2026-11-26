@@ -13,7 +13,7 @@ $heroJsVerHdr = @filemtime(__DIR__ . '/../../assets/js/heroSlideshow.js') ?: '2.
 $perm = $_SESSION['User_perm'] ?? null;
 $userNameHeader = $_SESSION['User_name'] ?? null;
 $firstNameHeader = $userNameHeader ? htmlspecialchars(explode(' ', trim($userNameHeader))[0]) : null;
-$userInitialHeader = $userNameHeader ? strtoupper(substr(trim($userNameHeader), 0, 1)) : null;
+$userInitialHeader = $userNameHeader ? mb_strtoupper(mb_substr(trim($userNameHeader), 0, 1, 'UTF-8'), 'UTF-8') : null;
 
 // Detectar a página atual para destacar o link ativo
 $currentScript = $_SERVER['SCRIPT_NAME'] ?? '';

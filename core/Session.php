@@ -172,24 +172,36 @@ class Session {
 
     /**
      * Defesa em Profundidade contra CSRF:
-     * 1. Valida Token explícito se enviado via POST ou Header X-CSRF-Token.
-     * 2. Valida estritamente cabeçalhos Origin e Referer (Same-Origin Policy) em requisições de mutação.
+     * 1. Exige Token CSRF explícito válido via POST ou Header X-CSRF-Token.
+     * 2. Valida cabeçalhos Origin e Referer (Same-Origin Policy) quando presentes.
      */
     public static function validarCsrf($token = null) {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
-        $tokenRecebido = $token ?? $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
-        if ($tokenRecebido !== null && $tokenRecebido !== '') {
-            if (!hash_equals($_SESSION['csrf_token'] ?? '', (string)$tokenRecebido)) {
-                http_response_code(403);
-                die("Ação bloqueada por segurança: Token CSRF inválido.");
+        $isJsonRequest = (
+            stripos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false ||
+            stripos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false ||
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest'
+        );
+
+        $fail = static function (string $msg) use ($isJsonRequest): void {
+            http_response_code(403);
+            if ($isJsonRequest) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => $msg]);
+                exit;
             }
-            return true;
+            die($msg);
+        };
+
+        $tokenRecebido = $token ?? $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if ($tokenRecebido === '' || !hash_equals($_SESSION['csrf_token'] ?? '', (string)$tokenRecebido)) {
+            $fail("Ação bloqueada por segurança: Token CSRF ausente ou inválido.");
         }
 
-        // Verificação estrita Same-Origin via Origin / Referer
+        // Verificação adicional Same-Origin via Origin / Referer quando enviados pelo navegador
         $hostAtual = strtolower($_SERVER['HTTP_HOST'] ?? '');
         if ($hostAtual !== '') {
             $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -198,8 +210,7 @@ class Session {
                 $originPort = parse_url($origin, PHP_URL_PORT);
                 $originFull = $originPort ? ($originHost . ':' . $originPort) : $originHost;
                 if ($originHost !== $hostAtual && $originFull !== $hostAtual) {
-                    http_response_code(403);
-                    die("Ação bloqueada por segurança: Origem externa não autorizada (CSRF Protection).");
+                    $fail("Ação bloqueada por segurança: Origem externa não autorizada (CSRF Protection).");
                 }
             }
 
@@ -209,8 +220,7 @@ class Session {
                 $refPort = parse_url($referer, PHP_URL_PORT);
                 $refFull = $refPort ? ($refHost . ':' . $refPort) : $refHost;
                 if ($refHost !== $hostAtual && $refFull !== $hostAtual) {
-                    http_response_code(403);
-                    die("Ação bloqueada por segurança: Referer externo não autorizado (CSRF Protection).");
+                    $fail("Ação bloqueada por segurança: Referer externo não autorizado (CSRF Protection).");
                 }
             }
         }

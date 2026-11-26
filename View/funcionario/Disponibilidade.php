@@ -1,5 +1,4 @@
 <?php
-date_default_timezone_set('Etc/GMT+3');
 require_once "../../config/conexao.php";
 require_once "../../core/Session.php";
 
@@ -54,7 +53,7 @@ if (!empty($minhasDisponibilidades)) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
@@ -113,9 +112,12 @@ if (!empty($minhasDisponibilidades)) {
                 Studio.</p>
         </div>
 
+        <?php include __DIR__ . '/../components/FlashMessage.php'; ?>
+
         <!-- CARD PRINCIPAL DO FORMULÁRIO -->
         <div class="cadastro-grid-card disp-main-card">
             <form action="../../controller/SalvarDisponibilidade.php" method="POST" id="formDisponibilidade">
+                <?= Session::csrfField() ?>
 
                 <input type="hidden" name="Fun_id" value="<?= htmlspecialchars($_SESSION['User_id']) ?>">
                 <input type="hidden" name="Emp_id" value="<?= htmlspecialchars($empId) ?>">
@@ -172,9 +174,9 @@ if (!empty($minhasDisponibilidades)) {
 
                 <!-- CONTAINER DINÂMICO DOS HORÁRIOS DE ATENDIMENTO GERADOS -->
                 <div class="secao-horarios-gerados">
-                    <label for="Dis_scheduled-times" class="label-horarios-titulo">
+                    <div class="label-horarios-titulo">
                         <strong>Horários de Atendimento Calculados</strong>
-                    </label>
+                    </div>
 
                     <div id="Dis_scheduled-times">
                         <div id="lista-horarios-vazia">
@@ -294,6 +296,7 @@ if (!empty($minhasDisponibilidades)) {
                                         <!-- FORMULÁRIO DE EDIÇÃO POR AVA_ID -->
                                         <form action="../../controller/EditarDisponibilidade.php" method="POST"
                                             class="edit-disp-form">
+                                            <?= Session::csrfField() ?>
                                             <input type="hidden" name="Ava_id" value="<?= htmlspecialchars($disp['Ava_id']) ?>">
                                             <select name="Ava_status" class="select-disp-status" required>
                                                 <option value="Disponivel" <?= $disp['Ava_status'] === 'Disponivel' ? 'selected' : '' ?>>Disponível</option>
@@ -308,6 +311,7 @@ if (!empty($minhasDisponibilidades)) {
                                         <form action="../../controller/ExcluirDisponibilidade.php" method="POST"
                                             onsubmit="return confirm('Tem certeza que deseja excluir esta disponibilidade?');"
                                             style="margin: 0;">
+                                            <?= Session::csrfField() ?>
                                             <input type="hidden" name="Ava_id" value="<?= htmlspecialchars($disp['Ava_id']) ?>">
                                             <button type="submit" class="btn-delete-disp">✕ Excluir</button>
                                         </form>
@@ -475,6 +479,12 @@ if (!empty($minhasDisponibilidades)) {
         function salvarLote(status) {
             const formLote = document.getElementById('formLoteData');
             formLote.innerHTML = '';
+
+            const inputCsrf = document.createElement('input');
+            inputCsrf.type = 'hidden';
+            inputCsrf.name = 'csrf_token';
+            inputCsrf.value = '<?= htmlspecialchars(Session::gerarTokenCsrf(), ENT_QUOTES, 'UTF-8') ?>';
+            formLote.appendChild(inputCsrf);
 
             const inputStatus = document.createElement('input');
             inputStatus.type = 'hidden';
@@ -728,9 +738,9 @@ if (!empty($minhasDisponibilidades)) {
         if (calendario) {
             calendario.innerHTML = `
                 <div class="calendario-header">
-                    <button type="button" class="calendario-btn">‹</button>
+                    <button type="button" class="calendario-btn" aria-label="Mês anterior">‹</button>
                     <span class="calendario-mes"></span>
-                    <button type="button" class="calendario-btn">›</button>
+                    <button type="button" class="calendario-btn" aria-label="Próximo mês">›</button>
                 </div>
 
                 <div class="calendario-semana">

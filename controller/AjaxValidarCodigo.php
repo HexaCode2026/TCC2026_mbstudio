@@ -7,6 +7,8 @@ require_once __DIR__ . "/../core/Session.php";
 Session::iniciar();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    Session::validarCsrf();
+
     try {
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data) {

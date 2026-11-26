@@ -16,9 +16,13 @@ if (PHP_SAPI !== 'cli' && (($_SESSION['User_perm'] ?? '') !== 'A')) {
     exit;
 }
 
-$destinatario = trim($_GET['email'] ?? $_POST['email'] ?? (defined('SMTP_FROM_EMAIL') && SMTP_FROM_EMAIL !== '' ? SMTP_FROM_EMAIL : ''));
-$nomeDestino  = trim($_GET['nome'] ?? $_POST['nome'] ?? 'Teste MB Studio');
-$autoDisparar = isset($_GET['disparar']) || isset($_POST['disparar']) || (PHP_SAPI === 'cli');
+$destinatario = trim($_POST['email'] ?? (defined('SMTP_FROM_EMAIL') && SMTP_FROM_EMAIL !== '' ? SMTP_FROM_EMAIL : ''));
+$nomeDestino  = trim($_POST['nome'] ?? 'Teste MB Studio');
+$autoDisparar = (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['disparar'])) || (PHP_SAPI === 'cli');
+
+if (PHP_SAPI !== 'cli' && $autoDisparar) {
+    Session::validarCsrf();
+}
 
 $mailer = new EmailHelper();
 $resultados = [];
@@ -95,7 +99,8 @@ if (PHP_SAPI === 'cli' || (($_GET['format'] ?? '') === 'json')) {
             (<?= htmlspecialchars((string)(defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : '')) ?>)
         </p>
 
-        <form method="GET" class="form-row">
+        <form method="POST" class="form-row">
+            <?= Session::csrfField() ?>
             <input type="hidden" name="disparar" value="1">
             <input type="email" name="email" value="<?= htmlspecialchars($destinatario) ?>" placeholder="E-mail de destino para teste" required>
             <button type="submit">Disparar 3 Templates de Teste</button>

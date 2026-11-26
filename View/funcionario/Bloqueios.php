@@ -134,6 +134,7 @@ $bloqCssVer   = @filemtime(__DIR__ . '/../../assets/css/funcionario/bloqueios.cs
                     </div>
 
                     <form action="../../controller/SalvarBloqueio.php" method="POST">
+                        <?= Session::csrfField() ?>
                         <div class="form-group">
                             <label for="block-data">Data da Pausa</label>
                             <input type="date" id="block-data" name="data" class="form-control" required min="<?= date('Y-m-d') ?>">

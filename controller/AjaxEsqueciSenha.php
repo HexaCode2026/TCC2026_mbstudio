@@ -5,15 +5,18 @@ require_once __DIR__ . '/../core/Session.php';
 require_once __DIR__ . '/../helpers/EmailHelper.php';
 
 Session::iniciar();
-// Libera o lock de sessão imediatamente pois este endpoint não escreve na sessão
-Session::liberarLock();
 
 header('Content-Type: application/json; charset=utf-8');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    Session::liberarLock();
     echo json_encode(['success' => false, 'message' => 'Método inválido.']);
     exit;
 }
+
+Session::validarCsrf();
+// Libera o lock de sessão imediatamente após validar o CSRF pois este endpoint não escreve na sessão
+Session::liberarLock();
 
 try {
     $input = json_decode(file_get_contents('php://input'), true);

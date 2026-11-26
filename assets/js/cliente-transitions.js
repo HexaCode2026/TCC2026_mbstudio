@@ -50,8 +50,10 @@
         if (!url) return false;
         if (isIndexUrl(url)) return true;
         const path = (url.pathname || '').toLowerCase();
-        // Rotas permitidas: Index.php e View/cliente/
-        return path.includes('/view/cliente/');
+        // Limita transições SPA às páginas institucionais estáticas para não impedir
+        // execução de scripts inline em páginas de formulário (Data, Horarios, Confirmar, Perfil)
+        return path.endsWith('/view/cliente/servicos.php') ||
+            path.endsWith('/view/cliente/funcionarios.php');
     }
 
     /**

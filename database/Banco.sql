@@ -18,7 +18,7 @@ CREATE TABLE users(
     User_must_change_pass BOOLEAN DEFAULT FALSE,
     User_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_users_perm_active (User_perm, User_active)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Seeder Idempotente do Administrador Inicial (Senha temporária: 'admin123' com Bcrypt)
 INSERT INTO users (User_name, User_email, User_pass, User_perm, User_active, User_must_change_pass)
@@ -38,7 +38,7 @@ CREATE TABLE clients(
     Cli_birth DATE,
     Cli_observation TEXT,
     FOREIGN KEY(User_id) REFERENCES users(User_id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ==========================================
 -- 3. FUNCIONÁRIOS
@@ -50,7 +50,7 @@ CREATE TABLE employees(
     Emp_specialty VARCHAR(100),
     Emp_bio TEXT,
     FOREIGN KEY(User_id) REFERENCES users(User_id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ==========================================
 -- 4. SERVIÇOS
@@ -64,7 +64,7 @@ CREATE TABLE services(
     Ser_image VARCHAR(255),
     Ser_active BOOLEAN DEFAULT TRUE,
     INDEX idx_services_active (Ser_active)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ==========================================
 -- 5. FUNCIONÁRIO X SERVIÇO (Relacionamento)
@@ -76,7 +76,7 @@ CREATE TABLE employee_services(
     FOREIGN KEY(Emp_id) REFERENCES employees(Emp_id) ON DELETE CASCADE,
     FOREIGN KEY(Ser_id) REFERENCES services(Ser_id) ON DELETE CASCADE,
     UNIQUE(Emp_id,Ser_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ==========================================
 -- 6. DISPONIBILIDADE
@@ -93,7 +93,7 @@ CREATE TABLE availabilities(
     FOREIGN KEY(Ser_id) REFERENCES services(Ser_id) ON DELETE SET NULL,
     INDEX idx_ava_lookup (Ava_date, Ser_id, Ava_status, Emp_id, Ava_start),
     INDEX idx_ava_emp_date (Emp_id, Ava_date)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ==========================================
 -- 7. BLOQUEIOS DA AGENDA
@@ -107,7 +107,7 @@ CREATE TABLE employee_blocks(
     Block_reason VARCHAR(255),
     FOREIGN KEY(Emp_id) REFERENCES employees(Emp_id) ON DELETE CASCADE,
     INDEX idx_block_emp_date (Emp_id, Block_date, Block_start, Block_end)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ==========================================
 -- 8. AGENDAMENTOS
@@ -117,6 +117,7 @@ CREATE TABLE appointments(
     Cli_id INT NOT NULL,
     Emp_id INT NOT NULL,
     Ser_id INT NOT NULL,
+    Appo_price DECIMAL(10,2) NULL DEFAULT NULL,
     Appo_date DATE NOT NULL,
     Appo_start TIME NOT NULL,
     Appo_end TIME NOT NULL,
@@ -136,12 +137,12 @@ CREATE TABLE appointments(
     Appo_observation TEXT,
     Appo_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Appo_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY(Cli_id) REFERENCES clients(Cli_id) ON DELETE CASCADE,
-    FOREIGN KEY(Emp_id) REFERENCES employees(Emp_id) ON DELETE CASCADE,
-    FOREIGN KEY(Ser_id) REFERENCES services(Ser_id) ON DELETE CASCADE,
+    FOREIGN KEY(Cli_id) REFERENCES clients(Cli_id) ON DELETE RESTRICT,
+    FOREIGN KEY(Emp_id) REFERENCES employees(Emp_id) ON DELETE RESTRICT,
+    FOREIGN KEY(Ser_id) REFERENCES services(Ser_id) ON DELETE RESTRICT,
     INDEX idx_appo_emp_date_status (Emp_id, Appo_date, Appo_status, Appo_start, Appo_end),
     INDEX idx_appo_date_status (Appo_date, Appo_status)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ==========================================
 -- 9. VIEW: RELATÓRIO DO ADMINISTRADOR
@@ -156,7 +157,7 @@ SELECT
     e_user.User_name AS Nome_Profissional,
     a.Emp_id AS ID_Profissional,
     s.Ser_name AS Servico_Realizado,
-    s.Ser_price AS Valor_Servico,
+    COALESCE(a.Appo_price, s.Ser_price) AS Valor_Servico,
     a.Appo_status AS Status,
     a.Appo_payment_method AS Forma_Pagamento,
     a.Appo_cancel_by AS Cancelado_Por
@@ -183,7 +184,7 @@ CREATE TABLE verification_codes (
     FOREIGN KEY(User_id) REFERENCES users(User_id) ON DELETE CASCADE,
     INDEX idx_verification_latest (User_id, Code_type, Code_used, Code_id DESC),
     INDEX idx_verification_lookup (User_id, Code_type, Code_used, Code_expires_at)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ==========================================
 -- 11. IMAGENS DO CARROSSEL / DESTAQUE HOME

@@ -6,6 +6,7 @@ require_once __DIR__ . "/../core/Session.php";
 Session::iniciar();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    Session::validarCsrf();
     $codigo = trim($_POST['codigo'] ?? '');
     $tipo = $_SESSION['verificar_tipo'] ?? null;
     $usuario = new User($pdo);
@@ -14,19 +15,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $pending = $_SESSION['pending_registration'] ?? null;
 
         if (!$pending) {
-            echo "<script>alert('Sessão de cadastro expirada. Cadastre-se novamente.'); window.location='../Index.php';</script>";
+            Session::setFlash('erro', 'Sessão de cadastro expirada. Cadastre-se novamente.');
+            header("Location: ../Index.php");
             exit;
         }
 
         if (time() > ($pending['expires_at'] ?? 0)) {
             unset($_SESSION['pending_registration'], $_SESSION['verificar_tipo']);
-            echo "<script>alert('Código expirado. Realize o cadastro novamente.'); window.location='../Index.php';</script>";
+            Session::setFlash('erro', 'Código expirado. Realize o cadastro novamente.');
+            header("Location: ../Index.php");
             exit;
         }
 
         if (($pending['attempts'] ?? 0) >= 5) {
             unset($_SESSION['pending_registration'], $_SESSION['verificar_tipo']);
-            echo "<script>alert('Muitas tentativas incorretas. Realize o cadastro novamente.'); window.location='../Index.php';</script>";
+            Session::setFlash('erro', 'Muitas tentativas incorretas. Realize o cadastro novamente.');
+            header("Location: ../Index.php");
             exit;
         }
 
@@ -40,17 +44,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 );
             }
             unset($_SESSION['pending_registration'], $_SESSION['verificar_tipo'], $_SESSION['verificar_user_id']);
-            echo "<script>alert('Conta confirmada e ativada com sucesso! Você já pode fazer login.'); window.location='../Index.php';</script>";
+            Session::setFlash('sucesso', 'Conta confirmada e ativada com sucesso! Você já pode fazer login.');
+            header("Location: ../Index.php");
             exit;
         } else {
             $_SESSION['pending_registration']['attempts'] = ($pending['attempts'] ?? 0) + 1;
-            echo "<script>alert('Código incorreto.'); window.location='../View/VerificarCodigo.php';</script>";
+            Session::setFlash('erro', 'Código incorreto.');
+            header("Location: ../View/VerificarCodigo.php");
             exit;
         }
     }
 
     if (!isset($_SESSION['verificar_user_id']) || !$tipo) {
-        echo "<script>alert('Sessão expirada. Faça login novamente.'); window.location='../Index.php';</script>";
+        Session::setFlash('erro', 'Sessão expirada. Faça login novamente.');
+        header("Location: ../Index.php");
         exit;
     }
 
@@ -78,8 +85,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
     } else {
-        $msg = addslashes($resultado['msg']);
-        echo "<script>alert('$msg'); window.location='../View/VerificarCodigo.php';</script>";
+        Session::setFlash('erro', $resultado['msg']);
+        header("Location: ../View/VerificarCodigo.php");
         exit;
     }
 }

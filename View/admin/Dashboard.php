@@ -25,7 +25,7 @@ $sucessoFlash = Session::getFlash('success');
 $erroFlash    = Session::getFlash('error');
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">

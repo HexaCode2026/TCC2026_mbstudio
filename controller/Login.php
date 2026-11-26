@@ -7,6 +7,7 @@ require_once __DIR__ . "/../helpers/EmailHelper.php";
 Session::iniciar();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    Session::validarCsrf();
     try {
         $email = trim($_POST['email'] ?? '');
         $senha = $_POST['senha'] ?? '';
@@ -16,13 +17,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             strcasecmp($_SESSION['pending_registration']['email'] ?? '', $email) === 0 &&
             time() < ($_SESSION['pending_registration']['expires_at'] ?? 0)
         ) {
+            Session::setFlash('erro', 'O cadastro deste e-mail ainda não foi confirmado. Confirme o código enviado para concluir seu cadastro.');
             Session::liberarLock();
-            echo "
-            <script>
-            alert('O cadastro deste e-mail ainda não foi confirmado. Confirme o código enviado para concluir seu cadastro.');
-            window.location='../View/VerificarCodigo.php';
-            </script>
-            ";
+            header("Location: ../View/VerificarCodigo.php");
             exit;
         }
 
@@ -31,13 +28,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($dados && password_verify($senha, $dados['User_pass'])) {
             if ((int)$dados['User_active'] === 0) {
+                Session::setFlash('erro', 'Sua conta encontra-se desativada. Entre em contato com a administração.');
                 Session::liberarLock();
-                echo "
-                <script>
-                alert('Sua conta encontra-se desativada. Entre em contato com a administração.');
-                window.location='../Index.php';
-                </script>
-                ";
+                header("Location: ../Index.php");
                 exit;
             }
 
@@ -60,9 +53,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['verificar_user_id'] = $dados['User_id'];
                 $_SESSION['verificar_tipo'] = 'Login2FA';
                 $_SESSION['temp_login_dados'] = $dados;
+                Session::setFlash('sucesso', 'Um código 2FA já foi enviado recentemente para o seu e-mail.');
                 Session::liberarLock();
 
-                echo "<script>alert('Um código 2FA já foi enviado recentemente para o seu e-mail.'); window.location='../View/VerificarCodigo.php';</script>";
+                header("Location: ../View/VerificarCodigo.php");
                 exit;
             }
 
@@ -80,28 +74,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (!$enviado) {
                 Session::iniciar();
                 unset($_SESSION['verificar_user_id'], $_SESSION['verificar_tipo'], $_SESSION['temp_login_dados'], $_SESSION['login2fa_sent_at']);
+                Session::setFlash('erro', 'Não foi possível enviar o código 2FA para o seu e-mail no momento. Tente novamente em instantes.');
                 Session::liberarLock();
 
                 $usuario->invalidarCodigosPendentes($dados['User_id'], 'Login2FA');
-                echo "
-                <script>
-                alert('Não foi possível enviar o código 2FA para o seu e-mail no momento. Tente novamente em instantes.');
-                window.location='../Index.php';
-                </script>
-                ";
+                header("Location: ../Index.php");
                 exit;
             }
 
-            echo "<script>alert('Para sua segurança, enviamos um código de verificação para o seu e-mail.'); window.location='../View/VerificarCodigo.php';</script>";
+            Session::iniciar();
+            Session::setFlash('sucesso', 'Para sua segurança, enviamos um código de verificação para o seu e-mail.');
+            Session::liberarLock();
+            header("Location: ../View/VerificarCodigo.php");
             exit;
         }
 
-        echo "
-        <script>
-        alert('Email ou senha incorretos');
-        window.location='../Index.php';
-        </script>
-        ";
+        Session::setFlash('erro', 'Email ou senha incorretos.');
+        header("Location: ../Index.php");
         exit;
     } catch (\Throwable $t) {
         Session::liberarLock();

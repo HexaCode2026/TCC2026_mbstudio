@@ -21,7 +21,7 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
      VIEW: Interface do Usuário (MB Studio Home)
      ========================================================================= -->
 <!DOCTYPE html>
-<html lang="pt-br" class="page-index">
+<html lang="pt-BR" class="page-index">
 
 <head>
     <meta charset="UTF-8">
@@ -40,6 +40,8 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
 
     <!-- Conteúdo da Página abaixo do Cabeçalho -->
     <div class="page-content-wrapper" id="page-content">
+        <main>
+            <?php include __DIR__ . '/View/components/FlashMessage.php'; ?>
 
         <!-- =================================================================
          1. HERO SECTION (APRESENTAÇÃO PRINCIPAL & QUADRADO DE DESTAQUE)
@@ -241,7 +243,7 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
                                         <img src="<?= htmlspecialchars($fPhoto) ?>" alt="<?= htmlspecialchars($f['User_name']) ?>">
                                     <?php else: ?>
                                         <div class="specialist-avatar-placeholder">
-                                            <?= strtoupper(substr($f['User_name'], 0, 1)) ?>
+                                            <?= htmlspecialchars(mb_strtoupper(mb_substr(trim($f['User_name']), 0, 1, 'UTF-8'), 'UTF-8'), ENT_QUOTES, 'UTF-8') ?>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -351,6 +353,8 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
             </div>
         </section>
 
+        </main>
+
         <!-- =================================================================
          7. RODAPÉ DE ALTO PADRÃO (FOOTER)
          ================================================================= -->
@@ -365,19 +369,19 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
                         valorizar a sua autoestima com excelência e carinho.
                     </p>
                     <div class="footer-social-links">
-                        <a href="https://www.instagram.com/maison.bellestudio/" target="_blank" class="social-icon-btn"
-                            title="Instagram">
+                        <a href="https://www.instagram.com/maison.bellestudio/" target="_blank" rel="noopener noreferrer" class="social-icon-btn"
+                            title="Instagram" aria-label="Instagram do MB Studio">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                                 <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                             </svg>
                         </a>
-                        <a href="https://wa.me/5511991075433?text=Olá, gostaria de agendar um horário" target="_blank"
-                            class="social-icon-btn" title="WhatsApp">
+                        <a href="https://wa.me/5511991075433?text=Olá, gostaria de agendar um horário" target="_blank" rel="noopener noreferrer"
+                            class="social-icon-btn" title="WhatsApp" aria-label="WhatsApp do MB Studio">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path
                                     d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
                                 </path>
@@ -427,12 +431,6 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
 
     <!-- Modal Global de Login / Cadastro -->
     <?php include 'View/components/LoginModal.php'; ?>
-    <?php
-    $heroJsVer  = @filemtime(__DIR__ . '/assets/js/heroSlideshow.js') ?: '2.4';
-    $transJsIdx = @filemtime(__DIR__ . '/assets/js/cliente-transitions.js') ?: '2.4';
-    ?>
-    <script src="assets/js/cliente-transitions.js?v=<?= $transJsIdx ?>"></script>
-    <script src="assets/js/heroSlideshow.js?v=<?= $heroJsVer ?>"></script>
 </body>
 
 </html>

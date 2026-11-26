@@ -14,7 +14,7 @@ $authCssVer = @filemtime(__DIR__ . '/../../assets/css/components/authbutton.css'
     <?php if ($userName): ?>
         <div class="auth-dropdown" id="desktopAuthDropdown">
             <button type="button" class="auth-btn" id="desktopAuthToggle" aria-expanded="false" aria-haspopup="true">
-                <div class="auth-icon"><?= strtoupper(substr(trim($userName), 0, 1)) ?></div>
+                <div class="auth-icon"><?= htmlspecialchars(mb_strtoupper(mb_substr(trim($userName), 0, 1, 'UTF-8'), 'UTF-8'), ENT_QUOTES, 'UTF-8') ?></div>
                 <span>Olá, <?= htmlspecialchars(explode(' ', trim($userName))[0]) ?></span>
                 <svg class="auth-dots-indicator" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <circle cx="12" cy="5" r="2"></circle>

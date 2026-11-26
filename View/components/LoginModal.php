@@ -10,14 +10,14 @@ $loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css
 
 <link rel="stylesheet" href="<?= $basePath ?>/assets/css/components/loginmodal.css?v=<?= $loginCssVer ?>">
 
-<div id="global-login-modal">
+<div id="global-login-modal" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
     <div class="login-modal-content">
-        <span class="login-modal-close" onclick="closeLoginModal()">&times;</span>
+        <button type="button" class="login-modal-close" onclick="closeLoginModal()" aria-label="Fechar modal">&times;</button>
         
         <!-- VISÃO DE LOGIN -->
         <div id="view-login" class="form-view active">
             <div class="login-modal-header">
-                <h2>Bem-vindo(a)</h2>
+                <h2 id="login-modal-title">Bem-vindo(a)</h2>
                 <p>Faça login para continuar.</p>
             </div>
             
@@ -25,11 +25,11 @@ $loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css
 
             <form id="global-login-form" onsubmit="handleAjaxLogin(event)">
                 <div class="login-form-group">
-                    <label>Email</label>
+                    <label for="modal-email">Email</label>
                     <input type="email" id="modal-email" required placeholder="seu@email.com">
                 </div>
                 <div class="login-form-group">
-                    <label>Senha</label>
+                    <label for="modal-senha">Senha</label>
                     <input type="password" id="modal-senha" required placeholder="••••••••">
                     <div style="text-align: right; margin-top: 5px;">
                         <a href="#" onclick="switchModalView('view-esqueci-senha')" style="font-size: 12px; color: var(--gold-primary); text-decoration: none;">Esqueceu a senha?</a>
@@ -51,16 +51,16 @@ $loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css
 
             <form id="global-cadastro-form" onsubmit="handleAjaxCadastro(event)">
                 <div class="login-form-group">
-                    <label>Nome Completo</label>
+                    <label for="cad-nome">Nome Completo</label>
                     <input type="text" id="cad-nome" required placeholder="Seu Nome">
                 </div>
                 <div class="login-form-group">
-                    <label>Email</label>
+                    <label for="cad-email">Email</label>
                     <input type="email" id="cad-email" required placeholder="seu@email.com">
                 </div>
                 <div class="login-form-group">
-                    <label>Senha</label>
-                    <input type="password" id="cad-senha" required placeholder="••••••••">
+                    <label for="cad-senha">Senha</label>
+                    <input type="password" id="cad-senha" required minlength="6" placeholder="••••••••">
                 </div>
                 <button type="submit" class="login-modal-btn">Cadastrar</button>
                 <button type="button" class="login-modal-register-btn" onclick="switchModalView('view-login')">Já tem conta? Faça Login</button>
@@ -78,7 +78,7 @@ $loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css
 
             <form id="global-verificacao-form" onsubmit="handleAjaxVerificacao(event)">
                 <div class="login-form-group">
-                    <label>Código de 6 dígitos</label>
+                    <label for="verificacao-codigo">Código de 6 dígitos</label>
                     <input type="text" id="verificacao-codigo" required placeholder="000000" maxlength="6" autocomplete="off" style="letter-spacing: 5px; font-size: 24px; text-align: center; font-weight: bold;">
                 </div>
                 <button type="submit" class="login-modal-btn">Verificar</button>
@@ -97,7 +97,7 @@ $loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css
 
             <form id="global-esqueci-form" onsubmit="handleAjaxEsqueciSenha(event)">
                 <div class="login-form-group">
-                    <label>Email</label>
+                    <label for="esqueci-email">Email</label>
                     <input type="email" id="esqueci-email" required placeholder="seu@email.com">
                 </div>
                 <button type="submit" class="login-modal-btn">Enviar Código</button>
@@ -117,12 +117,12 @@ $loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css
             <form id="global-redefinir-form" onsubmit="handleAjaxRedefinirSenha(event)">
                 <input type="hidden" id="redefinir-email">
                 <div class="login-form-group">
-                    <label>Código de 6 dígitos</label>
+                    <label for="redefinir-codigo">Código de 6 dígitos</label>
                     <input type="text" id="redefinir-codigo" required placeholder="000000" maxlength="6" autocomplete="off" style="letter-spacing: 5px; font-size: 24px; text-align: center; font-weight: bold;">
                 </div>
                 <div class="login-form-group">
-                    <label>Nova Senha</label>
-                    <input type="password" id="redefinir-senha" required placeholder="••••••••">
+                    <label for="redefinir-senha">Nova Senha</label>
+                    <input type="password" id="redefinir-senha" required minlength="6" placeholder="••••••••">
                 </div>
                 <button type="submit" class="login-modal-btn">Redefinir Senha</button>
                 <button type="button" class="login-modal-register-btn" onclick="switchModalView('view-login')">Cancelar</button>
@@ -135,6 +135,7 @@ $loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css
 <script>
 window.isLoggedIn = <?= $isLoggedIn ?>;
 window.pendingAuthActionUrl = null;
+const MB_CSRF_TOKEN = "<?= htmlspecialchars(Session::gerarTokenCsrf(), ENT_QUOTES, 'UTF-8') ?>";
 
 function checkAuthAndExecute(event, url) {
     if(event) event.preventDefault();
@@ -224,7 +225,7 @@ async function handleAjaxLogin(event) {
         const basePath = "<?= $basePath ?>";
         const response = await fetch(`${basePath}/controller/AjaxLogin.php`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': MB_CSRF_TOKEN },
             body: JSON.stringify({ email, senha })
         });
         
@@ -280,7 +281,7 @@ async function handleAjaxCadastro(event) {
         const basePath = "<?= $basePath ?>";
         const response = await fetch(`${basePath}/controller/AjaxCadastro.php`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': MB_CSRF_TOKEN },
             body: JSON.stringify({ nome, email, senha })
         });
         
@@ -296,8 +297,8 @@ async function handleAjaxCadastro(event) {
             showModalMessage('cadastro-modal-msg', false, data.message);
             
             setTimeout(() => {
-                document.getElementById('modal-email').value = email;
                 switchModalView('view-login');
+                document.getElementById('modal-email').value = email;
             }, 2000);
         } else {
             showModalMessage('cadastro-modal-msg', true, data.message || 'Erro ao realizar cadastro.');
@@ -324,7 +325,7 @@ async function handleAjaxVerificacao(event) {
         const basePath = "<?= $basePath ?>";
         const response = await fetch(`${basePath}/controller/AjaxValidarCodigo.php`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': MB_CSRF_TOKEN },
             body: JSON.stringify({ codigo })
         });
         
@@ -376,7 +377,7 @@ async function handleAjaxEsqueciSenha(event) {
         const basePath = "<?= $basePath ?>";
         const response = await fetch(`${basePath}/controller/AjaxEsqueciSenha.php`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': MB_CSRF_TOKEN },
             body: JSON.stringify({ email })
         });
         
@@ -385,8 +386,8 @@ async function handleAjaxEsqueciSenha(event) {
         if (data.success) {
             showModalMessage('esqueci-modal-msg', false, data.message);
             setTimeout(() => {
-                document.getElementById('redefinir-email').value = email;
                 switchModalView('view-redefinir-senha');
+                document.getElementById('redefinir-email').value = email;
             }, 2000);
         } else {
             showModalMessage('esqueci-modal-msg', true, data.message || 'Erro ao solicitar recuperação.');
@@ -415,7 +416,7 @@ async function handleAjaxRedefinirSenha(event) {
         const basePath = "<?= $basePath ?>";
         const response = await fetch(`${basePath}/controller/AjaxRedefinirSenha.php`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': MB_CSRF_TOKEN },
             body: JSON.stringify({ email, codigo, senha })
         });
         
@@ -424,8 +425,8 @@ async function handleAjaxRedefinirSenha(event) {
         if (data.success) {
             showModalMessage('redefinir-modal-msg', false, data.message);
             setTimeout(() => {
-                document.getElementById('modal-email').value = email;
                 switchModalView('view-login');
+                document.getElementById('modal-email').value = email;
             }, 2000);
         } else {
             showModalMessage('redefinir-modal-msg', true, data.message || 'Erro ao redefinir a senha.');

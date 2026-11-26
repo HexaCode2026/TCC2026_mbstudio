@@ -1,5 +1,4 @@
 <?php
-date_default_timezone_set('Etc/GMT+3');
 require_once "../../config/conexao.php";
 require_once "../../core/Session.php";
 
@@ -44,7 +43,7 @@ if (!empty($appointments)) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
@@ -225,6 +224,7 @@ if (!empty($appointments)) {
                 </div>
                 
                 <form action="../../controller/FinalizarAgendamento.php" method="POST" id="formFinalizacao">
+                    <?= Session::csrfField() ?>
                     <input type="hidden" name="appo_id" id="modalAppoId" value="">
                     
                     <div class="payment-section">

@@ -36,6 +36,7 @@ $usuarioNaoEncontrado = ($dadosCliente === false);
 
     <main class="client-main">
         <div class="main-container">
+            <?php include __DIR__ . '/../components/FlashMessage.php'; ?>
 
             <?php if ($usuarioNaoEncontrado): ?>
                 <div class="client-error-card">
@@ -53,6 +54,7 @@ $usuarioNaoEncontrado = ($dadosCliente === false);
                 </div>
 
                 <form action="../../controller/SalvarPerfilCliente.php" method="POST" class="client-profile-form">
+                    <?= Session::csrfField() ?>
 
                     <!-- DADOS PESSOAIS -->
                     <div class="profile-section">

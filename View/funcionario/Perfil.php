@@ -96,6 +96,8 @@ $funcCssVer   = @filemtime(__DIR__ . '/../../assets/css/funcionario.css') ?: '3.
 
             </section>
 
+            <?php include __DIR__ . '/../components/FlashMessage.php'; ?>
+
 
 
 
@@ -127,6 +129,7 @@ $funcCssVer   = @filemtime(__DIR__ . '/../../assets/css/funcionario.css') ?: '3.
                     class="employee-profile-form"
                     enctype="multipart/form-data"
                 >
+                    <?= Session::csrfField() ?>
 
 
                     <!-- ========================================== -->

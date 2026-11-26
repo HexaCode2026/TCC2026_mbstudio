@@ -122,6 +122,7 @@ $funcionario = $stmtFunc->fetch(PDO::FETCH_ASSOC);
                 </div>
 
                 <form action="../../controller/Agendar.php" method="POST">
+                    <?= Session::csrfField() ?>
                     <input type="hidden" name="ser_id" value="<?= htmlspecialchars($ser_id) ?>">
                     <input type="hidden" name="emp_id" value="<?= htmlspecialchars($emp_id) ?>">
                     <input type="hidden" name="data" value="<?= htmlspecialchars($data) ?>">

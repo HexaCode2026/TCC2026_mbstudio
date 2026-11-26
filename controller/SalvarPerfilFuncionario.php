@@ -85,17 +85,8 @@ $dadosAtuais = $employeeModel->buscarPorUserId($userId);
 if(!$dadosAtuais){
 
 
-    echo "
-
-    <script>
-
-    alert('Cadastro de funcionário não encontrado no sistema.');
-
-    window.location='../View/funcionario/Perfil.php';
-
-    </script>
-
-    ";
+    Session::setFlash('erro', 'Cadastro de funcionário não encontrado no sistema.');
+    header("Location: ../View/funcionario/Perfil.php");
 
     exit;
 
@@ -133,17 +124,8 @@ $confirmarSenha  = $_POST['confirmar_senha'] ?? '';
 if(empty($nome)){
 
 
-    echo "
-
-    <script>
-
-    alert('O campo Nome é obrigatório.');
-
-    window.location='../View/funcionario/Perfil.php';
-
-    </script>
-
-    ";
+    Session::setFlash('erro', 'O campo Nome é obrigatório.');
+    header("Location: ../View/funcionario/Perfil.php");
 
     exit;
 
@@ -155,17 +137,8 @@ if(empty($nome)){
 if(mb_strlen($nome) > 100){
 
 
-    echo "
-
-    <script>
-
-    alert('O campo Nome deve ter no máximo 100 caracteres.');
-
-    window.location='../View/funcionario/Perfil.php';
-
-    </script>
-
-    ";
+    Session::setFlash('erro', 'O campo Nome deve ter no máximo 100 caracteres.');
+    header("Location: ../View/funcionario/Perfil.php");
 
     exit;
 
@@ -182,17 +155,8 @@ if(mb_strlen($nome) > 100){
 if(empty($email)){
 
 
-    echo "
-
-    <script>
-
-    alert('O campo Email é obrigatório.');
-
-    window.location='../View/funcionario/Perfil.php';
-
-    </script>
-
-    ";
+    Session::setFlash('erro', 'O campo Email é obrigatório.');
+    header("Location: ../View/funcionario/Perfil.php");
 
     exit;
 
@@ -204,17 +168,8 @@ if(empty($email)){
 if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
 
 
-    echo "
-
-    <script>
-
-    alert('Informe um email válido.');
-
-    window.location='../View/funcionario/Perfil.php';
-
-    </script>
-
-    ";
+    Session::setFlash('erro', 'Informe um email válido.');
+    header("Location: ../View/funcionario/Perfil.php");
 
     exit;
 
@@ -232,17 +187,8 @@ if($email !== $dadosAtuais['User_email']){
     if($userModel->emailExiste($email)){
 
 
-        echo "
-
-        <script>
-
-        alert('Este email já está sendo utilizado por outro usuário.');
-
-        window.location='../View/funcionario/Perfil.php';
-
-        </script>
-
-        ";
+        Session::setFlash('erro', 'Este email já está sendo utilizado por outro usuário.');
+    header("Location: ../View/funcionario/Perfil.php");
 
         exit;
 
@@ -262,17 +208,8 @@ if($email !== $dadosAtuais['User_email']){
 if(mb_strlen($especialidade) > 100){
 
 
-    echo "
-
-    <script>
-
-    alert('O campo Especialidade deve ter no máximo 100 caracteres.');
-
-    window.location='../View/funcionario/Perfil.php';
-
-    </script>
-
-    ";
+    Session::setFlash('erro', 'O campo Especialidade deve ter no máximo 100 caracteres.');
+    header("Location: ../View/funcionario/Perfil.php");
 
     exit;
 
@@ -296,17 +233,8 @@ if(!empty($novaSenha)){
     if(empty($senhaAtual)){
 
 
-        echo "
-
-        <script>
-
-        alert('Para alterar a senha, você deve informar a senha atual.');
-
-        window.location='../View/funcionario/Perfil.php';
-
-        </script>
-
-        ";
+        Session::setFlash('erro', 'Para alterar a senha, você deve informar a senha atual.');
+    header("Location: ../View/funcionario/Perfil.php");
 
         exit;
 
@@ -318,17 +246,8 @@ if(!empty($novaSenha)){
     if(empty($confirmarSenha)){
 
 
-        echo "
-
-        <script>
-
-        alert('Confirme a nova senha.');
-
-        window.location='../View/funcionario/Perfil.php';
-
-        </script>
-
-        ";
+        Session::setFlash('erro', 'Confirme a nova senha.');
+    header("Location: ../View/funcionario/Perfil.php");
 
         exit;
 
@@ -340,17 +259,8 @@ if(!empty($novaSenha)){
     if(mb_strlen($novaSenha) < 6){
 
 
-        echo "
-
-        <script>
-
-        alert('A nova senha deve ter no mínimo 6 caracteres.');
-
-        window.location='../View/funcionario/Perfil.php';
-
-        </script>
-
-        ";
+        Session::setFlash('erro', 'A nova senha deve ter no mínimo 6 caracteres.');
+    header("Location: ../View/funcionario/Perfil.php");
 
         exit;
 
@@ -362,17 +272,8 @@ if(!empty($novaSenha)){
     if($novaSenha !== $confirmarSenha){
 
 
-        echo "
-
-        <script>
-
-        alert('A nova senha e a confirmação de senha não coincidem.');
-
-        window.location='../View/funcionario/Perfil.php';
-
-        </script>
-
-        ";
+        Session::setFlash('erro', 'A nova senha e a confirmação de senha não coincidem.');
+    header("Location: ../View/funcionario/Perfil.php");
 
         exit;
 
@@ -388,17 +289,8 @@ if(!empty($novaSenha)){
     if(!$dadosSenha || !password_verify($senhaAtual, $dadosSenha['User_pass'])){
 
 
-        echo "
-
-        <script>
-
-        alert('A senha atual informada está incorreta.');
-
-        window.location='../View/funcionario/Perfil.php';
-
-        </script>
-
-        ";
+        Session::setFlash('erro', 'A senha atual informada está incorreta.');
+    header("Location: ../View/funcionario/Perfil.php");
 
         exit;
 
@@ -440,17 +332,8 @@ if (
     if ($_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
 
 
-        echo "
-
-        <script>
-
-        alert('Erro no envio da foto. Tente novamente.');
-
-        window.location='../View/funcionario/Perfil.php';
-
-        </script>
-
-        ";
+        Session::setFlash('erro', 'Erro no envio da foto. Tente novamente.');
+    header("Location: ../View/funcionario/Perfil.php");
 
         exit;
 
@@ -463,17 +346,8 @@ if (
     if ($_FILES['foto']['size'] > 2 * 1024 * 1024) {
 
 
-        echo "
-
-        <script>
-
-        alert('A foto deve ter no máximo 2MB.');
-
-        window.location='../View/funcionario/Perfil.php';
-
-        </script>
-
-        ";
+        Session::setFlash('erro', 'A foto deve ter no máximo 2MB.');
+    header("Location: ../View/funcionario/Perfil.php");
 
         exit;
 
@@ -492,17 +366,8 @@ if (
     if (!in_array($extensao, $extensoesPermitidas, true)) {
 
 
-        echo "
-
-        <script>
-
-        alert('Formato de imagem não permitido. Use JPG, PNG ou WebP.');
-
-        window.location='../View/funcionario/Perfil.php';
-
-        </script>
-
-        ";
+        Session::setFlash('erro', 'Formato de imagem não permitido. Use JPG, PNG ou WebP.');
+    header("Location: ../View/funcionario/Perfil.php");
 
         exit;
 
@@ -521,17 +386,8 @@ if (
     if (!in_array($mimeReal, $mimesPermitidos, true)) {
 
 
-        echo "
-
-        <script>
-
-        alert('O arquivo enviado não é uma imagem válida.');
-
-        window.location='../View/funcionario/Perfil.php';
-
-        </script>
-
-        ";
+        Session::setFlash('erro', 'O arquivo enviado não é uma imagem válida.');
+    header("Location: ../View/funcionario/Perfil.php");
 
         exit;
 
@@ -544,17 +400,8 @@ if (
     if (!getimagesize($_FILES['foto']['tmp_name'])) {
 
 
-        echo "
-
-        <script>
-
-        alert('O arquivo enviado não é uma imagem válida.');
-
-        window.location='../View/funcionario/Perfil.php';
-
-        </script>
-
-        ";
+        Session::setFlash('erro', 'O arquivo enviado não é uma imagem válida.');
+    header("Location: ../View/funcionario/Perfil.php");
 
         exit;
 
@@ -590,17 +437,8 @@ if (
     if (!move_uploaded_file($_FILES['foto']['tmp_name'], $pastaDestino . $nomeArquivo)) {
 
 
-        echo "
-
-        <script>
-
-        alert('Erro ao salvar a foto no servidor. Tente novamente.');
-
-        window.location='../View/funcionario/Perfil.php';
-
-        </script>
-
-        ";
+        Session::setFlash('erro', 'Erro ao salvar a foto no servidor. Tente novamente.');
+    header("Location: ../View/funcionario/Perfil.php");
 
         exit;
 
@@ -668,17 +506,8 @@ if(!$atualizou){
     }
 
 
-    echo "
-
-    <script>
-
-    alert('Erro ao atualizar o perfil. Tente novamente.');
-
-    window.location='../View/funcionario/Perfil.php';
-
-    </script>
-
-    ";
+    Session::setFlash('erro', 'Erro ao atualizar o perfil. Tente novamente.');
+    header("Location: ../View/funcionario/Perfil.php");
 
     exit;
 
@@ -743,17 +572,8 @@ $_SESSION['User_email'] = $email;
 
 
 
-echo "
-
-<script>
-
-alert('Perfil atualizado com sucesso!');
-
-window.location='../View/funcionario/Perfil.php';
-
-</script>
-
-";
+Session::setFlash('sucesso', 'Perfil atualizado com sucesso!');
+    header("Location: ../View/funcionario/Perfil.php");
 
 
 ?>

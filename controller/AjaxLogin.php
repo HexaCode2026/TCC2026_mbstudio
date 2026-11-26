@@ -8,7 +8,22 @@ require_once __DIR__ . "/../helpers/EmailHelper.php";
 Session::iniciar();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    Session::validarCsrf();
+
     try {
+        // Rate limiting básico contra força bruta (máx. 5 tentativas falhas em 5 minutos)
+        $agora = time();
+        $tentativasLogin = $_SESSION['login_rate_limit'] ?? ['count' => 0, 'blocked_until' => 0];
+        if (($tentativasLogin['blocked_until'] ?? 0) > $agora) {
+            $restante = (int)ceil(($tentativasLogin['blocked_until'] - $agora) / 60);
+            http_response_code(429);
+            echo json_encode([
+                'success' => false,
+                'message' => "Muitas tentativas de login incorretas. Aguarde {$restante} minuto(s) e tente novamente."
+            ]);
+            exit;
+        }
+
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data) {
             $data = $_POST;
@@ -38,6 +53,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $dados = $usuario->findByEmail($email);
 
         if ($dados && password_verify($senha, $dados['User_pass'])) {
+            unset($_SESSION['login_rate_limit']);
+
             if ((int)$dados['User_active'] === 0) {
                 echo json_encode([
                     'success' => false,
@@ -124,6 +141,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ]);
             exit;
         }
+
+        $tentativasLogin['count'] = ($tentativasLogin['count'] ?? 0) + 1;
+        if ($tentativasLogin['count'] >= 5) {
+            $tentativasLogin['blocked_until'] = time() + 300;
+            $tentativasLogin['count'] = 0;
+        }
+        $_SESSION['login_rate_limit'] = $tentativasLogin;
 
         echo json_encode(['success' => false, 'message' => 'Email ou senha incorretos.']);
         exit;

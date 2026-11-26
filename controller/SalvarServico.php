@@ -16,27 +16,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $name = trim($_POST['nome'] ?? '');
     $description = trim($_POST['descricao'] ?? '');
-    $price = $_POST['preco'] ?? 0;
+    $price = (float)str_replace(',', '.', (string)($_POST['preco'] ?? 0));
     $duration = (int)($_POST['duracao'] ?? 0);
     $employee_ids = is_array($_POST['funcionarios'] ?? null) ? $_POST['funcionarios'] : [];
+
+    if ($name === '' || $price <= 0 || $duration <= 0) {
+        Session::setFlash('erro', 'Informe um nome válido, preço maior que zero e duração maior que zero.');
+        header("Location: ../View/admin/Servicos.php");
+        exit;
+    }
 
     // Upload Seguro de Imagem (Allowlist + MIME Magic Bytes + Verificação de Imagem)
     $image = null;
     if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] !== UPLOAD_ERR_NO_FILE) {
         if ($_FILES['imagem']['error'] !== UPLOAD_ERR_OK) {
-            echo "<script>
-                alert('Erro durante o envio da imagem. Tente novamente.');
-                window.location='../View/admin/Servicos.php';
-            </script>";
+            Session::setFlash('erro', 'Erro durante o envio da imagem. Tente novamente.');
+            header("Location: ../View/admin/Servicos.php");
             exit;
         }
 
         // 1. Limite de tamanho: máximo 5MB
         if ($_FILES['imagem']['size'] > 5 * 1024 * 1024) {
-            echo "<script>
-                alert('A imagem excede o tamanho máximo permitido de 5MB.');
-                window.location='../View/admin/Servicos.php';
-            </script>";
+            Session::setFlash('erro', 'A imagem excede o tamanho máximo permitido de 5MB.');
+            header("Location: ../View/admin/Servicos.php");
             exit;
         }
 
@@ -44,10 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $extOriginal = strtolower(pathinfo($_FILES['imagem']['name'], PATHINFO_EXTENSION));
         $extPermitidas = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'];
         if (!in_array($extOriginal, $extPermitidas, true)) {
-            echo "<script>
-                alert('Formato de arquivo inválido! Envie apenas JPG, PNG, WebP, GIF ou AVIF.');
-                window.location='../View/admin/Servicos.php';
-            </script>";
+            Session::setFlash('erro', 'Formato de arquivo inválido! Envie apenas JPG, PNG, WebP, GIF ou AVIF.');
+            header("Location: ../View/admin/Servicos.php");
             exit;
         }
 
@@ -63,19 +63,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ];
 
         if (!array_key_exists($mimeReal, $mapaMimes)) {
-            echo "<script>
-                alert('O conteúdo do arquivo não corresponde a uma imagem válida.');
-                window.location='../View/admin/Servicos.php';
-            </script>";
+            Session::setFlash('erro', 'O conteúdo do arquivo não corresponde a uma imagem válida.');
+            header("Location: ../View/admin/Servicos.php");
             exit;
         }
 
         // 4. Verificação estrutural de imagem
         if ($mimeReal !== 'image/avif' && !@getimagesize($_FILES['imagem']['tmp_name'])) {
-            echo "<script>
-                alert('Arquivo de imagem corrompido ou inválido.');
-                window.location='../View/admin/Servicos.php';
-            </script>";
+            Session::setFlash('erro', 'Arquivo de imagem corrompido ou inválido.');
+            header("Location: ../View/admin/Servicos.php");
             exit;
         }
 
@@ -97,16 +93,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $success = $serviceModel->store($name, $description, $price, $duration, $image, $employee_ids);
 
     if ($success) {
-        echo "<script>
-            alert('Serviço (Anúncio) criado com sucesso!');
-            window.location='../View/admin/Servicos.php';
-        </script>";
+        Session::setFlash('sucesso', 'Serviço (Anúncio) criado com sucesso!');
     } else {
-        echo "<script>
-            alert('Erro ao criar o serviço!');
-            window.location='../View/admin/Servicos.php';
-        </script>";
+        Session::setFlash('erro', 'Erro ao criar o serviço!');
     }
+    header("Location: ../View/admin/Servicos.php");
+    exit;
 } else {
     header("Location: ../View/admin/Servicos.php");
 }

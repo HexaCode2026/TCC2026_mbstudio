@@ -7,40 +7,35 @@ require_once __DIR__ . "/../helpers/EmailHelper.php";
 Session::iniciar();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    Session::validarCsrf();
     try {
         $nome = trim($_POST['nome'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $senha = $_POST['senha'] ?? '';
 
         if (empty($nome) || empty($email) || empty($senha)) {
-            echo "
-            <script>
-            alert('Todos os campos são obrigatórios!');
-            window.location='../Index.php';
-            </script>
-            ";
+            Session::setFlash('erro', 'Todos os campos são obrigatórios!');
+            header("Location: ../Index.php");
+            exit;
+        }
+
+        if (mb_strlen($senha) < 6) {
+            Session::setFlash('erro', 'A senha deve conter pelo menos 6 caracteres.');
+            header("Location: ../Index.php");
             exit;
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo "
-            <script>
-            alert('Informe um endereço de e-mail válido!');
-            window.location='../Index.php';
-            </script>
-            ";
+            Session::setFlash('erro', 'Informe um endereço de e-mail válido!');
+            header("Location: ../Index.php");
             exit;
         }
 
         $usuario = new User($pdo);
 
         if ($usuario->emailExiste($email)) {
-            echo "
-            <script>
-            alert('Este email já foi cadastrado!');
-            window.location='../Index.php';
-            </script>
-            ";
+            Session::setFlash('erro', 'Este email já foi cadastrado!');
+            header("Location: ../Index.php");
             exit;
         }
 
@@ -54,14 +49,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['pending_registration']['nome'] = $nome;
             $_SESSION['pending_registration']['senha_hash'] = User::hashSenha($senha);
             $_SESSION['verificar_tipo'] = 'Cadastro';
+            Session::setFlash('sucesso', 'Um código já foi enviado recentemente para seu e-mail. Confirme-o para concluir seu cadastro.');
             Session::liberarLock();
 
-            echo "
-            <script>
-            alert('Um código já foi enviado recentemente para seu e-mail. Confirme-o para concluir seu cadastro.');
-            window.location='../View/VerificarCodigo.php';
-            </script>
-            ";
+            header("Location: ../View/VerificarCodigo.php");
             exit;
         }
 
@@ -89,22 +80,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!$enviado) {
             Session::iniciar();
             unset($_SESSION['pending_registration'], $_SESSION['verificar_tipo']);
+            Session::setFlash('erro', 'Não foi possível enviar o e-mail de confirmação no momento. Tente novamente em instantes.');
             Session::liberarLock();
-            echo "
-            <script>
-            alert('Não foi possível enviar o e-mail de confirmação no momento. Tente novamente em instantes.');
-            window.location='../Index.php';
-            </script>
-            ";
+            header("Location: ../Index.php");
             exit;
         }
 
-        echo "
-        <script>
-        alert('Enviamos um código para seu e-mail. Confirme-o para concluir seu cadastro.');
-        window.location='../View/VerificarCodigo.php';
-        </script>
-        ";
+        Session::iniciar();
+        Session::setFlash('sucesso', 'Enviamos um código para seu e-mail. Confirme-o para concluir seu cadastro.');
+        Session::liberarLock();
+        header("Location: ../View/VerificarCodigo.php");
         exit;
     } catch (\Throwable $t) {
         Session::liberarLock();

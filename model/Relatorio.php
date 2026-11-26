@@ -44,5 +44,22 @@ class Relatorio {
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getFaturamentoTotal($dataInicial, $dataFinal, $empId = null): float {
+        $sql = "SELECT COALESCE(SUM(Valor_Servico), 0) AS Faturamento_Total
+                FROM vw_relatorio_admin
+                WHERE Data_Agendamento BETWEEN :dataInicial AND :dataFinal
+                  AND Status = 'Concluido'";
+        $params = [':dataInicial' => $dataInicial, ':dataFinal' => $dataFinal];
+
+        if ($empId) {
+            $sql .= " AND ID_Profissional = :empId";
+            $params[':empId'] = $empId;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return (float)$stmt->fetchColumn();
+    }
 }
 ?>

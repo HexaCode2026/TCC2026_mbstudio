@@ -83,7 +83,8 @@ class User
     {
         $secret = defined('APP_SECRET') ? (string)APP_SECRET : (string)(getenv('APP_SECRET') ?: '');
         if ($secret === '' || $secret === 'mbstudio_tcc_2026_hmac_secret_key') {
-            $secret = hash('sha256', __DIR__ . '|mbstudio_appsec_hmac_key_v2');
+            error_log('[Security] APP_SECRET ausente ou padrão em User::obterSegredoHmac().');
+            $secret = hash('sha256', __DIR__ . '|' . php_uname('n') . '|mbstudio_appsec_hmac_key_v2');
         }
         return $secret;
     }

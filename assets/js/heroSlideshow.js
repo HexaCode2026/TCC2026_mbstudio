@@ -40,7 +40,7 @@
 
         var dots = container.querySelectorAll('.slideshow-dot');
         for (var d = 0; d < dots.length; d++) {
-            if (d === nextIdx) {11
+            if (d === nextIdx) {
                 dots[d].classList.add('active');
             } else {
                 dots[d].classList.remove('active');

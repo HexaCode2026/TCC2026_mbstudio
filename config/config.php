@@ -50,10 +50,11 @@ if (!function_exists('log_message')) {
     }
 }
 
-// Chave secreta de aplicação (256-bit) para HMAC-SHA256 de tokens efêmeros (sem fallback previsível)
+// Chave secreta de aplicação (256-bit) para HMAC-SHA256 de tokens efêmeros
 $rawAppSecret = (string)(getenv("APP_SECRET") ?: ($_ENV["APP_SECRET"] ?? ""));
 if ($rawAppSecret === "" || $rawAppSecret === "mbstudio_tcc_2026_hmac_secret_key") {
-    $rawAppSecret = hash('sha256', __DIR__ . '|mbstudio_appsec_hmac_key_v2');
+    log_message('warning', '[Config] APP_SECRET não configurada no .env; configure uma chave aleatória forte em produção.');
+    $rawAppSecret = hash('sha256', __DIR__ . '|' . php_uname('n') . '|mbstudio_appsec_hmac_key_v2');
 }
 if (!defined("APP_SECRET")) define("APP_SECRET", $rawAppSecret);
 

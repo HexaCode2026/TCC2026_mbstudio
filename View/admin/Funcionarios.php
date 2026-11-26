@@ -44,7 +44,7 @@ function getIniciais($nome) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -299,6 +299,7 @@ function getIniciais($nome) {
 
                             <!-- Formulário para remover da equipe (alterar permissão para 'C') -->
                             <form action="../../controller/AlterarPermissao.php" method="POST" onsubmit="return confirm('Tem certeza que deseja rebaixar este funcionário para Cliente? Ele perderá acesso ao painel de equipe.');" style="flex: 1; margin: 0;">
+                                <?= Session::csrfField() ?>
                                 <input type="hidden" name="User_id" value="<?= $f['User_id'] ?>">
                                 <input type="hidden" name="User_perm" value="C">
                                 <button type="submit" class="btn-card-remove" style="width: 100%;" title="Rebaixar permissão para Cliente">

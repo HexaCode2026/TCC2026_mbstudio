@@ -57,7 +57,8 @@ class Service {
     public function index() {
         $sql = "SELECT 
                     s.Ser_id, s.Ser_name, s.Ser_description, s.Ser_price, s.Ser_duration, s.Ser_image, s.Ser_active,
-                    GROUP_CONCAT(u.User_name SEPARATOR ', ') AS Employees
+                    GROUP_CONCAT(u.User_name SEPARATOR ', ') AS Employees,
+                    GROUP_CONCAT(u.User_id SEPARATOR ',') AS EmployeeUserIds
                 FROM services s
                 LEFT JOIN employee_services es ON s.Ser_id = es.Ser_id
                 LEFT JOIN employees e ON es.Emp_id = e.Emp_id
@@ -146,12 +147,12 @@ class Service {
     // =====================================
     public function destroy($id) {
         try {
-            $checkSql = "SELECT COUNT(*) FROM appointments WHERE Ser_id = ? AND Appo_status = 'Pendente'";
+            $checkSql = "SELECT COUNT(*) FROM appointments WHERE Ser_id = ? AND Appo_status IN ('Pendente', 'Confirmado', 'Em Atendimento', 'Concluido')";
             $checkStmt = $this->pdo->prepare($checkSql);
             $checkStmt->execute([$id]);
             
             if ($checkStmt->fetchColumn() > 0) {
-                return false; // Existem agendamentos pendentes
+                return false; // Existem agendamentos ativos ou histórico concluído
             }
 
             $sql = "DELETE FROM services WHERE Ser_id = ?";

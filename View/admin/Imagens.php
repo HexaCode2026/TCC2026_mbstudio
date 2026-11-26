@@ -36,7 +36,7 @@ $adminCssVer  = @filemtime(__DIR__ . '/../../assets/css/admin.css') ?: '2.3';
 $imgCssVer    = @filemtime(__DIR__ . '/../../assets/css/admin/imagens.css') ?: '2.3';
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
@@ -132,28 +132,29 @@ $imgCssVer    = @filemtime(__DIR__ . '/../../assets/css/admin/imagens.css') ?: '
             </p>
 
             <form action="../../controller/ImagemController.php" method="POST" enctype="multipart/form-data">
+                <?= Session::csrfField() ?>
                 <input type="hidden" name="acao" value="adicionar">
                 <input type="hidden" name="ativo" value="1">
 
                 <div class="upload-form-grid">
                     <div class="form-field-box">
-                        <label>Arquivo da Foto *</label>
-                        <input type="file" name="imagem" accept="image/*" required class="input-admin-clean">
+                        <label for="img-novo-arquivo">Arquivo da Foto *</label>
+                        <input type="file" id="img-novo-arquivo" name="imagem" accept="image/*" required class="input-admin-clean">
                     </div>
 
                     <div class="form-field-box">
-                        <label>Título na Legenda (Ex: Corte Iluminado)</label>
-                        <input type="text" name="titulo" placeholder="Ex: Morena Iluminada" required class="input-admin-clean">
+                        <label for="img-novo-titulo">Título na Legenda (Ex: Corte Iluminado)</label>
+                        <input type="text" id="img-novo-titulo" name="titulo" placeholder="Ex: Morena Iluminada" required class="input-admin-clean">
                     </div>
 
                     <div class="form-field-box">
-                        <label>Subtítulo / Preço</label>
-                        <input type="text" name="subtitulo" placeholder="Ex: R$ 150,00" class="input-admin-clean">
+                        <label for="img-novo-subtitulo">Subtítulo / Preço</label>
+                        <input type="text" id="img-novo-subtitulo" name="subtitulo" placeholder="Ex: R$ 150,00" class="input-admin-clean">
                     </div>
 
                     <div class="form-field-box" style="max-width: 110px;">
-                        <label>Ordem</label>
-                        <input type="number" name="ordem" value="<?= $totalSlides + 1 ?>" min="1" class="input-admin-clean">
+                        <label for="img-novo-ordem">Ordem</label>
+                        <input type="number" id="img-novo-ordem" name="ordem" value="<?= $totalSlides + 1 ?>" min="1" class="input-admin-clean">
                     </div>
                 </div>
 
@@ -193,28 +194,29 @@ $imgCssVer    = @filemtime(__DIR__ . '/../../assets/css/admin/imagens.css') ?: '
 
                             <div class="slide-manage-body">
                                 <form action="../../controller/ImagemController.php" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 10px;">
+                                    <?= Session::csrfField() ?>
                                     <input type="hidden" name="acao" value="editar">
                                     <input type="hidden" name="Img_id" value="<?= (int)$slide['Img_id'] ?>">
 
                                     <div class="form-field-box">
-                                        <label>Título da Imagem</label>
-                                        <input type="text" name="titulo" value="<?= htmlspecialchars($slide['Img_title']) ?>" required class="input-admin-clean">
+                                        <label for="slide-titulo-<?= (int)$slide['Img_id'] ?>">Título da Imagem</label>
+                                        <input type="text" id="slide-titulo-<?= (int)$slide['Img_id'] ?>" name="titulo" value="<?= htmlspecialchars($slide['Img_title']) ?>" required class="input-admin-clean">
                                     </div>
 
                                     <div class="slide-edit-row">
                                         <div class="form-field-box">
-                                            <label>Subtítulo / Preço</label>
-                                            <input type="text" name="subtitulo" value="<?= htmlspecialchars($slide['Img_subtitle'] ?? '') ?>" class="input-admin-clean">
+                                            <label for="slide-sub-<?= (int)$slide['Img_id'] ?>">Subtítulo / Preço</label>
+                                            <input type="text" id="slide-sub-<?= (int)$slide['Img_id'] ?>" name="subtitulo" value="<?= htmlspecialchars($slide['Img_subtitle'] ?? '') ?>" class="input-admin-clean">
                                         </div>
                                         <div class="form-field-box">
-                                            <label>Ordem</label>
-                                            <input type="number" name="ordem" value="<?= (int)$slide['Img_order'] ?>" min="1" class="input-admin-clean">
+                                            <label for="slide-ordem-<?= (int)$slide['Img_id'] ?>">Ordem</label>
+                                            <input type="number" id="slide-ordem-<?= (int)$slide['Img_id'] ?>" name="ordem" value="<?= (int)$slide['Img_order'] ?>" min="1" class="input-admin-clean">
                                         </div>
                                     </div>
 
                                     <div class="form-field-box">
-                                        <label>Substituir Foto (Opcional)</label>
-                                        <input type="file" name="imagem" accept="image/*" class="input-admin-clean" style="font-size: 12.5px; padding: 7px 10px;">
+                                        <label for="slide-img-<?= (int)$slide['Img_id'] ?>">Substituir Foto (Opcional)</label>
+                                        <input type="file" id="slide-img-<?= (int)$slide['Img_id'] ?>" name="imagem" accept="image/*" class="input-admin-clean" style="font-size: 12.5px; padding: 7px 10px;">
                                     </div>
 
                                     <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer;">
@@ -229,6 +231,7 @@ $imgCssVer    = @filemtime(__DIR__ . '/../../assets/css/admin/imagens.css') ?: '
 
                                 <div class="slide-actions-bar">
                                     <form action="../../controller/ImagemController.php" method="POST" style="margin: 0;">
+                                        <?= Session::csrfField() ?>
                                         <input type="hidden" name="acao" value="status">
                                         <input type="hidden" name="Img_id" value="<?= (int)$slide['Img_id'] ?>">
                                         <input type="hidden" name="novo_status" value="<?= $isAtivo ? 0 : 1 ?>">
@@ -238,6 +241,7 @@ $imgCssVer    = @filemtime(__DIR__ . '/../../assets/css/admin/imagens.css') ?: '
                                     </form>
 
                                     <form action="../../controller/ImagemController.php" method="POST" style="margin: 0;" onsubmit="return confirm('Deseja realmente remover esta imagem do carrossel?');">
+                                        <?= Session::csrfField() ?>
                                         <input type="hidden" name="acao" value="excluir">
                                         <input type="hidden" name="Img_id" value="<?= (int)$slide['Img_id'] ?>">
                                         <button type="submit" class="btn-danger-sm">Excluir</button>
@@ -286,6 +290,7 @@ $imgCssVer    = @filemtime(__DIR__ . '/../../assets/css/admin/imagens.css') ?: '
                                 </div>
 
                                 <form action="../../controller/ImagemController.php" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+                                    <?= Session::csrfField() ?>
                                     <input type="hidden" name="acao" value="atualizar_servico">
                                     <input type="hidden" name="Ser_id" value="<?= (int)$srv['Ser_id'] ?>">
                                     <input type="file" name="imagem_servico" accept="image/*" required class="input-admin-clean" style="font-size: 12px; padding: 7px 10px;">

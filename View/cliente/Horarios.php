@@ -10,8 +10,10 @@ if (!isset($_SESSION['User_perm']) || $_SESSION['User_perm'] != 'C') {
     exit;
 }
 
-$ser_id = $_GET['Ser_id'] ?? null;
-$data = $_GET['data'] ?? null;
+$ser_id = filter_input(INPUT_GET, 'Ser_id', FILTER_VALIDATE_INT);
+$dataRaw = trim((string)($_GET['data'] ?? ''));
+$dtObj = DateTime::createFromFormat('Y-m-d', $dataRaw);
+$data = ($dtObj && $dtObj->format('Y-m-d') === $dataRaw) ? $dataRaw : null;
 
 if (!$ser_id || !$data) {
     header("Location: Servicos.php");
@@ -349,9 +351,9 @@ $diaSemanaNome = $diasSemana[date('w', $dataTimestamp)];
                                         <?php foreach ($todos_horarios as $h): ?>
                                             <!-- Link que envia os dados para Confirmar.php -->
                                             <a 
-                                                href="Confirmar.php?Ser_id=<?= $ser_id ?>&data=<?= $data ?>&Emp_id=<?= $func['Emp_id'] ?>&hora=<?= $h ?>" 
+                                                href="Confirmar.php?Ser_id=<?= (int)$ser_id ?>&data=<?= urlencode($data) ?>&Emp_id=<?= (int)$func['Emp_id'] ?>&hora=<?= urlencode($h) ?>" 
                                                 class="time-slot-btn"
-                                                title="Agendar com <?= htmlspecialchars($func['User_name']) ?> às <?= $h ?>"
+                                                title="Agendar com <?= htmlspecialchars($func['User_name'], ENT_QUOTES, 'UTF-8') ?> às <?= htmlspecialchars($h, ENT_QUOTES, 'UTF-8') ?>"
                                             >
                                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                                     <circle cx="12" cy="12" r="10"></circle>

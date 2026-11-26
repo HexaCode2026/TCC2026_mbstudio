@@ -18,10 +18,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $avaId = $_POST['Ava_id'] ?? null;
 
     if (!$avaId) {
-        echo "<script>
-            alert('Por favor, informe o ID (Ava_id) da disponibilidade a ser excluída!');
-            window.location='../View/funcionario/Disponibilidade.php';
-        </script>";
+        Session::setFlash('erro', 'Por favor, informe o ID (Ava_id) da disponibilidade a ser excluída!');
+        header("Location: ../View/funcionario/Disponibilidade.php");
         exit;
     }
 
@@ -31,10 +29,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $empId = $stmtEmp->fetchColumn();
 
     if (!$empId) {
-        echo "<script>
-            alert('Funcionário não encontrado.');
-            window.location='../View/funcionario/Disponibilidade.php';
-        </script>";
+        Session::setFlash('erro', 'Funcionário não encontrado.');
+        header("Location: ../View/funcionario/Disponibilidade.php");
         exit;
     }
 
@@ -42,16 +38,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sucesso = $availabilityModel->excluirPorId($avaId, $empId);
 
     if ($sucesso) {
-        echo "<script>
-            alert('Disponibilidade excluída com sucesso!');
-            window.location='../View/funcionario/Disponibilidade.php';
-        </script>";
+        Session::setFlash('sucesso', 'Disponibilidade excluída com sucesso!');
     } else {
-        echo "<script>
-            alert('Erro ao excluir a disponibilidade!');
-            window.location='../View/funcionario/Disponibilidade.php';
-        </script>";
+        Session::setFlash('erro', 'Erro ao excluir a disponibilidade!');
     }
+    header("Location: ../View/funcionario/Disponibilidade.php");
+    exit;
 } else {
     header("Location: ../View/funcionario/Disponibilidade.php");
 }

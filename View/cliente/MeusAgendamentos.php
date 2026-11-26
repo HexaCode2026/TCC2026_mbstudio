@@ -280,6 +280,7 @@ $appoCssVer   = @filemtime(__DIR__ . '/../../assets/css/cliente/meusagendamentos
                                         <div class="action-cell-wrapper">
                                             <?php if ($rawStatus == 'Pendente' || $rawStatus == 'Confirmado'): ?>
                                                 <form action="../../controller/CancelarAgendamento.php" method="POST" style="margin: 0; display: inline-block;" onsubmit="return confirm('Tem certeza que deseja cancelar este agendamento?');">
+                                                    <?= Session::csrfField() ?>
                                                     <input type="hidden" name="appo_id" value="<?= $a['Appo_id'] ?>">
                                                     <input type="hidden" name="cancel_reason" value="Cancelado pelo Cliente via painel">
                                                     <button type="submit" class="btn-cancel-appo" title="Cancelar este agendamento">

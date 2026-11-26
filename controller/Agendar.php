@@ -48,15 +48,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Libera o lock de sessão antes de iniciar a transação concorrente no banco
     Session::liberarLock();
 
-    // 1. Consulta leitura da duração do serviço FORA da transação para reduzir o tempo de retenção de locks
-    $stmtSer = $pdo->prepare("SELECT Ser_duration FROM services WHERE Ser_id = ? AND Ser_active = 1 LIMIT 1");
+    // 1. Consulta leitura da duração e preço do serviço FORA da transação para reduzir o tempo de retenção de locks
+    $stmtSer = $pdo->prepare("SELECT Ser_duration, Ser_price FROM services WHERE Ser_id = ? AND Ser_active = 1 LIMIT 1");
     $stmtSer->execute([$ser_id]);
-    $duracaoRaw = $stmtSer->fetchColumn();
-    if ($duracaoRaw === false) {
+    $serRow = $stmtSer->fetch(PDO::FETCH_ASSOC);
+    if (!$serRow) {
         header("Location: ../View/cliente/Servicos.php?erro=servico_indisponivel");
         exit;
     }
-    $duracao = (int)$duracaoRaw;
+    $duracao = (int)$serRow['Ser_duration'];
+    $precoServico = (float)$serRow['Ser_price'];
+
+    // Verifica de forma compatível se a coluna Appo_price existe (snapshot financeiro)
+    $temColunaAppoPrice = false;
+    try {
+        $stmtCol = $pdo->query("SHOW COLUMNS FROM appointments LIKE 'Appo_price'");
+        $temColunaAppoPrice = ($stmtCol && $stmtCol->fetch() !== false);
+    } catch (\Throwable $e) {
+        $temColunaAppoPrice = false;
+    }
 
     if ($duracao > 0) {
         $fim = date('H:i:s', strtotime("+$duracao minutes", strtotime($horaNormalizada)));
@@ -132,11 +142,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-            // Inserir agendamento com status inicial "Pendente"
-            $sql = "INSERT INTO appointments (Cli_id, Emp_id, Ser_id, Appo_date, Appo_start, Appo_end, Appo_status, Appo_observation)
-                    VALUES (?, ?, ?, ?, ?, ?, 'Pendente', ?)";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$cli_id, $emp_id, $ser_id, $data, $hora, $fim, $observacao]);
+            // Inserir agendamento com status inicial "Pendente" (gravando snapshot de preço se coluna existir)
+            if ($temColunaAppoPrice) {
+                $sql = "INSERT INTO appointments (Cli_id, Emp_id, Ser_id, Appo_price, Appo_date, Appo_start, Appo_end, Appo_status, Appo_observation)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, 'Pendente', ?)";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$cli_id, $emp_id, $ser_id, $precoServico, $data, $hora, $fim, $observacao]);
+            } else {
+                $sql = "INSERT INTO appointments (Cli_id, Emp_id, Ser_id, Appo_date, Appo_start, Appo_end, Appo_status, Appo_observation)
+                        VALUES (?, ?, ?, ?, ?, ?, 'Pendente', ?)";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$cli_id, $emp_id, $ser_id, $data, $hora, $fim, $observacao]);
+            }
 
             $pdo->commit();
             $novoAppoId = (int)$pdo->lastInsertId();

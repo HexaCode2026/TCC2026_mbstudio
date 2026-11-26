@@ -22,30 +22,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $end = $_POST['Ava_end'] ?? null;
 
     if (!$avaId) {
-        echo "<script>
-            alert('Por favor, informe o ID (Ava_id) da disponibilidade a ser editada!');
-            window.location='../View/funcionario/Disponibilidade.php';
-        </script>";
+        Session::setFlash('erro', 'Por favor, informe o ID (Ava_id) da disponibilidade a ser editada!');
+        header("Location: ../View/funcionario/Disponibilidade.php");
         exit;
     }
 
     if ($date) {
         $hoje = date('Y-m-d');
         if ($date < $hoje) {
-            echo "<script>
-                alert('A data não pode ser anterior a hoje!');
-                window.location='../View/funcionario/Disponibilidade.php';
-            </script>";
+            Session::setFlash('erro', 'A data não pode ser anterior a hoje!');
+            header("Location: ../View/funcionario/Disponibilidade.php");
             exit;
         }
     }
 
     if ($start && $end) {
         if ($start < '08:00' || $end > '19:00' || $start >= $end) {
-            echo "<script>
-                alert('Os horários devem estar entre 08:00 e 19:00 e o início deve ser menor que o término.');
-                window.location='../View/funcionario/Disponibilidade.php';
-            </script>";
+            Session::setFlash('erro', 'Os horários devem estar entre 08:00 e 19:00 e o início deve ser menor que o término.');
+            header("Location: ../View/funcionario/Disponibilidade.php");
             exit;
         }
     }
@@ -56,10 +50,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $empId = $stmtEmp->fetchColumn();
 
     if (!$empId) {
-        echo "<script>
-            alert('Funcionário não encontrado!');
-            window.location='../View/funcionario/Disponibilidade.php';
-        </script>";
+        Session::setFlash('erro', 'Funcionário não encontrado!');
+        header("Location: ../View/funcionario/Disponibilidade.php");
         exit;
     }
 
@@ -76,16 +68,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if ($sucesso) {
-        echo "<script>
-            alert('Disponibilidade atualizada com sucesso!');
-            window.location='../View/funcionario/Disponibilidade.php';
-        </script>";
+        Session::setFlash('sucesso', 'Disponibilidade atualizada com sucesso!');
     } else {
-        echo "<script>
-            alert('Aviso: Algumas atualizações falharam.');
-            window.location='../View/funcionario/Disponibilidade.php';
-        </script>";
+        Session::setFlash('erro', 'Aviso: Algumas atualizações falharam.');
     }
+    header("Location: ../View/funcionario/Disponibilidade.php");
+    exit;
 } else {
     header("Location: ../View/funcionario/Disponibilidade.php");
 }

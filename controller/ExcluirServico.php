@@ -27,16 +27,12 @@ if ($id && $id > 0) {
     $success = $serviceModel->destroy($id);
 
     if ($success) {
-        echo "<script>
-            alert('Serviço excluído com sucesso!');
-            window.location='../View/admin/Servicos.php';
-        </script>";
+        Session::setFlash('sucesso', 'Serviço excluído com sucesso!');
     } else {
-        echo "<script>
-            alert('Erro ao excluir serviço! Verifique se existem agendamentos pendentes.');
-            window.location='../View/admin/Servicos.php';
-        </script>";
+        Session::setFlash('erro', 'Não foi possível excluir o serviço! Verifique se existem agendamentos ativos ou concluídos vinculados a ele.');
     }
+    header("Location: ../View/admin/Servicos.php");
+    exit;
 } else {
     header("Location: ../View/admin/Servicos.php");
 }

@@ -24,6 +24,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
+    // Valida formato estrito YYYY-MM-DD e impede cadastro de bloqueios em datas passadas
+    $dtObj = DateTime::createFromFormat('Y-m-d', (string)$date);
+    if (!$dtObj || $dtObj->format('Y-m-d') !== (string)$date || $date < date('Y-m-d')) {
+        header("Location: ../View/funcionario/Bloqueios.php?erro=dados_invalidos");
+        exit;
+    }
+
     // Validar se hora de fim é maior que hora de início
     if (strtotime($start) >= strtotime($end)) {
         header("Location: ../View/funcionario/Bloqueios.php?erro=horario_invalido");

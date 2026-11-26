@@ -8,6 +8,8 @@ require_once __DIR__ . "/../helpers/EmailHelper.php";
 Session::iniciar();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    Session::validarCsrf();
+
     try {
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data) {
@@ -20,6 +22,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (empty($nome) || empty($email) || empty($senha)) {
             echo json_encode(['success' => false, 'message' => 'Todos os campos são obrigatórios.']);
+            exit;
+        }
+
+        if (mb_strlen($senha) < 6) {
+            echo json_encode(['success' => false, 'message' => 'A senha deve conter pelo menos 6 caracteres.']);
             exit;
         }
 

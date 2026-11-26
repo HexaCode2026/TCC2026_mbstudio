@@ -1,5 +1,4 @@
 <?php
-date_default_timezone_set('Etc/GMT+3');
 require_once "../../config/conexao.php";
 require_once "../../core/Session.php";
 
@@ -23,18 +22,6 @@ if (!$empId && $_SESSION['User_perm'] == 'F') {
     $insertEmp = $pdo->prepare("INSERT INTO employees (User_id) VALUES (?)");
     $insertEmp->execute([$userId]);
     $empId = $pdo->lastInsertId();
-}
-
-// POST: Salvar Observações do Cliente
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_client_obs') {
-    $cliId = $_POST['cli_id'] ?? 0;
-    $observation = $_POST['cli_observation'] ?? '';
-    if ($cliId) {
-        $stmtObs = $pdo->prepare("UPDATE clients SET Cli_observation = ? WHERE Cli_id = ?");
-        $stmtObs->execute([$observation, $cliId]);
-    }
-    header("Location: Agenda.php");
-    exit;
 }
 
 // Busca os agendamentos do funcionário vinculado ao usuário logado
@@ -74,7 +61,7 @@ if (!empty($appointments)) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
@@ -131,6 +118,8 @@ if (!empty($appointments)) {
                 Acompanhe em tempo real os agendamentos realizados, aceite solicitações e gerencie o fluxo de atendimento dos seus clientes.
             </p>
         </div>
+
+        <?php include __DIR__ . '/../components/FlashMessage.php'; ?>
 
         <?php if (!empty($appointments)): ?>
             <!-- Barra de Filtros -->
@@ -237,6 +226,7 @@ if (!empty($appointments)) {
                                         <!-- SE PENDENTE -->
                                         <?php if ($app['Appo_status'] == 'Pendente'): ?>
                                             <form action="../../controller/ConfirmarAgendamento.php" method="POST" style="margin: 0;">
+                                                <?= Session::csrfField() ?>
                                                 <input type="hidden" name="id" value="<?= $app['Appo_id'] ?>">
                                                 <button type="submit" class="btn-acao btn-aceitar">
                                                     ✓ Aceitar Agendamento
@@ -247,12 +237,14 @@ if (!empty($appointments)) {
                                         <!-- SE CONFIRMADO -->
                                         <?php if ($app['Appo_status'] == 'Confirmado'): ?>
                                             <form action="../../controller/IniciarAtendimento.php" method="POST" style="margin: 0;">
+                                                <?= Session::csrfField() ?>
                                                 <input type="hidden" name="appo_id" value="<?= $app['Appo_id'] ?>">
                                                 <button type="submit" class="btn-acao btn-iniciar">
                                                     ▶ Iniciar Atendimento
                                                 </button>
                                             </form>
                                             <form action="../../controller/NaoCompareceu.php" method="POST" style="margin: 0;" onsubmit="return confirm('Deseja realmente marcar que o cliente não compareceu?');">
+                                                <?= Session::csrfField() ?>
                                                 <input type="hidden" name="appo_id" value="<?= $app['Appo_id'] ?>">
                                                 <button type="submit" class="btn-acao btn-falta">
                                                     ∅ Não Compareceu
@@ -276,6 +268,7 @@ if (!empty($appointments)) {
                                         <!-- CANCELAMENTO (SE NÃO ESTIVER CANCELADO, CONCLUIDO OU NAO COMPARECEU) -->
                                         <?php if (strpos($app['Appo_status'], 'Cancelado') === false && $app['Appo_status'] != 'Concluido' && $app['Appo_status'] != 'Nao Compareceu'): ?>
                                             <form action="../../controller/CancelarAgendamento.php" method="POST" class="form-cancelar-inline" onsubmit="return confirm('Deseja realmente cancelar este agendamento?');">
+                                                <?= Session::csrfField() ?>
                                                 <input type="hidden" name="appo_id" value="<?= $app['Appo_id'] ?>">
                                                 <input type="text" name="cancel_reason" class="input-cancelar" placeholder="Motivo do cancelamento..." required oninput="this.nextElementSibling.disabled = this.value.trim() === '';">
                                                 <button type="submit" class="btn-acao btn-cancelar" disabled>
@@ -321,6 +314,7 @@ if (!empty($appointments)) {
                 </div>
                 
                 <form action="../../controller/FinalizarAgendamento.php" method="POST" id="formFinalizacao">
+                    <?= Session::csrfField() ?>
                     <input type="hidden" name="appo_id" id="modalAppoId" value="">
                     
                     <div style="margin-top: 15px; margin-bottom: 15px;">
@@ -366,8 +360,8 @@ if (!empty($appointments)) {
                 <div class="info-resumo">
                     <p><strong>Cliente:</strong> <span id="modalObsClienteNome"></span></p>
                 </div>
-                <form action="Agenda.php" method="POST" id="formObsCliente">
-                    <input type="hidden" name="action" value="update_client_obs">
+                <form action="../../controller/SalvarObservacaoCliente.php" method="POST" id="formObsCliente">
+                    <?= Session::csrfField() ?>
                     <input type="hidden" name="cli_id" id="modalObsCliId" value="">
                     
                     <div style="margin-top: 12px;">

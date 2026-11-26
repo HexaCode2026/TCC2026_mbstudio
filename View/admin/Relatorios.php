@@ -24,7 +24,7 @@ $faturamentoTotal = $relatorioDados['faturamentoTotal'];
 $funcionarios = $relatorioDados['funcionarios'];
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">

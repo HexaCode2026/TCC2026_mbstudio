@@ -144,8 +144,10 @@ $descricao = $tipo == 'Cadastro'
 
         <h1 class="verify-title"><?= htmlspecialchars($titulo) ?></h1>
         <p class="verify-desc"><?= htmlspecialchars($descricao) ?></p>
+        <?php include __DIR__ . '/components/FlashMessage.php'; ?>
 
         <form action="../controller/ValidarCodigo.php" method="POST">
+            <?= Session::csrfField() ?>
             <div class="verify-input-group">
                 <input 
                     type="text" 

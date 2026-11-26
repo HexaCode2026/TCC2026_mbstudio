@@ -1,11 +1,10 @@
 <?php
+require_once __DIR__ . '/../../core/Session.php';
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 $isLoggedIn = isset($_SESSION['User_id']) ? 'true' : 'false';
-$docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/');
-$projectRoot = str_replace('\\', '/', realpath(__DIR__ . '/../../'));
-$basePath = str_ireplace($docRoot, '', $projectRoot);
+$basePath = Session::getBasePath();
 $loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css') ?: '2.2';
 ?>
 

@@ -302,6 +302,8 @@
 .slideshow-dot {
     width: 10px;
     height: 10px;
+    min-width: 0;
+    min-height: 0;
     border-radius: 50%;
     border: 2px solid rgba(255, 255, 255, 0.6);
     background: transparent;
@@ -829,7 +831,17 @@
 
     #hero-slideshow.cuts-main-placeholder {
         max-width: 320px;
+        height: 380px;
         min-height: 380px;
+    }
+
+    .slide-info-overlay {
+        bottom: 40px;
+        padding: 0 56px;
+    }
+
+    .slide-label-name {
+        font-size: 16px;
     }
 
     .cuts-grid,

@@ -3,14 +3,24 @@
 class Session {
 
     public static function getBasePath(): string {
-        $docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? ''), '/');
-        $projectRoot = str_replace('\\', '/', realpath(__DIR__ . '/../'));
-        return $docRoot ? str_ireplace($docRoot, '', $projectRoot) : '';
+        $rawDocRoot = $_SERVER['DOCUMENT_ROOT'] ?? '';
+        $realDocRoot = $rawDocRoot !== '' ? (realpath($rawDocRoot) ?: $rawDocRoot) : '';
+        $docRoot = rtrim(str_replace('\\', '/', $realDocRoot), '/');
+        $projectRoot = rtrim(str_replace('\\', '/', realpath(__DIR__ . '/../') ?: (__DIR__ . '/..')), '/');
+        if ($docRoot !== '' && stripos($projectRoot, $docRoot) === 0) {
+            return substr($projectRoot, strlen($docRoot));
+        }
+        return '';
     }
 
     public static function iniciar() {
         if (session_status() === PHP_SESSION_NONE) {
-            $isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+            $isHttps = (
+                (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ||
+                (($_SERVER['SERVER_PORT'] ?? null) == 443) ||
+                (strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https') ||
+                (strtolower((string)($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '')) === 'on')
+            );
 
             @ini_set('session.cookie_httponly', '1');
             @ini_set('session.use_only_cookies', '1');

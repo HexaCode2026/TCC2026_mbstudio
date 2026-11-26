@@ -2,7 +2,8 @@
 # MB STUDIO — CONFIGURAÇÃO DE SEGURANÇA E ROTAS DO SERVIDOR WEB (APACHE)
 # ============================================================================
 
-# 1. Desativa listagem de diretórios
+# 1. Define o arquivo inicial padrão (Linux/Hostinger é case-sensitive) e desativa listagem de diretórios
+DirectoryIndex Index.php index.php
 Options -Indexes
 
 # 2. Mapeamento Explícito de Rotas MVC (Primeiro Acesso, Perfil Admin e Diagnóstico)

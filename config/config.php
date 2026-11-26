@@ -77,11 +77,22 @@ if (!defined("SMTP_TIMEOUT"))     define("SMTP_TIMEOUT", (int)(getenv("SMTP_TIME
 if (!defined("SMTP_DEBUG"))       define("SMTP_DEBUG", (int)(getenv("SMTP_DEBUG") ?: ($_ENV["SMTP_DEBUG"] ?? 0)));
 if (!defined("SMTP_ASYNC_QUEUE")) define("SMTP_ASYNC_QUEUE", filter_var(getenv("SMTP_ASYNC_QUEUE") !== false ? getenv("SMTP_ASYNC_QUEUE") : ($_ENV["SMTP_ASYNC_QUEUE"] ?? false), FILTER_VALIDATE_BOOLEAN));
 
-$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+$isHttps = (
+    (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ||
+    (($_SERVER['SERVER_PORT'] ?? null) == 443) ||
+    (strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https') ||
+    (strtolower((string)($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '')) === 'on')
+);
+$protocol = $isHttps ? "https" : "http";
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? ''), '/');
-$projectRoot = str_replace('\\', '/', realpath(__DIR__ . '/../'));
-$basePath = $docRoot ? str_ireplace($docRoot, '', $projectRoot) : '';
+$rawDocRoot = $_SERVER['DOCUMENT_ROOT'] ?? '';
+$realDocRoot = $rawDocRoot !== '' ? (realpath($rawDocRoot) ?: $rawDocRoot) : '';
+$docRoot = rtrim(str_replace('\\', '/', $realDocRoot), '/');
+$projectRoot = rtrim(str_replace('\\', '/', realpath(__DIR__ . '/../') ?: (__DIR__ . '/..')), '/');
+$basePath = '';
+if ($docRoot !== '' && stripos($projectRoot, $docRoot) === 0) {
+    $basePath = substr($projectRoot, strlen($docRoot));
+}
 
 if (!defined("BASE_URL")) {
     define("BASE_URL", $protocol . "://" . $host . $basePath . "/");

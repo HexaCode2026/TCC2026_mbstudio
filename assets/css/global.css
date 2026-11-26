@@ -255,8 +255,8 @@ button:active:not(:disabled),
         font-size: 16px !important;
     }
 
-    /* Mínimo de 44x44px para alvos de toque em dispositivos móveis */
-    button,
+    /* Mínimo de 44x44px para alvos de toque em dispositivos móveis (exceto indicadores visuais) */
+    button:not(.slideshow-dot),
     .btn-gold,
     .btn-outline,
     .btn-primary,

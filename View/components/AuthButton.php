@@ -1,11 +1,10 @@
 <?php
+require_once __DIR__ . '/../../core/Session.php';
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 $userName = isset($_SESSION['User_name']) ? $_SESSION['User_name'] : null;
-$docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/');
-$projectRoot = str_replace('\\', '/', realpath(__DIR__ . '/../../'));
-$basePath = str_ireplace($docRoot, '', $projectRoot);
+$basePath = Session::getBasePath();
 $authCssVer = @filemtime(__DIR__ . '/../../assets/css/components/authbutton.css') ?: '2.2';
 ?>
 

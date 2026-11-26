@@ -1,6 +1,9 @@
-DROP DATABASE IF EXISTS tcc_agendamento;
-CREATE DATABASE tcc_agendamento;
-USE tcc_agendamento;
+-- Em hospedagens compartilhadas (ex: Hostinger), crie o banco pelo painel (hPanel),
+-- selecione-o no phpMyAdmin e importe este arquivo diretamente (DROP/CREATE DATABASE é bloqueado).
+-- Para uso local, descomente as linhas abaixo caso deseje recriar o banco do zero:
+-- DROP DATABASE IF EXISTS tcc_agendamento;
+-- CREATE DATABASE tcc_agendamento;
+-- USE tcc_agendamento;
 
 -- ==========================================
 -- 1. USUÁRIOS

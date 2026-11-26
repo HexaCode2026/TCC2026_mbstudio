@@ -336,7 +336,7 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
         <section class="luxury-cta-banner">
             <div class="cta-banner-content">
                 <span class="section-tag" style="color: var(--gold-light);">Viva a Experiência</span>
-                <h2 class="cta-banner-title">
+                <h2 class="cta-banner-title" style="color:#ffffff;">
                     Pronta para realçar sua melhor <span class="cursiva-gold">versão</span>?
                 </h2>
                 <p class="cta-banner-desc">

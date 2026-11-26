@@ -54,3 +54,6 @@
 [2026-11-22 17:12:54] [ERROR] [EmailHelper][PHPMailer] Erro SMTP ao enviar para maisonbelle.com@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio | Detalhe: Erro de SMTP: Não foi possível autenticar. Erro de servidor SMTP: QUIT command failed
 [2026-11-22 17:12:57] [ERROR] [EmailHelper][PHPMailer] Erro SMTP ao enviar para maisonbelle.com@gmail.com | Assunto: Recuperação de Senha — MB Studio | Detalhe: Erro de SMTP: Não foi possível autenticar. Erro de servidor SMTP: QUIT command failed
 [2026-11-22 17:15:32] [ERROR] [EmailHelper][PHPMailer] Erro SMTP ao enviar para acacia40028922@gmail.com | Assunto: Seu Código de Acesso (2FA) — MB Studio | Detalhe: Erro de SMTP: Não foi possível autenticar. Erro de servidor SMTP: QUIT command failed
+[2026-11-26 01:32:23] [ERROR] [AjaxLogin] Erro inesperado: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'User_must_change_pass' in 'field list'
+[2026-11-26 01:32:25] [ERROR] [AjaxLogin] Erro inesperado: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'User_must_change_pass' in 'field list'
+[2026-11-26 01:32:35] [ERROR] [AjaxLogin] Erro inesperado: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'User_must_change_pass' in 'field list'

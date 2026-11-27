@@ -154,6 +154,43 @@ body {
     padding-top: 74px !important;
 }
 
+/* Evita sobreposição entre links centrais e ações laterais em notebooks/tablets (861px–1320px) */
+@media (max-width: 1320px) and (min-width: 861px) {
+    .header-main-bar {
+        padding: 0 18px;
+        gap: 12px;
+    }
+
+    .header-logo-link {
+        margin-right: 0;
+    }
+
+    .header-nav {
+        position: static;
+        left: auto;
+        top: auto;
+        transform: none;
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .header-nav-links {
+        gap: clamp(8px, 1.1vw, 18px);
+        padding: 6px 14px;
+        max-width: 100%;
+    }
+
+    .header-nav-links a,
+    .header-nav-links .nav-item-link {
+        font-size: 11.5px;
+        letter-spacing: 0.04em;
+    }
+
+    .header-right-actions {
+        margin-left: 0;
+    }
+}
+
 /* ==========================================================================
    MODO CELULAR & TABLET COMPACTO (<= 860px)
    Canto Direito apenas com o Botão de 3 Pontinhos (⋮) sem duplicar o botão do desktop
@@ -230,15 +267,15 @@ body {
         color: var(--gold-primary, #d4af37);
     }
 
-    /* Backdrop Translúcido */
+    /* Backdrop Translúcido Full-Screen (fora do header para não sofrer clipping do backdrop-filter) */
     .header-nav-backdrop {
         display: block !important;
         position: fixed;
         inset: 0;
-        background: rgba(10, 12, 18, 0.55);
+        background: rgba(10, 12, 18, 0.62);
         backdrop-filter: blur(4px);
         -webkit-backdrop-filter: blur(4px);
-        z-index: var(--z-modal-backdrop, 900);
+        z-index: var(--z-drawer-backdrop, 90);
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.22s ease;
@@ -261,7 +298,7 @@ body {
         border: 1px solid rgba(212, 175, 55, 0.32);
         border-radius: 16px;
         box-shadow: 0 22px 48px -8px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04);
-        z-index: var(--z-modal, 1000);
+        z-index: var(--z-drawer, 800);
         display: flex;
         flex-direction: column;
         align-items: stretch;

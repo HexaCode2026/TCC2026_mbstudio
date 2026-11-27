@@ -19,6 +19,7 @@ $userInitialHeader = $userNameHeader ? mb_strtoupper(mb_substr(trim($userNameHea
 $currentScript = $_SERVER['SCRIPT_NAME'] ?? '';
 $currentPage = basename($currentScript, '.php');
 ?>
+<link rel="icon" type="image/png" href="<?= $basePath ?>/assets/img/logob.png">
 <link rel="stylesheet" href="<?= $basePath ?>/assets/css/components/header.css?v=<?= $headerCssVer ?>">
 <?php if ($perm !== 'A' && $perm !== 'F'): ?>
     <link rel="stylesheet" href="<?= $basePath ?>/assets/css/cliente-transitions.css?v=<?= $transCssVer ?>">
@@ -30,9 +31,6 @@ $currentPage = basename($currentScript, '.php');
 <?php endif; ?>
 
 <header class="main-header" id="mainHeader">
-    <!-- Backdrop do Menu Mobile (3 pontinhos) -->
-    <div class="header-nav-backdrop" id="headerNavBackdrop" aria-hidden="true"></div>
-
     <div class="header-main-bar">
         <!-- ESQUERDA: Logo -->
         <a href="<?= $basePath ?>/Index.php" class="header-logo-link" title="MB Studio - Início">
@@ -71,18 +69,10 @@ $currentPage = basename($currentScript, '.php');
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                                 Meu Perfil
                             </a>
-                            <a href="<?= $basePath ?>/View/funcionario/Agenda.php" class="mobile-profile-item <?= $currentPage === 'Agenda' ? 'ativo' : '' ?>">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                Minha Agenda
-                            </a>
                         <?php elseif ($perm === 'A'): ?>
-                            <a href="<?= $basePath ?>/View/admin/Dashboard.php" class="mobile-profile-item <?= ($currentPage === 'Dashboard' || $currentPage === 'Home') ? 'ativo' : '' ?>">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                                Painel Administrativo
-                            </a>
                             <a href="<?= $basePath ?>/View/admin/Perfil.php" class="mobile-profile-item <?= ($currentPage === 'Perfil' || $currentPage === 'PerfilController') ? 'ativo' : '' ?>">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                Meu Perfil
+                                Meu Perfil Administrativo
                             </a>
                         <?php else: ?>
                             <a href="<?= $basePath ?>/View/cliente/Perfil.php" class="mobile-profile-item <?= $currentPage === 'Perfil' ? 'ativo' : '' ?>">
@@ -97,7 +87,7 @@ $currentPage = basename($currentScript, '.php');
                     </div>
                 <?php else: ?>
                     <span class="mobile-section-label">CONTA & ACESSO</span>
-                    <button type="button" class="mobile-auth-cta-btn" onclick="if(document.getElementById('headerNav')) document.getElementById('headerNav').classList.remove('mobile-open'); if(document.getElementById('headerNavBackdrop')) document.getElementById('headerNavBackdrop').classList.remove('active'); document.body.classList.remove('mobile-drawer-locked'); document.getElementById('global-login-modal').classList.add('show'); if(typeof switchModalView === 'function') switchModalView('view-login');">
+                    <button type="button" class="mobile-auth-cta-btn" onclick="if(document.getElementById('headerNav')) document.getElementById('headerNav').classList.remove('mobile-open'); if(document.getElementById('headerNavBackdrop')) document.getElementById('headerNavBackdrop').classList.remove('active'); document.body.classList.remove('mobile-drawer-locked'); document.getElementById('global-login-modal').classList.add('show'); document.body.classList.add('modal-open-locked'); if(typeof switchModalView === 'function') switchModalView('view-login');">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
                             <polyline points="10 17 15 12 10 7"></polyline>
@@ -113,12 +103,12 @@ $currentPage = basename($currentScript, '.php');
                 <span class="mobile-section-label mobile-nav-label">NAVEGAÇÃO</span>
                 <?php if ($perm === 'F'): ?>
                     <!-- Menu do Funcionário -->
+                    <a href="<?= $basePath ?>/View/funcionario/Home.php" class="nav-item-link <?= $currentPage === 'Home' ? 'ativo' : '' ?>">INÍCIO</a>
                     <a href="<?= $basePath ?>/View/funcionario/Agenda.php" class="nav-item-link <?= $currentPage === 'Agenda' ? 'ativo' : '' ?>">MINHA AGENDA</a>
                     <a href="<?= $basePath ?>/View/funcionario/Disponibilidade.php" class="nav-item-link <?= $currentPage === 'Disponibilidade' ? 'ativo' : '' ?>">MEUS HORÁRIOS</a>
                     <a href="<?= $basePath ?>/View/funcionario/Bloqueios.php" class="nav-item-link <?= $currentPage === 'Bloqueios' ? 'ativo' : '' ?>">PAUSAS/BLOQUEIOS</a>
-                    <a href="<?= $basePath ?>/View/funcionario/Perfil.php" class="nav-item-link <?= $currentPage === 'Perfil' ? 'ativo' : '' ?>">MEU PERFIL</a>
                 <?php elseif ($perm === 'A'): ?>
-                    <!-- Menu do Admin -->
+                    <!-- Menu do Admin (7 módulos principais; Perfil acessível pelo menu do usuário) -->
                     <a href="<?= $basePath ?>/View/admin/Dashboard.php" class="nav-item-link <?= ($currentPage === 'Dashboard' || $currentPage === 'Home') ? 'ativo' : '' ?>">PAINEL</a>
                     <a href="<?= $basePath ?>/View/admin/Servicos.php" class="nav-item-link <?= $currentPage === 'Servicos' ? 'ativo' : '' ?>">SERVIÇOS</a>
                     <a href="<?= $basePath ?>/View/admin/Imagens.php" class="nav-item-link <?= $currentPage === 'Imagens' ? 'ativo' : '' ?>">IMAGENS</a>
@@ -126,7 +116,6 @@ $currentPage = basename($currentScript, '.php');
                     <a href="<?= $basePath ?>/View/admin/Usuarios.php" class="nav-item-link <?= $currentPage === 'Usuarios' ? 'ativo' : '' ?>">USUÁRIOS</a>
                     <a href="<?= $basePath ?>/View/admin/Agenda.php" class="nav-item-link <?= $currentPage === 'Agenda' ? 'ativo' : '' ?>">AGENDAMENTOS</a>
                     <a href="<?= $basePath ?>/View/admin/Relatorios.php" class="nav-item-link <?= $currentPage === 'Relatorios' ? 'ativo' : '' ?>">RELATÓRIOS</a>
-                    <a href="<?= $basePath ?>/View/admin/Perfil.php" class="nav-item-link <?= ($currentPage === 'Perfil' || $currentPage === 'PerfilController') ? 'ativo' : '' ?>">PERFIL</a>
                 <?php else: ?>
                     <!-- Menu do Cliente / Visitante -->
                     <a href="<?= $basePath ?>/Index.php" class="nav-item-link <?= $currentPage === 'Index' ? 'ativo' : '' ?>">INÍCIO</a>
@@ -152,20 +141,23 @@ $currentPage = basename($currentScript, '.php');
                 <?php include __DIR__ . '/AuthButton.php'; ?>
             </div>
 
-            <!-- Botão 3 Pontinhos Mobile (Canto Direito) -->
-            <button type="button" class="header-dots-btn" id="mobileMenuToggle" aria-label="Abrir opções de perfil e menu" aria-expanded="false" aria-controls="headerNav" title="Opções de perfil e menu">
+            <!-- Botão Menu Mobile (Canto Direito) -->
+            <button type="button" class="header-dots-btn" id="mobileMenuToggle" aria-label="Abrir menu de navegação e perfil" aria-expanded="false" aria-controls="headerNav" title="Menu e opções de perfil">
                 <?php if ($userInitialHeader): ?>
                     <span class="dots-user-avatar"><?= $userInitialHeader ?></span>
                 <?php endif; ?>
-                <svg class="dots-icon-svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <circle cx="12" cy="5" r="2.2"></circle>
-                    <circle cx="12" cy="12" r="2.2"></circle>
-                    <circle cx="12" cy="19" r="2.2"></circle>
+                <svg class="dots-icon-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="4" y1="7" x2="20" y2="7"></line>
+                    <line x1="4" y1="12" x2="20" y2="12"></line>
+                    <line x1="4" y1="17" x2="20" y2="17"></line>
                 </svg>
             </button>
         </div>
     </div>
 </header>
+
+<!-- Backdrop Full-Screen do Menu Mobile (fora do header para cobrir toda a viewport) -->
+<div class="header-nav-backdrop" id="headerNavBackdrop" aria-hidden="true"></div>
 
 <script>
 (function() {

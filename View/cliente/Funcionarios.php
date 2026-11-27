@@ -21,46 +21,69 @@ $funcionarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nossa Equipe</title>
+    <title>Nossa Equipe | MB Studio</title>
     <link rel="stylesheet" href="../../assets/css/global.css?v=<?= @filemtime(__DIR__ . '/../../assets/css/global.css') ?: '2.4' ?>">
     <link rel="stylesheet" href="../../assets/css/cliente/funcionarios.css?v=<?= @filemtime(__DIR__ . '/../../assets/css/cliente/funcionarios.css') ?: '2.4' ?>">
 </head>
 
 <body>
     <?php include '../components/Header.php'; ?>
-    <?php include '../components/LoginModal.php'; ?>
 
-    <div class="team-container">
-        <a href="../../Index.php" class="back-link">← Voltar para a Home</a>
-        <h1 class="team-title">Conheça Nossa Equipe</h1>
+    <div class="page-content-wrapper" id="page-content">
+        <main class="team-page">
+            <div class="team-container">
+                <div class="team-top-bar">
+                    <a href="../../Index.php" class="back-link">← Voltar para a Home</a>
+                </div>
 
-        <?php if (count($funcionarios) > 0): ?>
-            <div class="team-grid">
-                <?php foreach ($funcionarios as $f): ?>
-                    <div class="team-card">
-                        <div class="team-photo-container">
-                            <?php if (!empty($f['Emp_photo'])): ?>
-                                <img src="../../<?= htmlspecialchars($f['Emp_photo']) ?>"
-                                    alt="<?= htmlspecialchars($f['User_name']) ?>" class="team-photo">
-                            <?php else: ?>
-                                <div
-                                    style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center; color:#888;">
-                                    <span>Sem Foto</span>
+                <header class="team-header">
+                    <span class="team-subtitle-tag">TALENTO &amp; DEDICAÇÃO</span>
+                    <h1 class="team-title">Conheça Nossa <span class="cursiva-gold">Equipe</span></h1>
+                    <div class="team-divider"></div>
+                    <p class="team-lead">
+                        Profissionais especializados em visagismo, cortes e tratamentos capilares de alto padrão para valorizar a sua beleza única.
+                    </p>
+                </header>
+
+                <?php if (count($funcionarios) > 0): ?>
+                    <div class="team-grid">
+                        <?php foreach ($funcionarios as $f): ?>
+                            <article class="team-card">
+                                <div class="team-photo-container">
+                                    <?php if (!empty($f['Emp_photo'])): ?>
+                                        <img src="../../<?= htmlspecialchars($f['Emp_photo']) ?>"
+                                            alt="<?= htmlspecialchars($f['User_name']) ?>" class="team-photo">
+                                    <?php else: ?>
+                                        <div class="team-photo-placeholder" aria-hidden="true">
+                                            <?= htmlspecialchars(mb_strtoupper(mb_substr(trim($f['User_name']), 0, 1, 'UTF-8'), 'UTF-8'), ENT_QUOTES, 'UTF-8') ?>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
-                            <?php endif; ?>
-                        </div>
-                        <h3 class="team-name"><?= htmlspecialchars($f['User_name']) ?></h3>
-                        <p class="team-specialty"><?= htmlspecialchars($f['Emp_specialty'] ?: 'Profissional da Beleza') ?></p>
-                        <?php if (!empty($f['Emp_bio'])): ?>
-                            <p class="team-bio">"<?= htmlspecialchars($f['Emp_bio']) ?>"</p>
-                        <?php endif; ?>
+                                <h2 class="team-name"><?= htmlspecialchars($f['User_name']) ?></h2>
+                                <p class="team-specialty"><?= htmlspecialchars($f['Emp_specialty'] ?: 'Profissional da Beleza') ?></p>
+                                <?php if (!empty($f['Emp_bio'])): ?>
+                                    <p class="team-bio">"<?= htmlspecialchars($f['Emp_bio']) ?>"</p>
+                                <?php endif; ?>
+                            </article>
+                        <?php endforeach; ?>
                     </div>
-                <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="empty-state-card">
+                        <div class="empty-state-icon" aria-hidden="true">✦</div>
+                        <h2 class="empty-state-title">Equipe em atualização</h2>
+                        <p class="empty-state-desc">
+                            No momento, não temos profissionais disponíveis para exibição. Enquanto isso, explore nosso catálogo de serviços e rituais exclusivos.
+                        </p>
+                        <a href="Servicos.php" class="btn-gold">Conhecer Nossos Serviços</a>
+                    </div>
+                <?php endif; ?>
             </div>
-        <?php else: ?>
-            <p style="color:#aaa;">No momento, não temos profissionais cadastrados.</p>
-        <?php endif; ?>
+        </main>
+
+        <?php include '../components/Footer.php'; ?>
     </div>
+
+    <?php include '../components/LoginModal.php'; ?>
 </body>
 
 </html>

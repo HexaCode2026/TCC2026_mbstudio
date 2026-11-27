@@ -10,10 +10,10 @@
     width: 100vw;
     height: 100vh;
     height: 100dvh;
-    background: rgba(15, 23, 42, 0.50);
+    background: rgba(15, 23, 42, 0.56);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    z-index: var(--z-modal-backdrop, 900);
+    z-index: var(--z-modal, 1100);
     justify-content: center;
     align-items: center;
     padding: var(--space-4, 16px);
@@ -234,6 +234,40 @@
 }
 
 /* Mensagens de Feedback */
+.login-forgot-wrap {
+    text-align: right;
+    margin-top: 8px;
+}
+
+.login-forgot-link {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold-text, #825D07);
+    text-decoration: none;
+    padding: 2px 4px;
+    border-radius: var(--radius-xs, 4px);
+    transition: color 150ms ease, text-decoration-color 150ms ease;
+}
+
+.login-forgot-link:hover {
+    color: var(--gold-darker, #6E4F05);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.login-forgot-link:focus-visible {
+    outline: 2px solid var(--gold-text, #825D07);
+    outline-offset: 2px;
+}
+
+.modal-code-input {
+    letter-spacing: 5px;
+    font-size: 24px !important;
+    text-align: center;
+    font-weight: 700;
+}
+
 .modal-msg {
     display: none;
     padding: 12px 14px;

@@ -81,14 +81,15 @@
             box-shadow: 0 6px 16px rgba(138, 101, 8, 0.35);
         }
 
-        /* Banner de Boas-Vindas e Título */
+        /* Banner de Boas-Vindas e Título (Padrão Unificado Admin) */
         .team-header-card {
-            background: linear-gradient(135deg, #ffffff 0%, #faf6ec 100%);
-            border: 1px solid var(--gold-border);
-            border-radius: 20px;
-            padding: 30px 35px;
+            background: var(--bg-card, #FFFFFF);
+            border: 1px solid var(--border, #E2E8F0);
+            border-left: 4px solid var(--gold-primary, #D4AF37);
+            border-radius: var(--radius-lg, 12px);
+            padding: clamp(22px, 3.5vw, 32px);
             box-shadow: var(--card-shadow);
-            margin-bottom: 35px;
+            margin-bottom: 28px;
             position: relative;
             overflow: hidden;
             display: flex;
@@ -99,13 +100,14 @@
         }
 
         .team-header-card::after {
-            content: '✂️';
+            content: '✦';
             position: absolute;
             right: 25px;
-            bottom: -15px;
-            font-size: 100px;
-            opacity: 0.08;
+            bottom: -20px;
+            font-size: 110px;
+            color: rgba(184, 134, 11, 0.04);
             pointer-events: none;
+            font-family: serif;
         }
 
         .header-tag-pill {
@@ -113,13 +115,13 @@
             align-items: center;
             gap: 6px;
             padding: 5px 14px;
-            background: rgba(184, 134, 11, 0.1);
+            background: #FAF4E4;
             border: 1px solid var(--gold-border);
-            border-radius: 30px;
-            color: var(--gold-dark);
+            border-radius: 9999px;
+            color: var(--gold-text, #825D07);
             font-size: 11.5px;
             font-weight: 700;
-            letter-spacing: 1.2px;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
             margin-bottom: 10px;
         }

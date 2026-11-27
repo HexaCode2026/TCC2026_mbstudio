@@ -48,13 +48,19 @@ if (!empty($appointments)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atendimentos | Admin | MB Studio</title>
+    <title>Agendamentos | MB Studio</title>
 
-    <link rel="stylesheet" href="../../assets/css/global.css">
+    <?php
+    $globalCssVer = @filemtime(__DIR__ . '/../../assets/css/global.css') ?: '3.0';
+    $adminCssVer  = @filemtime(__DIR__ . '/../../assets/css/admin.css') ?: '3.0';
+    $agendaCssVer = @filemtime(__DIR__ . '/../../assets/css/funcionario/agenda.css') ?: '3.0';
+    ?>
+    <link rel="stylesheet" href="../../assets/css/global.css?v=<?= $globalCssVer ?>">
+    <link rel="stylesheet" href="../../assets/css/admin.css?v=<?= $adminCssVer ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../assets/css/funcionario/agenda.css"> <!-- Reutilizando o mesmo estilo base elegante -->
+    <link rel="stylesheet" href="../../assets/css/funcionario/agenda.css?v=<?= $agendaCssVer ?>">
 </head>
 
 <body>
@@ -71,16 +77,16 @@ if (!empty($appointments)) {
             </a>
         </div>
 
-        <div class="agenda-header-box">
-            <div class="agenda-badge">
-                <span>✦ Controle Geral ✦</span>
+        <div class="admin-welcome-card">
+            <div>
+                <div class="welcome-badge">
+                    <span>✦ Controle Geral de Agenda ✦</span>
+                </div>
+                <h1 class="welcome-title">Agenda Global de Atendimentos</h1>
+                <p class="welcome-subtitle">
+                    Acompanhe globalmente o fluxo de todos os profissionais e finalize recebimentos que estão em atendimento no <strong>MB Studio</strong>.
+                </p>
             </div>
-            <h1 class="agenda-title">
-                Todos os <span class="cursiva-gold">Atendimentos</span>
-            </h1>
-            <p class="agenda-subtitle">
-                Acompanhe globalmente o fluxo de todos os profissionais e finalize recebimentos que estão em atendimento.
-            </p>
         </div>
 
         <?php if (isset($_GET['sucesso']) && $_GET['sucesso'] == 'atendimento_concluido'): ?>
@@ -201,12 +207,27 @@ if (!empty($appointments)) {
             </div>
         <?php else: ?>
             <div class="empty-agenda-card">
-                <div class="empty-icon">📅</div>
+                <div class="empty-icon empty-icon-svg" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </div>
                 <h3>Nenhum agendamento encontrado</h3>
-                <p>O salão ainda não possui históricos de agendamentos para exibir.</p>
+                <p>O salão ainda não possui agendamentos registrados. Certifique-se de que há serviços ativos e profissionais vinculados na equipe.</p>
+                <div style="margin-top: 22px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                    <a href="Funcionarios.php" class="btn-gold">Ver Equipe</a>
+                    <a href="Servicos.php" class="btn-outline">Ver Serviços</a>
+                </div>
             </div>
         <?php endif; ?>
     </main>
+
+    <footer class="admin-panel-footer">
+        <p>&copy; <?= date('Y') ?> MB Studio. Painel Administrativo de Gestão.</p>
+    </footer>
 
     <!-- Modal Finalização (idêntico ao do funcionário) -->
     <div id="modalFinalizacao" class="modal-overlay" style="display: none;">

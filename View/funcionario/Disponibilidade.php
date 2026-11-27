@@ -331,6 +331,10 @@ if (!empty($minhasDisponibilidades)) {
 
     </main>
 
+    <footer class="panel-footer">
+        <p>&copy; <?= date('Y') ?> MB Studio. Painel do Profissional.</p>
+    </footer>
+
     <script>
         const datasCadastradasJs = [
             <?php foreach ($datasCadastradas as $data): ?>

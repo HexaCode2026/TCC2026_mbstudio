@@ -140,6 +140,13 @@ $bloqCssVer   = @filemtime(__DIR__ . '/../../assets/css/funcionario/bloqueios.cs
                             <input type="date" id="block-data" name="data" class="form-control" required min="<?= date('Y-m-d') ?>">
                         </div>
 
+                        <div class="quick-presets-row" aria-label="Atalhos rápidos de horário">
+                            <span class="quick-presets-label">Atalhos:</span>
+                            <button type="button" class="btn-preset-chip" onclick="document.getElementById('block-inicio').value='12:00'; document.getElementById('block-fim').value='13:00'; if(!document.getElementById('block-motivo').value) document.getElementById('block-motivo').value='Almoço';">Almoço (12h–13h)</button>
+                            <button type="button" class="btn-preset-chip" onclick="document.getElementById('block-inicio').value='08:00'; document.getElementById('block-fim').value='12:00';">Manhã (08h–12h)</button>
+                            <button type="button" class="btn-preset-chip" onclick="document.getElementById('block-inicio').value='13:00'; document.getElementById('block-fim').value='19:00';">Tarde (13h–19h)</button>
+                        </div>
+
                         <div class="form-row-times">
                             <div class="form-group">
                                 <label for="block-inicio">Hora Inicial</label>
@@ -234,7 +241,12 @@ $bloqCssVer   = @filemtime(__DIR__ . '/../../assets/css/funcionario/bloqueios.cs
                         </div>
                     <?php else: ?>
                         <div class="empty-bloq-card">
-                            <div class="empty-bloq-icon">☕</div>
+                            <div class="empty-bloq-icon empty-icon-svg" aria-hidden="true">
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </div>
                             <h4>Nenhuma pausa programada</h4>
                             <p>Você não possui pausas ou bloqueios cadastrados para os próximos dias. Utilize o formulário ao lado sempre que precisar reservar um intervalo.</p>
                         </div>
@@ -244,6 +256,10 @@ $bloqCssVer   = @filemtime(__DIR__ . '/../../assets/css/funcionario/bloqueios.cs
 
         </div>
     </main>
+
+    <footer class="panel-footer">
+        <p>&copy; <?= date('Y') ?> MB Studio. Painel do Profissional.</p>
+    </footer>
 
 </body>
 </html>

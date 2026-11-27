@@ -38,17 +38,22 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciamento de Serviços | MB Studio Admin</title>
+    <title>Serviços | MB Studio</title>
 
-    <link rel="stylesheet" href="../../assets/css/global.css">
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <?php
+    $globalCssVer   = @filemtime(__DIR__ . '/../../assets/css/global.css') ?: '3.0';
+    $adminCssVer    = @filemtime(__DIR__ . '/../../assets/css/admin.css') ?: '3.0';
+    $servicosCssVer = @filemtime(__DIR__ . '/../../assets/css/admin/servicos.css') ?: '3.0';
+    ?>
+    <link rel="stylesheet" href="../../assets/css/global.css?v=<?= $globalCssVer ?>">
+    <link rel="stylesheet" href="../../assets/css/admin.css?v=<?= $adminCssVer ?>">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="../../assets/css/admin/servicos.css">
+    <link rel="stylesheet" href="../../assets/css/admin/servicos.css?v=<?= $servicosCssVer ?>">
 </head>
 <body>
 
@@ -68,13 +73,13 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
             </a>
 
             <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                <a href="#novo-servico" class="btn-toggle-new-service">
+                <button type="button" id="btnToggleNewService" class="btn-toggle-new-service" aria-expanded="false" aria-controls="novo-servico" onclick="toggleNewServiceForm()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
-                    <span>Cadastrar Novo Serviço</span>
-                </a>
+                    <span>Novo Serviço</span>
+                </button>
                 <div class="services-count-tag" id="summary-counter">
                     Total: <strong><?= $totalServicos ?></strong> serviço(s)
                 </div>
@@ -158,15 +163,15 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
 
         <?php include __DIR__ . '/../components/FlashMessage.php'; ?>
 
-        <!-- FORMULÁRIO DE CADASTRO DE NOVO SERVIÇO -->
-        <section class="form-section-card" id="novo-servico">
+        <!-- FORMULÁRIO DE CADASTRO DE NOVO SERVIÇO (COLAPSÁVEL PARA PRIORIZAR O CATÁLOGO) -->
+        <section class="form-section-card is-collapsed" id="novo-servico">
             <h2 class="form-card-title">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--gold-dark);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--gold-text);">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="8" x2="12" y2="16"></line>
                     <line x1="8" y1="12" x2="16" y2="12"></line>
                 </svg>
-                Cadastrar Novo Serviço (Anúncio)
+                Cadastrar Novo Serviço
             </h2>
             <p class="form-card-desc">Preencha os campos abaixo para disponibilizar um novo procedimento para agendamento.</p>
 
@@ -193,8 +198,8 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
 
                     <!-- Imagem -->
                     <div class="form-group-luxury">
-                        <label class="label-luxury" for="srv-imagem">Foto do Anúncio (Imagem): *</label>
-                        <input type="file" id="srv-imagem" name="imagem" accept="image/*" class="input-luxury" style="padding: 9px;" required>
+                        <label class="label-luxury" for="srv-imagem">Foto do Serviço (Imagem): *</label>
+                        <input type="file" id="srv-imagem" name="imagem" accept="image/*" class="input-luxury" required>
                     </div>
 
                     <!-- Descrição -->
@@ -205,7 +210,7 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
 
                     <!-- Atribuir Funcionários -->
                     <div class="form-group-luxury form-group-full">
-                        <label class="label-luxury">Atribuir Funcionários Aptos para este Serviço:</label>
+                        <span class="label-luxury">Atribuir Profissionais Aptos para este Serviço:</span>
                         <?php if(count($funcionarios) > 0): ?>
                             <div class="employees-checkbox-grid">
                                 <?php foreach ($funcionarios as $func): ?>
@@ -216,8 +221,8 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
                                 <?php endforeach; ?>
                             </div>
                         <?php else: ?>
-                            <p style="font-size: 13px; color: #8c867a; margin: 5px 0;">
-                                Nenhum funcionário com permissão 'F' cadastrado. Cadastre primeiro em <a href="Funcionarios.php" style="color: var(--gold-dark); font-weight: 700;">Gestão de Equipe</a>.
+                            <p style="font-size: 13px; color: var(--text-muted); margin: 5px 0;">
+                                Nenhum profissional cadastrado no momento. Promova um membro em <a href="Usuarios.php" style="color: var(--gold-text); font-weight: 700; text-decoration: underline;">Usuários</a> ou confira em <a href="Funcionarios.php" style="color: var(--gold-text); font-weight: 700; text-decoration: underline;">Equipe</a>.
                             </p>
                         <?php endif; ?>
                     </div>
@@ -253,10 +258,10 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
             </div>
 
             <div>
-                <select id="statusServiceFilter" class="filter-select" onchange="filterServicesTable()">
+                <select id="statusServiceFilter" class="filter-select" aria-label="Filtrar por status" onchange="filterServicesTable()">
                     <option value="ALL">Todos os Status</option>
-                    <option value="1">🟢 Apenas Ativos</option>
-                    <option value="0">🔴 Apenas Inativos</option>
+                    <option value="1">Apenas Ativos</option>
+                    <option value="0">Apenas Inativos</option>
                 </select>
             </div>
         </div>
@@ -331,7 +336,7 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
                                                 <circle cx="12" cy="12" r="10"></circle>
                                                 <polyline points="12 6 12 12 16 14"></polyline>
                                             </svg>
-                                            <?= $s['Ser_duration'] ?> min
+                                            <?= (int)($s['Ser_duration'] ?? 0) > 0 ? ((int)$s['Ser_duration'] . ' min') : 'Não definida' ?>
                                         </span>
                                     </td>
 
@@ -355,8 +360,9 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
                                         <?php endif; ?>
                                     </td>
 
-                                    <!-- Ações (Editar com Details / Excluir) -->
+                                    <!-- Ações (Editar com Details / Excluir lado a lado) -->
                                     <td style="text-align: right;">
+                                        <div class="service-actions-row">
                                         <!-- INTERAÇÃO COM DETAILS PARA EDIÇÃO -->
                                         <details class="edit-service-details">
                                             <summary title="Editar dados do serviço">
@@ -390,25 +396,25 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
                                                         </div>
                                                         <div style="flex: 1;">
                                                             <label class="label-luxury" style="font-size: 11px;" for="edit-duracao-<?= (int)$s['Ser_id'] ?>">Duração (min):</label>
-                                                            <input type="number" id="edit-duracao-<?= (int)$s['Ser_id'] ?>" min="1" name="duracao" value="<?= $s['Ser_duration'] ?>" class="input-luxury" style="padding: 7px 10px; font-size: 13px;" required>
+                                                            <input type="number" id="edit-duracao-<?= (int)$s['Ser_id'] ?>" min="1" name="duracao" value="<?= max(1, (int)$s['Ser_duration']) ?>" class="input-luxury" style="padding: 7px 10px; font-size: 13px;" required>
                                                         </div>
                                                     </div>
 
                                                     <div style="margin-bottom: 10px;">
                                                         <label class="label-luxury" style="font-size: 11px;" for="edit-img-<?= (int)$s['Ser_id'] ?>">Nova Imagem (Opcional):</label>
-                                                        <input type="file" id="edit-img-<?= (int)$s['Ser_id'] ?>" name="imagem" accept="image/*" class="input-luxury" style="padding: 6px; font-size: 12px;">
+                                                        <input type="file" id="edit-img-<?= (int)$s['Ser_id'] ?>" name="imagem" accept="image/*" class="input-luxury">
                                                     </div>
 
                                                     <div style="margin-bottom: 10px;">
                                                         <label class="label-luxury" style="font-size: 11px;" for="edit-ativo-<?= (int)$s['Ser_id'] ?>">Status:</label>
                                                         <select id="edit-ativo-<?= (int)$s['Ser_id'] ?>" name="ativo" class="select-luxury" style="padding: 7px 10px; font-size: 13px;">
-                                                            <option value="1" <?= $s['Ser_active'] == 1 ? 'selected' : '' ?>>🟢 Ativo</option>
-                                                            <option value="0" <?= $s['Ser_active'] == 0 ? 'selected' : '' ?>>🔴 Inativo</option>
+                                                            <option value="1" <?= $s['Ser_active'] == 1 ? 'selected' : '' ?>>Ativo</option>
+                                                            <option value="0" <?= $s['Ser_active'] == 0 ? 'selected' : '' ?>>Inativo</option>
                                                         </select>
                                                     </div>
 
                                                     <div style="margin-bottom: 12px;">
-                                                        <span class="label-luxury" style="font-size: 11px; display: block;">Reatribuir Funcionários:</span>
+                                                        <span class="label-luxury" style="font-size: 11px; display: block;">Reatribuir Profissionais:</span>
                                                         <div style="max-height: 90px; overflow-y: auto; background: #faf8f3; padding: 8px; border-radius: 6px; border: 1px solid rgba(184,134,11,0.2);">
                                                             <?php $vinculados = array_filter(explode(',', (string)($s['EmployeeUserIds'] ?? ''))); ?>
                                                             <?php foreach ($funcionarios as $func): ?>
@@ -437,6 +443,7 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
                                                 Excluir
                                             </button>
                                         </form>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -446,7 +453,9 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
 
                 <!-- Estado quando a pesquisa em tempo real não encontra resultados -->
                 <div id="noServiceResultsMessage" class="empty-state-wrap" style="display: none;">
-                    <div class="empty-icon-circle">🔍</div>
+                    <div class="empty-icon-svg" aria-hidden="true">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </div>
                     <h3 class="empty-title">Nenhum serviço encontrado</h3>
                     <p style="margin: 0; font-size: 14px;">Nenhum procedimento corresponde aos filtros ou ao termo pesquisado.</p>
                 </div>
@@ -454,27 +463,35 @@ $precoMedio = $totalServicos > 0 ? ($somaPrecos / $totalServicos) : 0;
             <?php else: ?>
                 <!-- Estado quando a tabela no banco está vazia -->
                 <div class="empty-state-wrap">
-                    <div class="empty-icon-circle">✨</div>
+                    <div class="empty-icon-svg" aria-hidden="true">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </div>
                     <h3 class="empty-title">Nenhum serviço cadastrado</h3>
-                    <p style="margin: 0; font-size: 14px;">Cadastre seu primeiro serviço utilizando o formulário acima.</p>
+                    <p style="margin: 0; font-size: 14px;">Clique em "Novo Serviço" acima para adicionar o primeiro procedimento.</p>
                 </div>
             <?php endif; ?>
         </div>
 
-        <!-- Rodapé Informativo -->
-        <div class="services-page-footer">
-            <div>
-                <strong>MB Studio Admin</strong> — Catálogo & Gerenciamento de Serviços
-            </div>
-            <div>
-                © <?= date('Y') ?> Todos os direitos reservados.
-            </div>
-        </div>
-
     </main>
+
+    <footer class="admin-panel-footer">
+        <p>&copy; <?= date('Y') ?> MB Studio. Painel Administrativo de Gestão.</p>
+    </footer>
 
     <!-- Script de Filtro Instantâneo em Tempo Real (Vanilla JS) -->
     <script>
+        function toggleNewServiceForm() {
+            const section = document.getElementById('novo-servico');
+            const btn = document.getElementById('btnToggleNewService');
+            if (!section) return;
+            const isCollapsed = section.classList.toggle('is-collapsed');
+            if (btn) btn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+            if (!isCollapsed) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const firstInput = document.getElementById('srv-nome');
+                if (firstInput) setTimeout(() => firstInput.focus(), 250);
+            }
+        }
         function filterServicesTable() {
             const searchInput = document.getElementById('searchServiceInput').value.toLowerCase().trim();
             const statusFilter = document.getElementById('statusServiceFilter').value;

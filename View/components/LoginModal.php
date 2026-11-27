@@ -26,13 +26,13 @@ $loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css
             <form id="global-login-form" onsubmit="handleAjaxLogin(event)">
                 <div class="login-form-group">
                     <label for="modal-email">Email</label>
-                    <input type="email" id="modal-email" required placeholder="seu@email.com">
+                    <input type="email" id="modal-email" required placeholder="seu@email.com" autocomplete="email">
                 </div>
                 <div class="login-form-group">
                     <label for="modal-senha">Senha</label>
-                    <input type="password" id="modal-senha" required placeholder="••••••••">
-                    <div style="text-align: right; margin-top: 5px;">
-                        <a href="#" onclick="switchModalView('view-esqueci-senha')" style="font-size: 12px; color: var(--gold-primary); text-decoration: none;">Esqueceu a senha?</a>
+                    <input type="password" id="modal-senha" required placeholder="••••••••" autocomplete="current-password">
+                    <div class="login-forgot-wrap">
+                        <a href="#" onclick="event.preventDefault(); switchModalView('view-esqueci-senha');" class="login-forgot-link">Esqueceu a senha?</a>
                     </div>
                 </div>
                 <button type="submit" class="login-modal-btn">Entrar</button>
@@ -52,15 +52,15 @@ $loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css
             <form id="global-cadastro-form" onsubmit="handleAjaxCadastro(event)">
                 <div class="login-form-group">
                     <label for="cad-nome">Nome Completo</label>
-                    <input type="text" id="cad-nome" required placeholder="Seu Nome">
+                    <input type="text" id="cad-nome" required placeholder="Seu Nome" autocomplete="name">
                 </div>
                 <div class="login-form-group">
                     <label for="cad-email">Email</label>
-                    <input type="email" id="cad-email" required placeholder="seu@email.com">
+                    <input type="email" id="cad-email" required placeholder="seu@email.com" autocomplete="email">
                 </div>
                 <div class="login-form-group">
                     <label for="cad-senha">Senha</label>
-                    <input type="password" id="cad-senha" required minlength="6" placeholder="••••••••">
+                    <input type="password" id="cad-senha" required minlength="6" placeholder="••••••••" autocomplete="new-password">
                 </div>
                 <button type="submit" class="login-modal-btn">Cadastrar</button>
                 <button type="button" class="login-modal-register-btn" onclick="switchModalView('view-login')">Já tem conta? Faça Login</button>
@@ -79,7 +79,7 @@ $loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css
             <form id="global-verificacao-form" onsubmit="handleAjaxVerificacao(event)">
                 <div class="login-form-group">
                     <label for="verificacao-codigo">Código de 6 dígitos</label>
-                    <input type="text" id="verificacao-codigo" required placeholder="000000" maxlength="6" autocomplete="off" style="letter-spacing: 5px; font-size: 24px; text-align: center; font-weight: bold;">
+                    <input type="text" id="verificacao-codigo" required placeholder="000000" maxlength="6" autocomplete="one-time-code" class="modal-code-input">
                 </div>
                 <button type="submit" class="login-modal-btn">Verificar</button>
                 <button type="button" class="login-modal-register-btn" onclick="switchModalView('view-login')">Cancelar</button>
@@ -98,7 +98,7 @@ $loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css
             <form id="global-esqueci-form" onsubmit="handleAjaxEsqueciSenha(event)">
                 <div class="login-form-group">
                     <label for="esqueci-email">Email</label>
-                    <input type="email" id="esqueci-email" required placeholder="seu@email.com">
+                    <input type="email" id="esqueci-email" required placeholder="seu@email.com" autocomplete="email">
                 </div>
                 <button type="submit" class="login-modal-btn">Enviar Código</button>
                 <button type="button" class="login-modal-register-btn" onclick="switchModalView('view-login')">Voltar para o Login</button>
@@ -118,11 +118,11 @@ $loginCssVer = @filemtime(__DIR__ . '/../../assets/css/components/loginmodal.css
                 <input type="hidden" id="redefinir-email">
                 <div class="login-form-group">
                     <label for="redefinir-codigo">Código de 6 dígitos</label>
-                    <input type="text" id="redefinir-codigo" required placeholder="000000" maxlength="6" autocomplete="off" style="letter-spacing: 5px; font-size: 24px; text-align: center; font-weight: bold;">
+                    <input type="text" id="redefinir-codigo" required placeholder="000000" maxlength="6" autocomplete="one-time-code" class="modal-code-input">
                 </div>
                 <div class="login-form-group">
                     <label for="redefinir-senha">Nova Senha</label>
-                    <input type="password" id="redefinir-senha" required minlength="6" placeholder="••••••••">
+                    <input type="password" id="redefinir-senha" required minlength="6" placeholder="••••••••" autocomplete="new-password">
                 </div>
                 <button type="submit" class="login-modal-btn">Redefinir Senha</button>
                 <button type="button" class="login-modal-register-btn" onclick="switchModalView('view-login')">Cancelar</button>
@@ -147,6 +147,7 @@ function checkAuthAndExecute(event, url) {
         const modal = document.getElementById('global-login-modal');
         switchModalView('view-login'); // sempre abre no login primeiro
         modal.classList.add('show');
+        document.body.classList.add('modal-open-locked');
     }
 }
 

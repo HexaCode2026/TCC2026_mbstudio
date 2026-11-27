@@ -48,17 +48,22 @@ function getIniciais($nome) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Equipe | MB Studio Admin</title>
+    <title>Equipe | MB Studio</title>
 
-    <link rel="stylesheet" href="../../assets/css/global.css">
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <?php
+    $globalCssVer = @filemtime(__DIR__ . '/../../assets/css/global.css') ?: '3.0';
+    $adminCssVer  = @filemtime(__DIR__ . '/../../assets/css/admin.css') ?: '3.0';
+    $funcCssVer   = @filemtime(__DIR__ . '/../../assets/css/admin/funcionarios.css') ?: '3.0';
+    ?>
+    <link rel="stylesheet" href="../../assets/css/global.css?v=<?= $globalCssVer ?>">
+    <link rel="stylesheet" href="../../assets/css/admin.css?v=<?= $adminCssVer ?>">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="../../assets/css/admin/funcionarios.css">
+    <link rel="stylesheet" href="../../assets/css/admin/funcionarios.css?v=<?= $funcCssVer ?>">
 </head>
 <body>
 
@@ -186,14 +191,14 @@ function getIniciais($nome) {
 
             <div class="filters-group">
                 <!-- Filtro por Status -->
-                <select id="statusTeamFilter" class="filter-select" onchange="filterTeamGrid()">
+                <select id="statusTeamFilter" class="filter-select" aria-label="Filtrar por status" onchange="filterTeamGrid()">
                     <option value="ALL">Todos os Status</option>
-                    <option value="1">🟢 Apenas Ativos</option>
-                    <option value="0">🔴 Apenas Inativos</option>
+                    <option value="1">Apenas Ativos</option>
+                    <option value="0">Apenas Inativos</option>
                 </select>
 
                 <!-- Filtro por Serviços Atribuídos -->
-                <select id="servicesTeamFilter" class="filter-select" onchange="filterTeamGrid()">
+                <select id="servicesTeamFilter" class="filter-select" aria-label="Filtrar por serviços atribuídos" onchange="filterTeamGrid()">
                     <option value="ALL">Todos os Serviços</option>
                     <option value="COM">Com Serviços Atribuídos</option>
                     <option value="SEM">Sem Serviços Atribuídos</option>
@@ -319,7 +324,9 @@ function getIniciais($nome) {
 
             <!-- Estado quando a pesquisa em tempo real não encontra resultados -->
             <div id="noTeamResultsMessage" class="empty-state-wrap" style="display: none; margin-top: 20px;">
-                <div class="empty-icon-circle">🔍</div>
+                <div class="empty-icon-svg" aria-hidden="true">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
                 <h3 class="empty-title">Nenhum profissional encontrado</h3>
                 <p style="margin: 0; font-size: 14px;">Nenhum membro da equipe corresponde aos filtros ou termo pesquisado.</p>
             </div>
@@ -327,23 +334,26 @@ function getIniciais($nome) {
         <?php else: ?>
             <!-- Estado quando não há funcionários cadastrados no banco -->
             <div class="empty-state-wrap">
-                <div class="empty-icon-circle">✂️</div>
-                <h3 class="empty-title">Nenhum membro na equipe</h3>
-                <p style="margin: 0; font-size: 14px;">No momento, não há usuários cadastrados com a permissão 'F' (Funcionário).</p>
+                <div class="empty-icon-svg" aria-hidden="true">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="6" cy="6" r="3"></circle>
+                        <circle cx="6" cy="18" r="3"></circle>
+                        <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                        <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                        <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <h3 class="empty-title">Nenhum profissional na equipe</h3>
+                <p style="margin: 0 auto 20px; max-width: 480px; font-size: 14px;">No momento, não há profissionais ativos na equipe do estúdio. Você pode promover um usuário cadastrado para o cargo de Profissional.</p>
+                <a href="Usuarios.php" class="btn-gold">Promover Usuário em Usuários</a>
             </div>
         <?php endif; ?>
 
-        <!-- Rodapé do Painel -->
-        <div class="team-page-footer">
-            <div>
-                <strong>MB Studio Admin</strong> — Gestão de Especialistas & Staff
-            </div>
-            <div>
-                © <?= date('Y') ?> Todos os direitos reservados.
-            </div>
-        </div>
-
     </main>
+
+    <footer class="admin-panel-footer">
+        <p>&copy; <?= date('Y') ?> MB Studio. Painel Administrativo de Gestão.</p>
+    </footer>
 
     <!-- Script de Filtro Instantâneo em Tempo Real (Vanilla JS) -->
     <script>

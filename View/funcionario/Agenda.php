@@ -286,7 +286,14 @@ if (!empty($appointments)) {
 
         <?php else: ?>
             <div class="empty-agenda-card">
-                <div class="empty-icon">📅</div>
+                <div class="empty-icon empty-icon-svg" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </div>
                 <h3>Nenhum agendamento encontrado</h3>
                 <p>Assim que os clientes realizarem agendamentos com você, eles aparecerão detalhados aqui.</p>
                 <div style="margin-top: 25px;">
@@ -298,6 +305,10 @@ if (!empty($appointments)) {
         <?php endif; ?>
 
     </main>
+
+    <footer class="panel-footer">
+        <p>&copy; <?= date('Y') ?> MB Studio. Painel do Profissional.</p>
+    </footer>
 
     <!-- Modal Finalização -->
     <div id="modalFinalizacao" class="modal-overlay" style="display: none;">

@@ -48,17 +48,22 @@ function getIniciais($nome) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciamento de Usuários | MB Studio</title>
+    <title>Usuários | MB Studio</title>
 
-    <link rel="stylesheet" href="../../assets/css/global.css">
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <?php
+    $globalCssVer   = @filemtime(__DIR__ . '/../../assets/css/global.css') ?: '3.0';
+    $adminCssVer    = @filemtime(__DIR__ . '/../../assets/css/admin.css') ?: '3.0';
+    $usuariosCssVer = @filemtime(__DIR__ . '/../../assets/css/admin/usuarios.css') ?: '3.0';
+    ?>
+    <link rel="stylesheet" href="../../assets/css/global.css?v=<?= $globalCssVer ?>">
+    <link rel="stylesheet" href="../../assets/css/admin.css?v=<?= $adminCssVer ?>">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="../../assets/css/admin/usuarios.css">
+    <link rel="stylesheet" href="../../assets/css/admin/usuarios.css?v=<?= $usuariosCssVer ?>">
 </head>
 <body>
 
@@ -192,18 +197,18 @@ function getIniciais($nome) {
 
             <div class="filters-group">
                 <!-- Filtro por Permissão -->
-                <select id="permFilter" class="filter-select" onchange="filterUsersTable()">
-                    <option value="ALL">Todas as Permissões</option>
-                    <option value="C">👤 Apenas Clientes (C)</option>
-                    <option value="F">✂️ Apenas Funcionários (F)</option>
-                    <option value="A">👑 Apenas Administradores (A)</option>
+                <select id="permFilter" class="filter-select" aria-label="Filtrar por cargo" onchange="filterUsersTable()">
+                    <option value="ALL">Todos os Cargos</option>
+                    <option value="C">Apenas Clientes</option>
+                    <option value="F">Apenas Profissionais</option>
+                    <option value="A">Apenas Administradores</option>
                 </select>
 
                 <!-- Filtro por Status -->
-                <select id="statusFilter" class="filter-select" onchange="filterUsersTable()">
+                <select id="statusFilter" class="filter-select" aria-label="Filtrar por status" onchange="filterUsersTable()">
                     <option value="ALL">Todos os Status</option>
-                    <option value="1">🟢 Apenas Ativos</option>
-                    <option value="0">🔴 Apenas Inativos</option>
+                    <option value="1">Apenas Ativos</option>
+                    <option value="0">Apenas Inativos</option>
                 </select>
             </div>
         </div>
@@ -285,16 +290,16 @@ function getIniciais($nome) {
                                                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                                     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                                 </svg>
-                                                👑 Admin (A) — Cargo Protegido
+                                                Administrador — Protegido
                                             </span>
                                         <?php else: ?>
                                             <form action="../../controller/AlterarPermissao.php" method="POST" class="perm-form-container">
                                                 <?= Session::csrfField() ?>
                                                 <input type="hidden" name="User_id" value="<?= $u['User_id'] ?>">
                                                 <select name="User_perm" class="select-luxury-perm" aria-label="Permissão do Usuário">
-                                                    <option value="C" <?= $u['User_perm'] == 'C' ? 'selected' : '' ?>>👤 Cliente (C)</option>
-                                                    <option value="F" <?= $u['User_perm'] == 'F' ? 'selected' : '' ?>>✂️ Funcionário (F)</option>
-                                                    <option value="A" <?= $u['User_perm'] == 'A' ? 'selected' : '' ?>>👑 Admin (A)</option>
+                                                    <option value="C" <?= $u['User_perm'] == 'C' ? 'selected' : '' ?>>Cliente</option>
+                                                    <option value="F" <?= $u['User_perm'] == 'F' ? 'selected' : '' ?>>Profissional</option>
+                                                    <option value="A" <?= $u['User_perm'] == 'A' ? 'selected' : '' ?>>Administrador</option>
                                                 </select>
                                                 <button type="submit" class="btn-luxury-save" title="Salvar alteração de permissão">
                                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -368,7 +373,9 @@ function getIniciais($nome) {
 
                 <!-- Estado quando a pesquisa em tempo real não encontra resultados -->
                 <div id="noSearchResultsMessage" class="empty-state-wrap" style="display: none;">
-                    <div class="empty-icon-circle">🔍</div>
+                    <div class="empty-icon-svg" aria-hidden="true">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </div>
                     <h3 class="empty-title">Nenhum usuário encontrado</h3>
                     <p style="margin: 0; font-size: 14px;">Nenhum registro corresponde aos filtros ou ao termo pesquisado.</p>
                 </div>
@@ -376,24 +383,20 @@ function getIniciais($nome) {
             <?php else: ?>
                 <!-- Estado quando a tabela no banco está completamente vazia -->
                 <div class="empty-state-wrap">
-                    <div class="empty-icon-circle">👤</div>
+                    <div class="empty-icon-svg" aria-hidden="true">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
                     <h3 class="empty-title">Nenhum usuário encontrado</h3>
                     <p style="margin: 0; font-size: 14px;">Ainda não existem usuários cadastrados no banco de dados.</p>
                 </div>
             <?php endif; ?>
         </div>
 
-        <!-- Rodapé do Painel de Usuários -->
-        <div class="users-page-footer">
-            <div>
-                <strong>MB Studio Admin</strong> — Gestão de Usuários & Acessos
-            </div>
-            <div>
-                © <?= date('Y') ?> Todos os direitos reservados.
-            </div>
-        </div>
-
     </main>
+
+    <footer class="admin-panel-footer">
+        <p>&copy; <?= date('Y') ?> MB Studio. Painel Administrativo de Gestão.</p>
+    </footer>
 
     <!-- Script de Filtro Instantâneo em Tempo Real (Vanilla JS) -->
     <script>

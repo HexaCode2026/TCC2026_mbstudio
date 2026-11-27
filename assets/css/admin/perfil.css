@@ -40,64 +40,78 @@
 }
 
 .admin-role-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 13px;
-    color: #8A6508;
-    background: #FDFAF0;
-    border: 1px solid rgba(212, 175, 55, 0.45);
+    color: var(--gold-text, #825D07);
+    background: #FAF4E4;
+    border: 1px solid rgba(184, 134, 11, 0.4);
     padding: 7px 16px;
-    border-radius: 999px;
+    border-radius: 9999px;
 }
 
 .profile-header-card {
-    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-    border-radius: 16px;
-    padding: 30px 32px;
+    background: var(--bg-card, #FFFFFF);
+    border: 1px solid var(--border, #E2E8F0);
+    border-left: 4px solid var(--gold-primary, #D4AF37);
+    border-radius: var(--radius-lg, 12px);
+    padding: clamp(24px, 3.5vw, 32px);
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 22px;
     margin-bottom: 24px;
-    border-bottom: 3px solid #D4AF37;
-    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.14);
+    box-shadow: var(--shadow-resting);
+    position: relative;
+    overflow: hidden;
 }
 
 .profile-avatar-large {
-    width: 72px;
-    height: 72px;
+    width: 68px;
+    height: 68px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #D4AF37 0%, #9A7B1C 100%);
+    background: var(--gold-gradient, linear-gradient(135deg, #D4AF37 0%, #B8860B 100%));
     color: #0F172A;
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 30px;
+    font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+    font-size: 28px;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    border: 3px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(212, 175, 55, 0.5);
+    box-shadow: var(--shadow-resting);
 }
 
 .header-tag-pill {
-    display: inline-block;
-    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    background: #FAF4E4;
+    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.38));
+    border-radius: 9999px;
+    font-size: 11.5px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #D4AF37;
-    margin-bottom: 6px;
+    color: var(--gold-text, #825D07);
+    margin-bottom: 10px;
 }
 
 .profile-main-title {
     margin: 0 0 6px 0;
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 26px;
-    color: #FFFFFF;
+    font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+    font-size: clamp(24px, 3vw, 30px);
+    color: var(--text-primary, #0F172A);
+    letter-spacing: -0.025em;
 }
 
 .profile-subtitle {
     margin: 0;
-    font-size: 14px;
-    color: #CBD5E1;
-    line-height: 1.5;
+    font-size: 14.5px;
+    color: var(--text-muted, #5A6577);
+    line-height: 1.55;
 }
 
 .profile-alert {

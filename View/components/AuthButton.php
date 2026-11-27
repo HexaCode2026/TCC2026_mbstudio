@@ -39,7 +39,7 @@ $authCssVer = @filemtime(__DIR__ . '/../../assets/css/components/authbutton.css'
             </div>
         </div>
     <?php else: ?>
-        <a href="#" onclick="document.getElementById('global-login-modal').classList.add('show'); switchModalView('view-login'); return false;" class="auth-btn">
+        <a href="#" onclick="document.getElementById('global-login-modal').classList.add('show'); document.body.classList.add('modal-open-locked'); switchModalView('view-login'); return false;" class="auth-btn">
             <div class="auth-icon" style="background: transparent; border: 1px solid #d4af37; color: #d4af37;">
                 <!-- Icone SVG de Login -->
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

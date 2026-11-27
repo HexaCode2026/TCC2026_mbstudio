@@ -31,7 +31,6 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
     <script>document.documentElement.classList.add('cliente-transitions-enabled');</script>
     <link rel="stylesheet" href="assets/css/global.css?v=<?= $globalCssVer ?>">
     <link rel="stylesheet" href="assets/css/home.css?v=<?= $homeCssVer ?>" id="theme-home-css">
-    <link rel="stylesheet" href="assets/css/cliente-transitions.css?v=<?= $transCssVer ?>">
 </head>
 
 <body class="cliente-page page-index-body">
@@ -51,9 +50,8 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
 
                 <div class="hero-content">
                     <div class="hero-badge-tag">
-                        <span class="dot"></span>
-                        <span>Beleza | Confiança | <span class="cursiva"
-                                style="text-transform: capitalize; font-size: 14px;">Elegância</span></span>
+                        <span class="dot" aria-hidden="true"></span>
+                        <span>Beleza | Confiança | <span class="cursiva hero-badge-cursiva">Elegância</span></span>
                     </div>
 
                     <h1 class="hero-title">
@@ -137,7 +135,7 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
                     <h2 class="section-title">
                         Um refúgio de <span class="cursiva-gold">beleza</span>, conforto e autenticidade
                     </h2>
-                    <div class="divider-gold" style="margin: 10px 0 25px 0;"></div>
+                    <div class="divider-gold"></div>
 
                     <p class="lead-text">
                         "Acreditamos que a beleza não segue padrões pré-definidos: ela nasce da sua identidade única e
@@ -194,24 +192,30 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
                                         <span class="icone-tesoura">✂</span>
                                     <?php endif; ?>
                                 </div>
-                                <h4><?= htmlspecialchars($s['Ser_name']) ?></h4>
+                                <h3 class="cut-title"><?= htmlspecialchars($s['Ser_name']) ?></h3>
                                 <p class="cut-desc">
                                     <?= htmlspecialchars($s['Ser_description'] ?: 'Serviço exclusivo MB Studio com produtos de alta performance.') ?>
                                 </p>
-                                <div style="margin-bottom: 12px; font-weight: 700; color: var(--gold-dark); font-size: 14px;">
-                                    R$ <?= number_format($s['Ser_price'], 2, ',', '.') ?>
-                                    <?= !empty($s['Ser_duration']) ? ' <span style="font-weight: normal; color: #888; font-size: 12px;">(' . $s['Ser_duration'] . ' min)</span>' : '' ?>
+                                <div class="cut-card-footer">
+                                    <div class="cut-meta-price">
+                                        <span>R$ <?= number_format($s['Ser_price'], 2, ',', '.') ?></span>
+                                        <?php if ((int)($s['Ser_duration'] ?? 0) > 0): ?>
+                                            <span class="cut-duration">(<?= (int)$s['Ser_duration'] ?> min)</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <a href="#"
+                                        onclick="checkAuthAndExecute(event, 'View/cliente/Data.php?Ser_id=<?= $s['Ser_id'] ?>')"
+                                        class="btn-outline-gold">Agendar</a>
                                 </div>
-                                <a href="#"
-                                    onclick="checkAuthAndExecute(event, 'View/cliente/Data.php?Ser_id=<?= $s['Ser_id'] ?>')"
-                                    class="btn-outline-gold">Agendar</a>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <p style="color:#888; width: 100%; text-align: center; margin: 30px 0; font-style: italic;">No momento,
-                        não
-                        temos serviços cadastrados.</p>
+                    <div class="empty-state-card">
+                        <div class="empty-state-icon" aria-hidden="true">✂</div>
+                        <h3 class="empty-state-title">Catálogo em preparação</h3>
+                        <p class="empty-state-desc">No momento, não temos serviços cadastrados para exibição.</p>
+                    </div>
                 <?php endif; ?>
             </div>
         </section>
@@ -261,9 +265,11 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <p style="color:#aaa; width: 100%; text-align: center; margin: 30px 0; font-style: italic;">No momento,
-                        não
-                        temos profissionais cadastrados.</p>
+                    <div class="empty-state-card empty-state-card--dark">
+                        <div class="empty-state-icon" aria-hidden="true">✦</div>
+                        <h3 class="empty-state-title">Equipe em atualização</h3>
+                        <p class="empty-state-desc">No momento, não temos profissionais cadastrados para exibição.</p>
+                    </div>
                 <?php endif; ?>
 
                 <a href="View/cliente/Funcionarios.php" class="btn-gold">
@@ -316,7 +322,7 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
                                         </div>
                                         <a href="#"
                                             onclick="checkAuthAndExecute(event, 'View/cliente/Data.php?Ser_id=<?= $n['Ser_id'] ?>')"
-                                            class="btn-gold" style="padding: 8px 18px; font-size: 12px;">
+                                            class="btn-gold news-cta-btn">
                                             Agendar
                                         </a>
                                     </div>
@@ -325,9 +331,11 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <p style="color:#666; width: 100%; text-align: center; margin: 30px 0; font-style: italic;">No momento,
-                        não
-                        há novidades cadastradas.</p>
+                    <div class="empty-state-card">
+                        <div class="empty-state-icon" aria-hidden="true">✦</div>
+                        <h3 class="empty-state-title">Em breve novidades</h3>
+                        <p class="empty-state-desc">No momento, não há lançamentos cadastrados.</p>
+                    </div>
                 <?php endif; ?>
             </div>
         </section>
@@ -337,8 +345,8 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
          ================================================================= -->
         <section class="luxury-cta-banner">
             <div class="cta-banner-content">
-                <span class="section-tag" style="color: var(--gold-light);">Viva a Experiência</span>
-                <h2 class="cta-banner-title" style="color:#ffffff;">
+                <span class="section-tag">Viva a Experiência</span>
+                <h2 class="cta-banner-title">
                     Pronta para realçar sua melhor <span class="cursiva-gold">versão</span>?
                 </h2>
                 <p class="cta-banner-desc">
@@ -346,8 +354,7 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
                     sua
                     preferência.
                 </p>
-                <a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Servicos.php')" class="btn-gold"
-                    style="font-size: 15px; padding: 16px 42px;">
+                <a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Servicos.php')" class="btn-gold cta-banner-btn">
                     AGENDE SEU HORÁRIO AGORA
                 </a>
             </div>
@@ -355,78 +362,7 @@ $transCssVer  = @filemtime(__DIR__ . '/assets/css/cliente-transitions.css') ?: '
 
         </main>
 
-        <!-- =================================================================
-         7. RODAPÉ DE ALTO PADRÃO (FOOTER)
-         ================================================================= -->
-        <footer class="salon-footer" id="contato">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <h4 style="display: flex; align-items: center; gap: 8px;">
-                        <span style="color: var(--gold-primary); font-size: 20px;">✦</span> MB STUDIO
-                    </h4>
-                    <p>
-                        Referência em sofisticação, visagismo e cuidados com a beleza feminina. Um espaço feito para
-                        valorizar a sua autoestima com excelência e carinho.
-                    </p>
-                    <div class="footer-social-links">
-                        <a href="https://www.instagram.com/maison.bellestudio/" target="_blank" rel="noopener noreferrer" class="social-icon-btn"
-                            title="Instagram" aria-label="Instagram do MB Studio">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                            </svg>
-                        </a>
-                        <a href="https://wa.me/5511991075433?text=Olá, gostaria de agendar um horário" target="_blank" rel="noopener noreferrer"
-                            class="social-icon-btn" title="WhatsApp" aria-label="WhatsApp do MB Studio">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path
-                                    d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
-                                </path>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Navegação</h4>
-                    <ul class="footer-links">
-                        <li><a href="Index.php">Início</a></li>
-                        <li><a href="View/cliente/Servicos.php">Nossos Serviços</a></li>
-                        <li><a href="View/cliente/Funcionarios.php">Nossa Equipe</a></li>
-                        <li><a href="#" onclick="checkAuthAndExecute(event, 'View/cliente/Servicos.php')">Agendamento
-                                Online</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Horário de Funcionamento</h4>
-                    <p style="margin-bottom: 6px;"><strong>Terça a Sexta:</strong></p>
-                    <p style="color: var(--gold-light); margin-bottom: 12px;">09h00 às 19h00</p>
-                    <p style="margin-bottom: 6px;"><strong>Sábados:</strong></p>
-                    <p style="color: var(--gold-light);">08h30 às 18h00</p>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Localização</h4>
-                    <p>
-                        Rua Mangaratiba, 449 - Vila Santo Antônio<br>
-                        São Paulo - SP
-                    </p>
-                    <p style="color: var(--gold-light);">
-                        (11) 99107-5433<br>
-                        cidapedroso@terra.com.br
-                    </p>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p>&copy; <?= date('Y') ?> MB Studio. Todos os direitos reservados.</p>
-                <p>Elegância e Beleza em Cada Detalhe.</p>
-            </div>
-        </footer>
+        <?php include __DIR__ . '/View/components/Footer.php'; ?>
     </div><!-- /.page-content-wrapper -->
 
     <!-- Modal Global de Login / Cadastro -->

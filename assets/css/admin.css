@@ -19,14 +19,15 @@ body {
     box-sizing: border-box;
 }
 
-/* Header & Welcome Box */
+/* Header & Welcome Box (Padrão Unificado para Todas as Telas Admin) */
 .admin-welcome-card {
     background: var(--bg-card, #FFFFFF);
     border: 1px solid var(--border, #E2E8F0);
+    border-left: 4px solid var(--gold-primary, #D4AF37);
     border-radius: var(--radius-lg, 12px);
-    padding: clamp(24px, 4vw, 36px) clamp(24px, 4vw, 40px);
+    padding: clamp(24px, 3.5vw, 34px) clamp(22px, 3.5vw, 36px);
     box-shadow: var(--shadow-resting);
-    margin-bottom: 36px;
+    margin-bottom: 32px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -41,7 +42,7 @@ body {
     position: absolute;
     right: 28px;
     bottom: -20px;
-    font-size: 120px;
+    font-size: 112px;
     color: rgba(184, 134, 11, 0.04);
     pointer-events: none;
     font-family: serif;
@@ -52,10 +53,10 @@ body {
     align-items: center;
     gap: 8px;
     padding: 5px 14px;
-    background: var(--gold-lighter, #FDFAF0);
-    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.35));
+    background: #FAF4E4;
+    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.38));
     border-radius: var(--radius-full, 9999px);
-    color: var(--gold-darker, #8A6508);
+    color: var(--gold-text, #825D07);
     font-size: 11.5px;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -65,7 +66,7 @@ body {
 
 .welcome-title {
     font-family: var(--font-heading, 'Playfair Display', serif);
-    font-size: clamp(26px, 3.2vw, 34px);
+    font-size: clamp(24px, 3.2vw, 34px);
     font-weight: 700;
     color: var(--text-primary, #0F172A);
     letter-spacing: -0.025em;
@@ -74,11 +75,42 @@ body {
 }
 
 .welcome-subtitle {
-    font-size: 15px;
-    color: var(--text-muted, #64748B);
+    font-size: 14.5px;
+    color: var(--text-muted, #5A6577);
     max-width: 680px;
     line-height: 1.55;
     margin: 0;
+}
+
+.welcome-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.btn-profile-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #FAF4E4;
+    color: var(--gold-text, #825D07);
+    border: 1px solid var(--gold-border-strong, rgba(184, 134, 11, 0.65));
+    padding: 10px 20px;
+    border-radius: var(--radius-md, 8px);
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: var(--shadow-resting);
+    transition: all var(--transition-fast, 150ms ease);
+}
+
+.btn-profile-top:hover {
+    background: var(--gold-gradient);
+    color: #0F172A;
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-gold);
 }
 
 .btn-logout-top {
@@ -103,6 +135,29 @@ body {
     border-color: #FCA5A5;
     transform: translateY(-1px);
     box-shadow: var(--shadow-hover);
+}
+
+.admin-flash-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 14px 18px;
+    border-radius: var(--radius-md, 8px);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.admin-flash-alert--success {
+    background: var(--color-success-bg, #ECFDF5);
+    border: 1px solid var(--color-success-border, #A7F3D0);
+    color: var(--color-success, #047857);
+}
+
+.admin-flash-alert--error {
+    background: var(--color-error-bg, #FEF2F2);
+    border: 1px solid var(--color-error-border, #FECACA);
+    color: var(--color-error, #B91C1C);
 }
 
 /* =========================================
@@ -132,7 +187,7 @@ body {
 
 .metrics-grid-six {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
     margin-bottom: 44px;
 }
@@ -149,12 +204,14 @@ body {
     justify-content: space-between;
     position: relative;
     overflow: hidden;
+    text-decoration: none;
+    color: inherit;
 }
 
 .metric-card-white:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-hover);
-    border-color: var(--gold-border, rgba(212, 175, 55, 0.4));
+    border-color: var(--gold-border-strong, rgba(184, 134, 11, 0.65));
 }
 
 .metric-card-header {
@@ -168,22 +225,22 @@ body {
     width: 44px;
     height: 44px;
     border-radius: var(--radius-md, 8px);
-    background: var(--gold-lighter, #FDFAF0);
-    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.3));
+    background: #FAF4E4;
+    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.35));
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--gold-darker, #8A6508);
+    color: var(--gold-text, #825D07);
 }
 
 .metric-tag-label {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--gold-darker, #8A6508);
-    background: var(--gold-lighter, #FDFAF0);
-    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.25));
+    color: var(--gold-text, #825D07);
+    background: #FAF4E4;
+    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.35));
     padding: 4px 10px;
     border-radius: var(--radius-full, 9999px);
 }
@@ -191,7 +248,7 @@ body {
 .metric-title {
     font-size: 13.5px;
     font-weight: 600;
-    color: var(--text-muted, #64748B);
+    color: var(--text-muted, #5A6577);
     margin-bottom: 4px;
 }
 
@@ -203,21 +260,22 @@ body {
     letter-spacing: -0.025em;
     line-height: 1.1;
     margin-bottom: 6px;
+    font-variant-numeric: tabular-nums;
 }
 
 .metric-description {
     font-size: 12.5px;
-    color: var(--text-muted, #64748B);
+    color: var(--text-muted, #5A6577);
     line-height: 1.45;
     margin: 0;
 }
 
 /* =========================================
-   SEÇÃO DE GERENCIAMENTO (AÇÕES RÁPIDAS)
+   SEÇÃO DE GERENCIAMENTO (AÇÕES RÁPIDAS 3x2)
    ========================================= */
 .management-grid-four {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
     margin-bottom: 40px;
 }
@@ -324,6 +382,13 @@ body {
 /* =========================================
    RESPONSIVIDADE & ERGONOMIA MOBILE
    ========================================= */
+@media (max-width: 960px) {
+    .metrics-grid-six,
+    .management-grid-four {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 768px) {
     .admin-dashboard-wrapper {
         padding: 20px 16px 60px;
@@ -339,8 +404,13 @@ body {
         gap: 16px;
     }
 
-    .btn-logout-top {
+    .welcome-actions {
         width: 100%;
+    }
+
+    .btn-profile-top,
+    .btn-logout-top {
+        flex: 1;
         min-height: 44px;
         justify-content: center;
     }

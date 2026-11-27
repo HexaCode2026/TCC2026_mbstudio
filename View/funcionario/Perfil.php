@@ -225,6 +225,7 @@ $funcCssVer   = @filemtime(__DIR__ . '/../../assets/css/funcionario.css') ?: '3.
                                     id="nome" 
                                     name="nome" 
                                     class="form-input" 
+                                    autocomplete="name"
                                     required 
                                     maxlength="100" 
                                     value="<?= htmlspecialchars($dadosFuncionario['User_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
@@ -246,6 +247,7 @@ $funcCssVer   = @filemtime(__DIR__ . '/../../assets/css/funcionario.css') ?: '3.
                                     id="email" 
                                     name="email" 
                                     class="form-input" 
+                                    autocomplete="email"
                                     required 
                                     maxlength="150" 
                                     value="<?= htmlspecialchars($dadosFuncionario['User_email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
@@ -414,6 +416,10 @@ $funcCssVer   = @filemtime(__DIR__ . '/../../assets/css/funcionario.css') ?: '3.
         </div>
 
     </main>
+
+    <footer class="panel-footer">
+        <p>&copy; <?= date('Y') ?> MB Studio. Painel do Profissional.</p>
+    </footer>
 
 
     <!-- Preview da Foto de Perfil -->

@@ -41,7 +41,7 @@ $imgCssVer    = @filemtime(__DIR__ . '/../../assets/css/admin/imagens.css') ?: '
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciar Imagens | Painel Admin MB Studio</title>
+    <title>Imagens | MB Studio</title>
 
     <link rel="stylesheet" href="../../assets/css/global.css?v=<?= $globalCssVer ?>">
     <link rel="stylesheet" href="../../assets/css/admin.css?v=<?= $adminCssVer ?>">
@@ -216,7 +216,7 @@ $imgCssVer    = @filemtime(__DIR__ . '/../../assets/css/admin/imagens.css') ?: '
 
                                     <div class="form-field-box">
                                         <label for="slide-img-<?= (int)$slide['Img_id'] ?>">Substituir Foto (Opcional)</label>
-                                        <input type="file" id="slide-img-<?= (int)$slide['Img_id'] ?>" name="imagem" accept="image/*" class="input-admin-clean" style="font-size: 12.5px; padding: 7px 10px;">
+                                        <input type="file" id="slide-img-<?= (int)$slide['Img_id'] ?>" name="imagem" accept="image/*" class="input-admin-clean">
                                     </div>
 
                                     <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer;">
@@ -293,7 +293,7 @@ $imgCssVer    = @filemtime(__DIR__ . '/../../assets/css/admin/imagens.css') ?: '
                                     <?= Session::csrfField() ?>
                                     <input type="hidden" name="acao" value="atualizar_servico">
                                     <input type="hidden" name="Ser_id" value="<?= (int)$srv['Ser_id'] ?>">
-                                    <input type="file" name="imagem_servico" accept="image/*" required class="input-admin-clean" style="font-size: 12px; padding: 7px 10px;">
+                                    <input type="file" name="imagem_servico" accept="image/*" required class="input-admin-clean">
                                     <button type="submit" class="btn-outline-sm" style="width: 100%;">
                                         Atualizar Foto do Serviço
                                     </button>
@@ -306,6 +306,10 @@ $imgCssVer    = @filemtime(__DIR__ . '/../../assets/css/admin/imagens.css') ?: '
         </section>
 
     </main>
+
+    <footer class="admin-panel-footer">
+        <p>&copy; <?= date('Y') ?> MB Studio. Painel Administrativo de Gestão.</p>
+    </footer>
 </body>
 
 </html>

@@ -21,7 +21,7 @@ html {
     view-transition-name: site-header;
     opacity: 1 !important;
     visibility: visible !important;
-    z-index: 9999 !important;
+    z-index: var(--z-sticky, 100) !important;
 }
 
 /* O Conteúdo da Página abaixo do cabeçalho mapeado para cada tela */

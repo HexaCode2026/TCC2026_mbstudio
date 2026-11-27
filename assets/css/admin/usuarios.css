@@ -59,14 +59,15 @@
             box-shadow: var(--shadow-hover);
         }
 
-        /* Banner de Título */
+        /* Banner de Título (Padrão Unificado Admin) */
         .users-header-card {
             background: var(--bg-card, #FFFFFF);
             border: 1px solid var(--border, #E2E8F0);
+            border-left: 4px solid var(--gold-primary, #D4AF37);
             border-radius: var(--radius-lg, 12px);
-            padding: 30px 35px;
+            padding: clamp(22px, 3.5vw, 32px);
             box-shadow: var(--shadow-resting);
-            margin-bottom: 35px;
+            margin-bottom: 28px;
             position: relative;
             overflow: hidden;
             display: flex;
@@ -77,13 +78,14 @@
         }
 
         .users-header-card::after {
-            content: '👥';
+            content: '✦';
             position: absolute;
             right: 25px;
-            bottom: -15px;
-            font-size: 100px;
-            opacity: 0.05;
+            bottom: -20px;
+            font-size: 110px;
+            color: rgba(184, 134, 11, 0.04);
             pointer-events: none;
+            font-family: serif;
         }
 
         .header-tag-pill {
@@ -91,10 +93,10 @@
             align-items: center;
             gap: 6px;
             padding: 5px 14px;
-            background: var(--gold-lighter, #FDFAF0);
+            background: #FAF4E4;
             border: 1px solid var(--gold-border);
-            border-radius: 30px;
-            color: var(--gold-dark);
+            border-radius: 9999px;
+            color: var(--gold-text, #825D07);
             font-size: 11.5px;
             font-weight: 700;
             letter-spacing: 0.06em;
@@ -407,12 +409,12 @@
             background-color: #EF4444;
         }
 
-        /* Formulário de Permissão */
+        /* Formulário de Permissão (Select + Salvar sempre alinhados horizontalmente) */
         .perm-form-container {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
         }
 
         .select-luxury-perm {
@@ -617,12 +619,17 @@
 
         @media (max-width: 640px) {
             .top-nav-bar {
-                flex-direction: column;
-                align-items: stretch;
+                flex-direction: row;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 16px;
             }
 
             .btn-back-dashboard,
             .btn-add-user-top {
-                width: 100%;
+                width: auto;
+                padding: 8px 14px;
+                min-height: 40px;
+                font-size: 13px;
             }
         }

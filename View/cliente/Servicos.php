@@ -27,75 +27,91 @@ $servicos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- Cabeçalho Oficial do Projeto -->
     <?php include '../components/Header.php'; ?>
 
-    <main class="servicos-page">
+    <div class="page-content-wrapper" id="page-content">
+        <main class="servicos-page">
 
-        <!-- Decorações Finas de Fundo -->
-        <div class="decoracao decoracao-esquerda"></div>
-        <div class="decoracao decoracao-direita"></div>
+            <!-- Decorações Finas de Fundo -->
+            <div class="decoracao decoracao-esquerda" aria-hidden="true"></div>
+            <div class="decoracao decoracao-direita" aria-hidden="true"></div>
 
-        <!-- Seção de Introdução -->
-        <section class="intro">
-            <div class="intro-text">
-                <span class="subtitulo">
-                    NOSSOS SERVIÇOS
-                </span>
+            <!-- Seção de Introdução -->
+            <section class="intro">
+                <div class="intro-text">
+                    <span class="subtitulo">
+                        NOSSOS SERVIÇOS
+                    </span>
 
-                <h1>
-                    Cuidado e <span>beleza</span><br>
-                    para todos os estilos.
-                </h1>
+                    <h1>
+                        Cuidado e <span>beleza</span><br>
+                        para todos os estilos.
+                    </h1>
 
-                <div class="linha-titulo"></div>
+                    <div class="linha-titulo"></div>
 
-                <p>
-                    Serviços de qualidade para realçar<br>
-                    a sua beleza no dia a dia.
-                </p>
-            </div>
+                    <p>
+                        Serviços de qualidade para realçar<br>
+                        a sua beleza no dia a dia.
+                    </p>
+                </div>
 
-            <!-- Ilustração Temática -->
-            <div class="ilustracao" aria-hidden="true">
-                <div class="tesoura">✂</div>
-                <div class="pente">║</div>
-                <div class="secador">◯</div>
-                <div class="brilho brilho-1">✧</div>
-                <div class="brilho brilho-2">✧</div>
-            </div>
-        </section>
-
-        <!-- Grid de Serviços Dinâmicos do Banco de Dados -->
-        <?php if (count($servicos) > 0): ?>
-            <section class="servicos-grid" id="catalogo-servicos">
-                <?php foreach ($servicos as $s): ?>
-                    <!-- Card de Serviço Clicável que Redireciona para o Agendamento -->
-                    <a href="#" onclick="checkAuthAndExecute(event, 'Data.php?Ser_id=<?= $s['Ser_id'] ?>')" class="servico-card" title="Clique para agendar <?= htmlspecialchars($s['Ser_name']) ?>">
-                        
-                        <div class="servico-icone">
-                            <?php if (!empty($s['Ser_image'])): ?>
-                                <img src="../../<?= htmlspecialchars($s['Ser_image']) ?>" alt="<?= htmlspecialchars($s['Ser_name']) ?>">
-                            <?php else: ?>
-                                <span class="icone-tesoura">✂</span>
-                            <?php endif; ?>
-                        </div>
-
-                        <h2><?= htmlspecialchars($s['Ser_name']) ?></h2>
-
-                        <?php if (!empty($s['Ser_description'])): ?>
-                            <p class="desc-servico"><?= htmlspecialchars($s['Ser_description']) ?></p>
-                        <?php endif; ?>
-
-                        <div class="servico-info-meta">
-                            <span class="meta-preco"><strong>Preço:</strong> R$ <?= number_format($s['Ser_price'], 2, ',', '.') ?></span>
-                            <span class="meta-duracao"><strong>Tempo:</strong> <?= $s['Ser_duration'] ?> min</span>
-                        </div>
-                    </a>
-                <?php endforeach; ?>
+                <!-- Ilustração Temática -->
+                <div class="ilustracao" aria-hidden="true">
+                    <div class="tesoura">✂</div>
+                    <div class="pente">║</div>
+                    <div class="secador">◯</div>
+                    <div class="brilho brilho-1">✧</div>
+                    <div class="brilho brilho-2">✧</div>
+                </div>
             </section>
-        <?php else: ?>
-            <p style="text-align: center; padding: 40px; color: #666;">No momento, não há serviços disponíveis.</p>
-        <?php endif; ?>
 
-    </main>
+            <!-- Grid de Serviços Dinâmicos do Banco de Dados -->
+            <?php if (count($servicos) > 0): ?>
+                <section class="servicos-grid" id="catalogo-servicos">
+                    <?php foreach ($servicos as $s): ?>
+                        <!-- Card de Serviço Clicável que Redireciona para o Agendamento -->
+                        <a href="#" onclick="checkAuthAndExecute(event, 'Data.php?Ser_id=<?= $s['Ser_id'] ?>')" class="servico-card" title="Clique para agendar <?= htmlspecialchars($s['Ser_name']) ?>">
+                            
+                            <div class="servico-icone">
+                                <?php if (!empty($s['Ser_image'])): ?>
+                                    <img src="../../<?= htmlspecialchars($s['Ser_image']) ?>" alt="<?= htmlspecialchars($s['Ser_name']) ?>">
+                                <?php else: ?>
+                                    <span class="icone-tesoura" aria-hidden="true">✂</span>
+                                <?php endif; ?>
+                            </div>
+
+                            <h2><?= htmlspecialchars($s['Ser_name']) ?></h2>
+
+                            <?php if (!empty($s['Ser_description'])): ?>
+                                <p class="desc-servico"><?= htmlspecialchars($s['Ser_description']) ?></p>
+                            <?php endif; ?>
+
+                            <div class="servico-card-footer">
+                                <div class="servico-info-meta">
+                                    <span class="meta-preco"><strong>Preço:</strong> R$ <?= number_format($s['Ser_price'], 2, ',', '.') ?></span>
+                                    <?php if ((int)($s['Ser_duration'] ?? 0) > 0): ?>
+                                        <span class="meta-duracao"><strong>Tempo:</strong> <?= (int)$s['Ser_duration'] ?> min</span>
+                                    <?php endif; ?>
+                                </div>
+                                <span class="servico-card-cta">
+                                    Agendar horário <span class="servico-card-cta-arrow" aria-hidden="true">→</span>
+                                </span>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                </section>
+            <?php else: ?>
+                <div class="empty-state-card">
+                    <div class="empty-state-icon" aria-hidden="true">✂</div>
+                    <h2 class="empty-state-title">Nenhum serviço disponível</h2>
+                    <p class="empty-state-desc">No momento, não há serviços disponíveis para agendamento online.</p>
+                    <a href="../../Index.php" class="btn-outline">Voltar para o Início</a>
+                </div>
+            <?php endif; ?>
+
+        </main>
+
+        <?php include '../components/Footer.php'; ?>
+    </div>
 
     <!-- Modal Global de Login / Cadastro -->
     <?php include '../components/LoginModal.php'; ?>

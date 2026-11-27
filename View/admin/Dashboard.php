@@ -32,13 +32,15 @@ $erroFlash    = Session::getFlash('error');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo | MB Studio</title>
 
-    <link rel="stylesheet" href="../../assets/css/global.css">
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <?php
+    $globalCssVer = @filemtime(__DIR__ . '/../../assets/css/global.css') ?: '3.0';
+    $adminCssVer  = @filemtime(__DIR__ . '/../../assets/css/admin.css') ?: '3.0';
+    ?>
+    <link rel="stylesheet" href="../../assets/css/global.css?v=<?= $globalCssVer ?>">
+    <link rel="stylesheet" href="../../assets/css/admin.css?v=<?= $adminCssVer ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="../../assets/css/admin/dashboard.css">
 </head>
 
 <body>
@@ -48,14 +50,16 @@ $erroFlash    = Session::getFlash('error');
     <main class="admin-dashboard-wrapper">
 
         <?php if (!empty($sucessoFlash)): ?>
-            <div style="margin-bottom: 20px; padding: 14px 18px; border-radius: 12px; background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; font-size: 14px; font-weight: 600;">
-                ✅ <?= htmlspecialchars($sucessoFlash) ?>
+            <div class="admin-flash-alert admin-flash-alert--success" role="status">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span><?= htmlspecialchars($sucessoFlash) ?></span>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($erroFlash)): ?>
-            <div style="margin-bottom: 20px; padding: 14px 18px; border-radius: 12px; background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; font-size: 14px; font-weight: 600;">
-                ⚠️ <?= htmlspecialchars($erroFlash) ?>
+            <div class="admin-flash-alert admin-flash-alert--error" role="alert">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span><?= htmlspecialchars($erroFlash) ?></span>
             </div>
         <?php endif; ?>
 
@@ -73,8 +77,8 @@ $erroFlash    = Session::getFlash('error');
                 </p>
             </div>
 
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <a href="Perfil.php" class="btn-logout-top" style="border-color: rgba(212, 175, 55, 0.5); color: #D4AF37;" title="Meu Perfil Administrativo">
+            <div class="welcome-actions">
+                <a href="Perfil.php" class="btn-profile-top" title="Meu Perfil Administrativo">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
@@ -103,7 +107,7 @@ $erroFlash    = Session::getFlash('error');
 
             <div class="metrics-grid-six">
                 <!-- 1. Usuários -->
-                <div class="metric-card-white">
+                <a href="Usuarios.php" class="metric-card-white" title="Abrir gestão de usuários">
                     <div class="metric-card-header">
                         <div class="metric-icon-wrap">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -120,10 +124,10 @@ $erroFlash    = Session::getFlash('error');
                         <div class="metric-number"><?= htmlspecialchars($usuarios) ?></div>
                         <p class="metric-description">Contas cadastradas no sistema do MB Studio.</p>
                     </div>
-                </div>
+                </a>
 
                 <!-- 2. Clientes -->
-                <div class="metric-card-white">
+                <a href="Usuarios.php" class="metric-card-white" title="Ver clientes cadastrados">
                     <div class="metric-card-header">
                         <div class="metric-icon-wrap">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -138,10 +142,10 @@ $erroFlash    = Session::getFlash('error');
                         <div class="metric-number"><?= htmlspecialchars($clientes) ?></div>
                         <p class="metric-description">Clientes cadastrados e aptos para agendar horários.</p>
                     </div>
-                </div>
+                </a>
 
                 <!-- 3. Funcionários -->
-                <div class="metric-card-white">
+                <a href="Funcionarios.php" class="metric-card-white" title="Gerenciar equipe de profissionais">
                     <div class="metric-card-header">
                         <div class="metric-icon-wrap">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -159,10 +163,10 @@ $erroFlash    = Session::getFlash('error');
                         <div class="metric-number"><?= htmlspecialchars($funcionarios) ?></div>
                         <p class="metric-description">Profissionais da beleza atuantes no estúdio.</p>
                     </div>
-                </div>
+                </a>
 
                 <!-- 4. Administradores -->
-                <div class="metric-card-white">
+                <a href="Usuarios.php" class="metric-card-white" title="Ver contas administrativas">
                     <div class="metric-card-header">
                         <div class="metric-icon-wrap">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -176,10 +180,10 @@ $erroFlash    = Session::getFlash('error');
                         <div class="metric-number"><?= htmlspecialchars($administradores) ?></div>
                         <p class="metric-description">Gestores com acesso total ao painel de controle.</p>
                     </div>
-                </div>
+                </a>
 
                 <!-- 5. Serviços -->
-                <div class="metric-card-white">
+                <a href="Servicos.php" class="metric-card-white" title="Gerenciar catálogo de serviços">
                     <div class="metric-card-header">
                         <div class="metric-icon-wrap">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -193,10 +197,10 @@ $erroFlash    = Session::getFlash('error');
                         <div class="metric-number"><?= htmlspecialchars($servicos) ?></div>
                         <p class="metric-description">Procedimentos de beleza ativos no catálogo.</p>
                     </div>
-                </div>
+                </a>
 
                 <!-- 6. Agendamentos -->
-                <div class="metric-card-white">
+                <a href="Agenda.php" class="metric-card-white" title="Ver agenda global de atendimentos">
                     <div class="metric-card-header">
                         <div class="metric-icon-wrap">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -213,7 +217,7 @@ $erroFlash    = Session::getFlash('error');
                         <div class="metric-number"><?= htmlspecialchars($agendamentos) ?></div>
                         <p class="metric-description">Agendamentos registrados no histórico do salão.</p>
                     </div>
-                </div>
+                </a>
             </div>
         </section>
 
@@ -226,7 +230,7 @@ $erroFlash    = Session::getFlash('error');
                 <p class="section-desc-admin">Selecione uma área abaixo para cadastrar, editar ou gerenciar os dados do salão.</p>
             </div>
 
-            <div class="management-grid-four" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+            <div class="management-grid-four">
                 <!-- Card 0: Atendimentos/Agenda -->
                 <a href="Agenda.php" class="action-card-link">
                     <div class="action-icon-circle">

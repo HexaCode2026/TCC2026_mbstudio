@@ -208,6 +208,42 @@ body {
     gap: 14px;
 }
 
+.quick-presets-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.quick-presets-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted, #5A6577);
+}
+
+.btn-preset-chip {
+    padding: 6px 11px;
+    min-height: 32px !important;
+    min-width: auto !important;
+    border-radius: 9999px;
+    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.38));
+    background: var(--gold-lighter, #FDFAF0);
+    color: var(--gold-text, #825D07);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.btn-preset-chip:hover {
+    background: var(--gold-gradient);
+    border-color: transparent;
+    color: #0F172A;
+}
+
 .form-group {
     margin-bottom: 18px;
     display: flex;

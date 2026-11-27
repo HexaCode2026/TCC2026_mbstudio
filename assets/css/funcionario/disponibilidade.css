@@ -182,7 +182,7 @@ body {
 .calendario-semana,
 .calendario-dias {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 6px;
     text-align: center;
 }
@@ -197,11 +197,14 @@ body {
     color: #334155;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    min-width: 0;
 }
 
 .calendario-dias button {
     width: 100%;
+    min-width: 0 !important;
     min-height: 42px;
+    padding: 0;
     border: 1.5px solid #CBD5E1;
     border-radius: 8px;
     background: #FFFFFF;
@@ -215,16 +218,16 @@ body {
 
 .calendario-dias button:hover:not(:disabled) {
     background: #FEFCE8;
-    border-color: #B8860B;
-    color: #8A6508;
+    border-color: var(--gold-dark, #8A6508);
+    color: var(--gold-text, #825D07);
     transform: translateY(-1px);
 }
 
 .calendario-dias button:disabled {
     background: #F1F5F9;
     border-color: #E2E8F0;
-    color: #94A3B8;
-    opacity: 0.6;
+    color: #64748B;
+    opacity: 0.72;
     cursor: not-allowed;
 }
 
@@ -449,8 +452,8 @@ body {
 #btnSalvar:disabled {
     background: #E2E8F0;
     border-color: #CBD5E1;
-    color: #64748B;
-    opacity: 0.75;
+    color: #475569;
+    opacity: 0.85;
     cursor: not-allowed;
     box-shadow: none;
 }
@@ -787,6 +790,56 @@ body {
 }
 
 @media (max-width: 640px) {
+    .pagina-disponibilidade {
+        padding: 20px 12px 56px;
+    }
+
+    .disp-top-nav {
+        margin-bottom: 16px;
+        gap: 8px;
+    }
+
+    .disp-top-nav .btn-back-link {
+        padding: 8px 14px;
+        min-height: 40px;
+        font-size: 13px;
+    }
+
+    .disp-main-card,
+    .cadastro-grid-card,
+    .secao-cadastradas {
+        padding: 16px 12px;
+    }
+
+    .calendario-container,
+    .cards,
+    .coluna-direita {
+        padding: 14px 10px;
+    }
+
+    .calendario-semana,
+    .calendario-dias {
+        gap: 4px;
+    }
+
+    .calendario-semana span {
+        font-size: 10px;
+        letter-spacing: 0.02em;
+    }
+
+    .calendario-dias button {
+        min-height: 38px;
+        font-size: 13px;
+        border-radius: 6px;
+    }
+
+    .calendario-btn {
+        width: 36px;
+        height: 36px;
+        min-width: 36px !important;
+        min-height: 36px !important;
+    }
+
     .area-horarios {
         grid-template-columns: 1fr;
     }

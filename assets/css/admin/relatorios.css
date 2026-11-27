@@ -79,6 +79,96 @@
     box-shadow: var(--shadow-gold);
 }
 
+.report-presets-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 16px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--border, #E2E8F0);
+}
+
+.report-presets-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.report-presets-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted, #5A6577);
+}
+
+.btn-period-chip {
+    padding: 6px 12px;
+    min-height: 34px !important;
+    min-width: auto !important;
+    border-radius: var(--radius-full, 9999px);
+    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.38));
+    background: #FAF4E4;
+    color: var(--gold-text, #825D07);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.btn-period-chip:hover {
+    background: var(--gold-gradient);
+    border-color: transparent;
+    color: #0F172A;
+}
+
+/* Grid Executivo Principal (2 KPIs destaque) */
+.report-kpi-primary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Grade Compacta de Distribuição por Status */
+.report-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.report-status-chip-card {
+    background: var(--bg-card, #FFFFFF);
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: var(--radius-md, 8px);
+    padding: 14px 16px;
+    box-shadow: var(--shadow-resting);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.report-status-chip-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-secondary, #334155);
+    line-height: 1.3;
+}
+
+.report-status-chip-val {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary, #0F172A);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+}
+
 /* Grid de Métricas do Relatório */
 .metrics-grid-report {
     display: grid;
@@ -189,7 +279,22 @@
         font-size: 16px !important;
     }
 
-    .metrics-grid-report {
+    .metrics-grid-report,
+    .report-kpi-primary-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media print {
+    .main-header,
+    .report-filter-card,
+    .welcome-actions,
+    .admin-panel-footer {
+        display: none !important;
+    }
+
+    body {
+        padding-top: 0 !important;
+        background: #FFFFFF !important;
     }
 }

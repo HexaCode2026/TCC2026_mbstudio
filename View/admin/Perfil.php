@@ -28,7 +28,7 @@ $perfilCssVer = @filemtime(__DIR__ . '/../../assets/css/admin/perfil.css') ?: '1
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Perfil Administrativo | MB Studio</title>
+    <title>Meu Perfil | MB Studio</title>
 
     <link rel="stylesheet" href="<?= $basePath ?>/assets/css/global.css?v=<?= $globalCssVer ?>">
     <link rel="stylesheet" href="<?= $basePath ?>/assets/css/admin.css?v=<?= $adminCssVer ?>">
@@ -55,7 +55,10 @@ $perfilCssVer = @filemtime(__DIR__ . '/../../assets/css/admin/perfil.css') ?: '1
             </a>
 
             <div class="admin-role-pill">
-                <span>👑 Permissão: <strong>Administrador</strong></span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <span>Permissão: <strong>Administrador</strong></span>
             </div>
         </div>
 
@@ -119,6 +122,7 @@ $perfilCssVer = @filemtime(__DIR__ . '/../../assets/css/admin/perfil.css') ?: '1
                                 id="User_name"
                                 name="User_name"
                                 value="<?= htmlspecialchars($dadosAdmin['User_name']) ?>"
+                                autocomplete="name"
                                 required
                                 minlength="3"
                                 maxlength="100"
@@ -131,7 +135,7 @@ $perfilCssVer = @filemtime(__DIR__ . '/../../assets/css/admin/perfil.css') ?: '1
                         <div class="profile-form-group">
                             <label for="User_email_readonly">
                                 E-mail de Login
-                                <span class="locked-field-tag">🔒 Protegido (Somente Leitura)</span>
+                                <span class="locked-field-tag">Protegido (Somente Leitura)</span>
                             </label>
                             <input
                                 type="email"
@@ -176,6 +180,7 @@ $perfilCssVer = @filemtime(__DIR__ . '/../../assets/css/admin/perfil.css') ?: '1
                             type="password"
                             id="senha_atual"
                             name="senha_atual"
+                            autocomplete="current-password"
                             class="profile-input"
                             placeholder="Digite sua senha atual"
                         >
@@ -188,6 +193,7 @@ $perfilCssVer = @filemtime(__DIR__ . '/../../assets/css/admin/perfil.css') ?: '1
                                 type="password"
                                 id="nova_senha"
                                 name="nova_senha"
+                                autocomplete="new-password"
                                 minlength="8"
                                 class="profile-input"
                                 placeholder="Nova senha segura"
@@ -200,6 +206,7 @@ $perfilCssVer = @filemtime(__DIR__ . '/../../assets/css/admin/perfil.css') ?: '1
                                 type="password"
                                 id="confirmar_senha"
                                 name="confirmar_senha"
+                                autocomplete="new-password"
                                 minlength="8"
                                 class="profile-input"
                                 placeholder="Repita a nova senha"
@@ -221,6 +228,10 @@ $perfilCssVer = @filemtime(__DIR__ . '/../../assets/css/admin/perfil.css') ?: '1
         </div>
 
     </main>
+
+    <footer class="admin-panel-footer">
+        <p>&copy; <?= date('Y') ?> MB Studio. Painel Administrativo de Gestão.</p>
+    </footer>
 
 </body>
 </html>

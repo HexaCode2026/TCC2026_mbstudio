@@ -40,9 +40,9 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: var(--gold-soft, rgba(212, 175, 55, 0.12));
-    color: var(--color-primary, #B8860B);
-    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.35));
+    background: #FAF4E4;
+    color: var(--gold-text, #825D07);
+    border: 1px solid var(--gold-border, rgba(212, 175, 55, 0.38));
     padding: 5px 14px;
     border-radius: var(--radius-full, 9999px);
     font-size: 11.5px;
